@@ -1,0 +1,92 @@
+%% 상징기호
+aud1m04 SymbolMyoungjo04-Normal <aud004.pfb
+aud1mo04 SymbolMyoungjo04-Normal " .167 SlantFont " <aud004.pfb
+aud1m05 SymbolMyoungjo05-Normal <aud005.pfb
+aud1mo05 SymbolMyoungjo05-Normal " .167 SlantFont " <aud005.pfb
+aud1m06 SymbolMyoungjo06-Normal <aud006.pfb
+aud1mo06 SymbolMyoungjo06-Normal " .167 SlantFont " <aud006.pfb
+aud1m07 SymbolMyoungjo07-Normal <aud007.pfb
+aud1mo07 SymbolMyoungjo07-Normal " .167 SlantFont " <aud007.pfb
+%% 한글 완성형
+pkmjm0 HangulMyoungjoA-Regular <pkmjm0.pfb
+pkmjmo0 HangulMyoungjoA-Regular " .167 SlantFont " <pkmjm0.pfb
+pkmjm1 HangulMyoungjoB-Regular <pkmjm1.pfb
+pkmjmo1 HangulMyoungjoB-Regular " .167 SlantFont " <pkmjm1.pfb
+pkmjm2 HangulMyoungjoC-Regular <pkmjm2.pfb
+pkmjmo2 HangulMyoungjoC-Regular " .167 SlantFont " <pkmjm2.pfb
+pkmjm3 HangulMyoungjoD-Regular <pkmjm3.pfb
+pkmjmo3 HangulMyoungjoD-Regular " .167 SlantFont " <pkmjm3.pfb
+pkmjm4 HangulMyoungjoE-Regular <pkmjm4.pfb
+pkmjmo4 HangulMyoungjoE-Regular " .167 SlantFont " <pkmjm4.pfb
+pkmjm5 HangulMyoungjoF-Regular <pkmjm5.pfb
+pkmjmo5 HangulMyoungjoF-Regular " .167 SlantFont " <pkmjm5.pfb
+pkmjm6 HangulMyoungjoG-Regular <pkmjm6.pfb
+pkmjmo6 HangulMyoungjoG-Regular " .167 SlantFont " <pkmjm6.pfb
+pkmjm7 HangulMyoungjoH-Regular <pkmjm7.pfb
+pkmjmo7 HangulMyoungjoH-Regular " .167 SlantFont " <pkmjm7.pfb
+pkmjm8 HangulMyoungjoI-Regular <pkmjm8.pfb
+pkmjmo8 HangulMyoungjoI-Regular " .167 SlantFont " <pkmjm8.pfb
+pkmjm9 HangulMyoungjoJ-Regular <pkmjm9.pfb
+pkmjmo9 HangulMyoungjoJ-Regular " .167 SlantFont " <pkmjm9.pfb
+pkol0 HangulMyoungjoA-Regular " /PaintType 2 store " <pkmjm0.pfb
+pkolo0 HangulMyoungjoA-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm0.pfb
+pkol1 HangulMyoungjoB-Regular " /PaintType 2 store " <pkmjm1.pfb
+pkolo1 HangulMyoungjoB-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm1.pfb
+pkol2 HangulMyoungjoC-Regular " /PaintType 2 store " <pkmjm2.pfb
+pkolo2 HangulMyoungjoC-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm2.pfb
+pkol3 HangulMyoungjoD-Regular " /PaintType 2 store " <pkmjm3.pfb
+pkolo3 HangulMyoungjoD-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm3.pfb
+pkol4 HangulMyoungjoE-Regular " /PaintType 2 store " <pkmjm4.pfb
+pkolo4 HangulMyoungjoE-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm4.pfb
+pkol5 HangulMyoungjoF-Regular " /PaintType 2 store " <pkmjm5.pfb
+pkolo5 HangulMyoungjoF-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm5.pfb
+pkol6 HangulMyoungjoG-Regular " /PaintType 2 store " <pkmjm6.pfb
+pkolo6 HangulMyoungjoG-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm6.pfb
+pkol7 HangulMyoungjoH-Regular " /PaintType 2 store " <pkmjm7.pfb
+pkolo7 HangulMyoungjoH-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm7.pfb
+pkol8 HangulMyoungjoI-Regular " /PaintType 2 store " <pkmjm8.pfb
+pkolo8 HangulMyoungjoI-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm8.pfb
+pkol9 HangulMyoungjoJ-Regular " /PaintType 2 store " <pkmjm9.pfb
+pkolo9 HangulMyoungjoJ-Regular " .167 SlantFont " " /PaintType 2 store " <pkmjm9.pfb
+%% 한자
+aud1m10 HanjaMyoungjo10-Normal <aud010.pfb
+aud1mo10 HanjaMyoungjo10-Normal " .167 SlantFont " <aud010.pfb
+aud1m11 HanjaMyoungjo11-Normal <aud011.pfb
+aud1mo11 HanjaMyoungjo11-Normal " .167 SlantFont " <aud011.pfb
+aud1m12 HanjaMyoungjo12-Normal <aud012.pfb
+aud1mo12 HanjaMyoungjo12-Normal " .167 SlantFont " <aud012.pfb
+aud1m13 HanjaMyoungjo13-Normal <aud013.pfb
+aud1mo13 HanjaMyoungjo13-Normal " .167 SlantFont " <aud013.pfb
+aud1m14 HanjaMyoungjo14-Normal <aud014.pfb
+aud1mo14 HanjaMyoungjo14-Normal " .167 SlantFont " <aud014.pfb
+aud1m15 HanjaMyoungjo15-Normal <aud015.pfb
+aud1mo15 HanjaMyoungjo15-Normal " .167 SlantFont " <aud015.pfb
+aud1m16 HanjaMyoungjo16-Normal <aud016.pfb
+aud1mo16 HanjaMyoungjo16-Normal " .167 SlantFont " <aud016.pfb
+aud1m17 HanjaMyoungjo17-Normal <aud017.pfb
+aud1mo17 HanjaMyoungjo17-Normal " .167 SlantFont " <aud017.pfb
+aud1m18 HanjaMyoungjo18-Normal <aud018.pfb
+aud1mo18 HanjaMyoungjo18-Normal " .167 SlantFont " <aud018.pfb
+aud1m19 HanjaMyoungjo19-Normal <aud019.pfb
+aud1mo19 HanjaMyoungjo19-Normal " .167 SlantFont " <aud019.pfb
+aud1m20 HanjaMyoungjo20-Normal <aud020.pfb
+aud1mo20 HanjaMyoungjo20-Normal " .167 SlantFont " <aud020.pfb
+aud1m21 HanjaMyoungjo21-Normal <aud021.pfb
+aud1mo21 HanjaMyoungjo21-Normal " .167 SlantFont " <aud021.pfb
+aud1m22 HanjaMyoungjo22-Normal <aud022.pfb
+aud1mo22 HanjaMyoungjo22-Normal " .167 SlantFont " <aud022.pfb
+aud1m23 HanjaMyoungjo23-Normal <aud023.pfb
+aud1mo23 HanjaMyoungjo23-Normal " .167 SlantFont " <aud023.pfb
+aud1m24 HanjaMyoungjo24-Normal <aud024.pfb
+aud1mo24 HanjaMyoungjo24-Normal " .167 SlantFont " <aud024.pfb
+aud1m25 HanjaMyoungjo25-Normal <aud025.pfb
+aud1mo25 HanjaMyoungjo25-Normal " .167 SlantFont " <aud025.pfb
+aud1m26 HanjaMyoungjo26-Normal <aud026.pfb
+aud1mo26 HanjaMyoungjo26-Normal " .167 SlantFont " <aud026.pfb
+aud1m27 HanjaMyoungjo27-Normal <aud027.pfb
+aud1mo27 HanjaMyoungjo27-Normal " .167 SlantFont " <aud027.pfb
+aud1m28 HanjaMyoungjo28-Normal <aud028.pfb
+aud1mo28 HanjaMyoungjo28-Normal " .167 SlantFont " <aud028.pfb
+aud1m29 HanjaMyoungjo29-Normal <aud029.pfb
+aud1mo29 HanjaMyoungjo29-Normal " .167 SlantFont " <aud029.pfb
+%%

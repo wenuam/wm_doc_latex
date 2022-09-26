@@ -1,0 +1,11 @@
+% this is for the ttex package
+dbtt DBThaiText  <dbtt.pfb
+dbttb DBThaiTextBold  <dbttb.pfb
+dbttbi DBThaiTextBoldItalic  <dbttbi.pfb
+dbtti DBThaiTextItalic  <dbtti.pfb
+
+% this is for the CJK package
+fdbr8z DBThaiText " dbttThaiEncoding ReEncodeFont " <dbtt.enc <dbtt.pfb
+fdbb8z DBThaiTextBold " dbttThaiEncoding ReEncodeFont " <dbtt.enc <dbttb.pfb
+fdbo8z DBThaiTextItalic " dbttThaiEncoding ReEncodeFont " <dbtt.enc <dbtti.pfb
+fdbbo8z DBThaiTextBoldItalic " dbttThaiEncoding ReEncodeFont " <dbtt.enc <dbttbi.pfb
