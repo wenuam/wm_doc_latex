@@ -11,4 +11,4 @@ set "PATH=%PATH: ;=;%"
 set "PATH=%PATH:; =;%"
 
 rem Generate PDF file (those arguments allows the magic to happen)
-pdflatex -shell-escape -synctex=1 -interaction=nonstopmode --extra-mem-top=10000000 "%~1"
+pdflatex -shell-escape -synctex=1 -interaction=nonstopmode --extra-mem-top=10000000  -file-line-error -max-print-line=8190 "%~1"
