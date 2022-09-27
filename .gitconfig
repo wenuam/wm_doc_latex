@@ -1,0 +1,15 @@
+[http]
+	postBuffer = 1048576000
+	maxRequestBuffer = 128m
+	lowSpeedLimit = 0
+	lowSpeedTime = 999999
+[ssh]
+	postBuffer = 512m
+[core]
+	compression = 0
+	packedGitLimit = 512m 
+	packedGitWindowSize = 512m 
+[pack] 
+	deltaCacheSize = 2047m 
+	packSizeLimit = 2047m 
+	windowMemory = 2047m

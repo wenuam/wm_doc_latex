@@ -1,0 +1,18 @@
+# https://github.com/github/gitignore
+
+__pycache__/
+miktex/texmfs/data/miktex/data/le/pdftex/
+miktex/texmfs/data/miktex/log/
+Thumbs.db
+
+# Local files
+#.gitignore
+decompose.bat
+fSplit.exe
+
+# Too large files
+#node.exe
+chrome.dll
+interactive_ui_tests.exe
+#electron.exe
+pandoc.exe
