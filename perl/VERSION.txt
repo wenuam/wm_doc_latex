@@ -1,0 +1,1 @@
+perl (Strawberry Perl portable 5.32.1.1 / 210124)
