@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{carlito}
-    [2014/08/20 (Bob Tennent)  Supports Carlito fonts for LaTeX, pdfLaTeX, luaLaTeX and xeLaTeX.]
+    [2022/10/05 (Bob Tennent)  Supports Carlito fonts for LaTeX, pdfLaTeX, luaLaTeX and xeLaTeX.]
 
 \RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
 
@@ -69,7 +69,6 @@
 \fi
 
 \ifcarlito@fontspec
-  \ifxetex\XeTeXtracingfonts=1\fi
   \defaultfontfeatures{
         Ligatures = TeX ,
         Scale     = \Carlito@scale ,
@@ -128,14 +127,14 @@
   \providecommand\infigures{\addfontfeatures{VerticalPosition=ScientificInferior}}
 
 \else 
-  \def\carlitofamily{Carlito-\carlito@figurealign\carlito@figurestyle}
+  \def\carlitofamily{Crlt-\carlito@figurealign\carlito@figurestyle}
   \newcommand*\carlito{\fontfamily{\carlitofamily}\selectfont}
   \def\sfdefault{\carlitofamily}
   \ifcarlito@default\edef\familydefault{\sfdefault}\fi
-  \newcommand*\carlitoOsF{\fontfamily{Carlito-OsF}\selectfont}
-  \newcommand*\carlitoLF{\fontfamily{Carlito-LF}\selectfont}
-  \newcommand*\carlitoTLF{\fontfamily{Carlito-TLF}\selectfont}
-  \newcommand*\carlitoTOsF{\fontfamily{Carlito-TOsF}\selectfont}
+  \newcommand*\carlitoOsF{\fontfamily{Crlt-OsF}\selectfont}
+  \newcommand*\carlitoLF{\fontfamily{Crlt-LF}\selectfont}
+  \newcommand*\carlitoTLF{\fontfamily{Crlt-TLF}\selectfont}
+  \newcommand*\carlitoTOsF{\fontfamily{Crlt-TOsF}\selectfont}
 
   \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
   \fa@naming@exception{figures}{{superior}{tabular}}{Sup}

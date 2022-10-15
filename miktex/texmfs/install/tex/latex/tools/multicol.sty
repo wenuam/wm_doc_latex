@@ -12,7 +12,7 @@
 %% reports for it can be opened at https://latex-project.org/bugs/
 %% (but please observe conditions on bug reports sent to that address!)
 %% 
-%% Copyright (C) 1993-2021
+%% Copyright (C) 1993-2022
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 %% 
@@ -104,10 +104,11 @@
 \providecommand\DeclareCurrentRelease[2]{}
 
 \DeclareRelease{}{2017-04-11}{multicol-2017-04-11.sty}
-\DeclareCurrentRelease{}{2018-04-01}
+\DeclareRelease{v1.8}{2019-10-01}{multicol-2019-10-01.sty}
+\DeclareCurrentRelease{}{2021-11-15}
 
 \ProvidesPackage{multicol}
-          [2021/10/28 v1.9b  multicolumn formatting (FMi)]
+          [2021/11/30 v1.9d  multicolumn formatting (FMi)]
 %%
 \DeclareOption{twocolumn}
    {\PackageWarning{multicol}{May not work
@@ -1023,7 +1024,7 @@
      a multicols or multicols* environment.}%
   \else
     \ifvmode
-     \nobreak\vfill\penalty -\@Mv\relax
+     \nobreak\vfill\kern\z@\penalty -\@Mv\relax
    \else
      \@bsphack
      \vadjust{\nobreak\vfill\kern\z@\penalty -\@Mv\relax}%

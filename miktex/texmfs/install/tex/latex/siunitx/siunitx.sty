@@ -42,7 +42,7 @@
       }%
     \endinput
   }%
-\ProvidesExplPackage {siunitx} {2022-09-07} {3.1.7}
+\ProvidesExplPackage {siunitx} {2022-10-04} {3.1.8}
   {A comprehensive (SI) units package}
 \msg_new:nnnn { siunitx } { incompatible-package }
   { Package~'#1'~incompatible. }
@@ -3070,7 +3070,9 @@
 \cs_generate_variant:Nn \__siunitx_number_round_final:nn { f }
 \cs_new:Npn \__siunitx_number_round_final_shift:nn #1#2
   {
-    \str_if_eq:VnTF \l__siunitx_number_round_mode_tl { places }
+    \bool_lazy_or:nnTF
+      { \str_if_eq_p:Vn \l__siunitx_number_round_mode_tl { figures } }
+      { \str_if_eq_p:Vn \l__siunitx_number_round_mode_tl { places } }
       {
         \use:c
           { __siunitx_number_round_ \l__siunitx_number_exponent_mode_tl :nn }
@@ -3083,7 +3085,11 @@
   {
     \int_compare:nNnTF { \tl_count:n {#1} } = 4
       {
-        \__siunitx_number_round_engineering:NNNNn #1 {#2}
+        \bool_lazy_and:nnTF
+          { \int_compare_p:nNn \l__siunitx_number_round_precision_int = 1 }
+          { \str_if_eq_p:Vn \l__siunitx_number_round_mode_tl { figures } }
+          { { 1 } { } }
+          { \__siunitx_number_round_engineering:NNNNn #1 {#2} }
         \__siunitx_number_round_final_shift:Nw 3
       }
       { {#1} {#2} }
@@ -3092,7 +3098,7 @@
   {
     {#1}
     \exp_args:NV \__siunitx_number_round_engineering:nnN
-      { \l__siunitx_number_round_precision_int } { }
+      \l__siunitx_number_round_precision_int { }
       #2#3#4#5 \q_recursion_tail \q_recursion_stop
   }
 \cs_new:Npn \__siunitx_number_round_engineering:nnN #1#2#3
@@ -3106,11 +3112,17 @@
 \cs_new:Npn \__siunitx_number_round_input:nn #1#2 { {#1} {#2} }
 \cs_new:Npn \__siunitx_number_round_scientific:nn #1#2
   {
-    \__siunitx_number_exponent_shift:nnf
-      { 1 } {#1} { \__siunitx_number_round_truncate_direct:n {#2} }
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn \l__siunitx_number_round_precision_int = 1 }
+      { \str_if_eq_p:Vn \l__siunitx_number_round_mode_tl { figures } }
+      { { 1 } { } }
+      {
+        \__siunitx_number_exponent_shift:nnf
+          { 1 } {#1} { \__siunitx_number_round_truncate_direct:n {#2} }
+      }
     \__siunitx_number_round_final_shift:Nw 1
   }
-\cs_new:Npn \__siunitx_number_round_final_shift:Nw #1#2 \__siunitx_number_round_places_end:nnn #3#4#5
+\cs_new:Npn \__siunitx_number_round_final_shift:Nw #1#2 \__siunitx_number_round_end:nnn #3#4#5
   {
     \exp_not:n { {#3} }
     \__siunitx_number_exponent_finalise:n { #4#5 + #1 }
@@ -3157,6 +3169,7 @@
         { \prg_replicate:nn {#1} { 0 } }
     }
   }
+\cs_new:Npn \__siunitx_number_round_end:nnn #1#2#3 { \exp_not:n { {#1} {#2} {#3} } }
 \cs_new:Npn \__siunitx_number_round_figures:nnnnnnn #1#2#3#4#5#6#7
   {
     \bool_lazy_and:nnTF
@@ -3177,7 +3190,7 @@
             \exp_not:n { {#1} {#2} }
             \__siunitx_number_round_figures_count:nnN {#3} {#4} #3#4
               \q_recursion_tail \q_recursion_stop
-            \exp_not:n { { } {#6} {#7} }
+            \__siunitx_number_round_end:nnn { } {#6} {#7}
           }
           { { } { } { 0 } { } { } { } { 0 } }
       }
@@ -3220,12 +3233,11 @@
               { \__siunitx_number_round_places_decimal:nn }
               { \__siunitx_number_round_places_integer:nn }
                 {#3} {#4}
-            \__siunitx_number_round_places_end:nnn { } {#6} {#7}
+            \__siunitx_number_round_end:nnn { } {#6} {#7}
           }
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
-\cs_new:Npn \__siunitx_number_round_places_end:nnn #1#2#3 { \exp_not:n { {#1} {#2} {#3} } }
 \cs_new:Npn \__siunitx_number_round_places_decimal:nn #1#2
   {
     \int_compare:nNnTF
@@ -3419,7 +3431,7 @@
     \use:c
       { __siunitx_number_round_ \l__siunitx_number_exponent_mode_tl :nn }
         {#2} {#3}
-    \__siunitx_number_round_places_end:nnn { { S } { 1 #1 } } {#4} {#5}
+    \__siunitx_number_round_end:nnn { { S } { 1 #1 } } {#4} {#5}
   }
 \cs_new:Npn \__siunitx_number_round_uncertainty_engineering:nnn #1#2#3
   {

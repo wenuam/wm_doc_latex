@@ -96,24 +96,17 @@
 \DisableBabelHook{babel-fontspec}
 \bbl@trace{Font handling with fontspec}
 \ifx\ExplSyntaxOn\@undefined\else
-  \ExplSyntaxOn
-  \catcode`\ =10
+  \def\bbl@fs@warn@nx#1#2{% \bbl@tempfs is the original macro
+    \in@{,#1,}{,no-script,language-not-exist,}%
+    \ifin@\else\bbl@tempfs@nx{#1}{#2}\fi}
+  \def\bbl@fs@warn@nxx#1#2#3{%
+    \in@{,#1,}{,no-script,language-not-exist,}%
+    \ifin@\else\bbl@tempfs@nxx{#1}{#2}{#3}\fi}
   \def\bbl@loadfontspec{%
-    \usepackage{fontspec}%  TODO. Apply patch always
-    \expandafter
-    \def\csname msg~text~>~fontspec/language-not-exist\endcsname##1##2##3##4{%
-      Font '\l_fontspec_fontname_tl' is using the\\%
-      default features for language '##1'.\\%
-      That's usually fine, because many languages\\%
-      require no specific features, but if the output is\\%
-      not as expected, consider selecting another font.}
-    \expandafter
-    \def\csname msg~text~>~fontspec/no-script\endcsname##1##2##3##4{%
-      Font '\l_fontspec_fontname_tl' is using the\\%
-      default features for script '##2'.\\%
-      That's not always wrong, but if the output is\\%
-      not as expected, consider selecting another font.}}
-  \ExplSyntaxOff
+    \let\bbl@loadfontspec\relax
+    \ifx\fontspec\@undefined
+      \usepackage{fontspec}%
+    \fi}%
 \fi
 \@onlypreamble\babelfont
 \newcommand\babelfont[2][]{%  1=langs/scripts 2=fam
@@ -125,9 +118,7 @@
     \fi}%
   \edef\bbl@tempa{#1}%
   \def\bbl@tempb{#2}%  Used by \bbl@bblfont
-  \ifx\fontspec\@undefined
-    \bbl@loadfontspec
-  \fi
+  \bbl@loadfontspec
   \EnableBabelHook{babel-fontspec}% Just calls \bbl@switchfont
   \bbl@bblfont}
 \newcommand\bbl@bblfont[2][]{% 1=features 2=fontname, @font=rm|sf|tt
@@ -250,8 +241,15 @@
       {\\\newfontscript{\bbl@cl{sname}}{\bbl@cl{sotf}}}%
     \<keys_if_exist:nnF>{fontspec-opentype}{Language/\bbl@cl{lname}}%
       {\\\newfontlanguage{\bbl@cl{lname}}{\bbl@cl{lotf}}}%
+    \let\\\bbl@tempfs@nx\<__fontspec_warning:nx>%
+    \let\<__fontspec_warning:nx>\\\bbl@fs@warn@nx
+    \let\\\bbl@tempfs@nxx\<__fontspec_warning:nxx>%
+    \let\<__fontspec_warning:nxx>\\\bbl@fs@warn@nxx
     \\\renewfontfamily\\#4%
       [\bbl@cl{lsys},#2]}{#3}% ie \bbl@exp{..}{#3}
+  \bbl@exp{%
+    \let\<__fontspec_warning:nx>\\\bbl@tempfs@nx
+    \let\<__fontspec_warning:nxx>\\\bbl@tempfs@nxx}%
   \begingroup
      #4%
      \xdef#1{\f@family}%     eg, \bbl@rmdflt@lang{FreeSerif(0)}

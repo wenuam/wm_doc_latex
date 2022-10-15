@@ -36,6 +36,7 @@
 Babel.linebreaking.replacements = {}
 Babel.linebreaking.replacements[0] = {}  -- pre
 Babel.linebreaking.replacements[1] = {}  -- post
+Babel.linebreaking.replacements[2] = {}  -- post-line WIP
 
 -- Discretionaries contain strings as nodes
 function Babel.str_to_nodes(fn, matches, base)
@@ -187,6 +188,7 @@ Babel.us_char = string.char(31)
 function Babel.hyphenate_replace(head, mode)
   local u = unicode.utf8
   local lbkr = Babel.linebreaking.replacements[mode]
+  if mode == 2 then mode = 0 end -- WIP
 
   local word_head = head
 

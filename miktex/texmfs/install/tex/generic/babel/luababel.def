@@ -808,24 +808,17 @@ end
 \DisableBabelHook{babel-fontspec}
 \bbl@trace{Font handling with fontspec}
 \ifx\ExplSyntaxOn\@undefined\else
-  \ExplSyntaxOn
-  \catcode`\ =10
+  \def\bbl@fs@warn@nx#1#2{% \bbl@tempfs is the original macro
+    \in@{,#1,}{,no-script,language-not-exist,}%
+    \ifin@\else\bbl@tempfs@nx{#1}{#2}\fi}
+  \def\bbl@fs@warn@nxx#1#2#3{%
+    \in@{,#1,}{,no-script,language-not-exist,}%
+    \ifin@\else\bbl@tempfs@nxx{#1}{#2}{#3}\fi}
   \def\bbl@loadfontspec{%
-    \usepackage{fontspec}%  TODO. Apply patch always
-    \expandafter
-    \def\csname msg~text~>~fontspec/language-not-exist\endcsname##1##2##3##4{%
-      Font '\l_fontspec_fontname_tl' is using the\\%
-      default features for language '##1'.\\%
-      That's usually fine, because many languages\\%
-      require no specific features, but if the output is\\%
-      not as expected, consider selecting another font.}
-    \expandafter
-    \def\csname msg~text~>~fontspec/no-script\endcsname##1##2##3##4{%
-      Font '\l_fontspec_fontname_tl' is using the\\%
-      default features for script '##2'.\\%
-      That's not always wrong, but if the output is\\%
-      not as expected, consider selecting another font.}}
-  \ExplSyntaxOff
+    \let\bbl@loadfontspec\relax
+    \ifx\fontspec\@undefined
+      \usepackage{fontspec}%
+    \fi}%
 \fi
 \@onlypreamble\babelfont
 \newcommand\babelfont[2][]{%  1=langs/scripts 2=fam
@@ -837,9 +830,7 @@ end
     \fi}%
   \edef\bbl@tempa{#1}%
   \def\bbl@tempb{#2}%  Used by \bbl@bblfont
-  \ifx\fontspec\@undefined
-    \bbl@loadfontspec
-  \fi
+  \bbl@loadfontspec
   \EnableBabelHook{babel-fontspec}% Just calls \bbl@switchfont
   \bbl@bblfont}
 \newcommand\bbl@bblfont[2][]{% 1=features 2=fontname, @font=rm|sf|tt
@@ -962,8 +953,15 @@ end
       {\\\newfontscript{\bbl@cl{sname}}{\bbl@cl{sotf}}}%
     \<keys_if_exist:nnF>{fontspec-opentype}{Language/\bbl@cl{lname}}%
       {\\\newfontlanguage{\bbl@cl{lname}}{\bbl@cl{lotf}}}%
+    \let\\\bbl@tempfs@nx\<__fontspec_warning:nx>%
+    \let\<__fontspec_warning:nx>\\\bbl@fs@warn@nx
+    \let\\\bbl@tempfs@nxx\<__fontspec_warning:nxx>%
+    \let\<__fontspec_warning:nxx>\\\bbl@fs@warn@nxx
     \\\renewfontfamily\\#4%
       [\bbl@cl{lsys},#2]}{#3}% ie \bbl@exp{..}{#3}
+  \bbl@exp{%
+    \let\<__fontspec_warning:nx>\\\bbl@tempfs@nx
+    \let\<__fontspec_warning:nxx>\\\bbl@tempfs@nxx}%
   \begingroup
      #4%
      \xdef#1{\f@family}%     eg, \bbl@rmdflt@lang{FreeSerif(0)}
@@ -1062,6 +1060,11 @@ function Babel.locale_map(head)
           (item.char >= 0x1DC0 and item.char <= 0x1DFF) then
         toloc = toloc_save
       end
+      if toloc and Babel.locale_props[toloc] and
+          Babel.locale_props[toloc].letters and
+          tex.getcatcode(item.char) \string~= 11 then
+        toloc = nil
+      end
       if toloc and toloc > -1 then
         if Babel.locale_props[toloc].lg then
           item.lang = Babel.locale_props[toloc].lg
@@ -1072,7 +1075,7 @@ function Babel.locale_map(head)
         end
         toloc_save = toloc
       end
-    elseif not inmath and item.id == 7 then
+    elseif not inmath and item.id == 7 then % Apply recursively
       item.replace = item.replace and Babel.locale_map(item.replace)
       item.pre     = item.pre and Babel.locale_map(item.pre)
       item.post    = item.post and Babel.locale_map(item.post)
@@ -1140,10 +1143,11 @@ end
   \@ifnextchar[{\bbl@settransform{0}}{\bbl@settransform{0}[]}}
 \gdef\babelposthyphenation{&%
   \@ifnextchar[{\bbl@settransform{1}}{\bbl@settransform{1}[]}}
+\gdef\bbl@postlinebreak{\bbl@settransform{2}[]} &% WIP
 \gdef\bbl@settransform#1[#2]#3#4#5{&%
   \ifcase#1
     \bbl@activateprehyphen
-  \else
+  \or
     \bbl@activateposthyphen
   \fi
   \begingroup
@@ -1159,7 +1163,7 @@ end
            rep = rep:gsub('^%s*(remove)%s*$', 'remove = true')
            rep = rep:gsub('^%s*(insert)%s*,', 'insert = true, ')
            rep = rep:gsub('(string)%s*=%s*([^%s,]*)', Babel.capture_func)
-           if #1 == 0 then
+           if #1 == 0 or #1 == 2 then
              rep = rep:gsub('(space)%s*=%s*([%d%.]+)%s+([%d%.]+)%s+([%d%.]+)',
                'space = {' .. '%2, %3, %4' .. '}')
              rep = rep:gsub('(spacefactor)%s*=%s*([%d%.]+)%s+([%d%.]+)%s+([%d%.]+)',
@@ -1172,6 +1176,16 @@ end
            end
            tex.print([[\string\babeltempa{{]] .. rep .. [[}}]])
          }}}&%
+    \bbl@foreach\babeltempb{&%
+      \bbl@forkv{{##1}}{&%
+        \in@{,####1,}{,nil,step,data,remove,insert,string,no,pre,&%
+            no,post,penalty,kashida,space,spacefactor,}&%
+        \ifin@\else
+          \bbl@error
+           {Bad option '####1' in a transform.\\&%
+            I’ll ignore it but expect more errors}&%
+           {See the manual for further info.}&%
+        \fi}}&%
     \let\bbl@kv@attribute\relax
     \let\bbl@kv@label\relax
     \bbl@forkv{#2}{\bbl@csarg\edef{kv@##1}{##2}}&%
@@ -1182,7 +1196,7 @@ end
       local lbkr = Babel.linebreaking.replacements[#1]
       local u = unicode.utf8
       local id, attr, label
-      if #1 == 0 then
+      if #1 == 0 or #1 == 2 then
         id = \the\csname bbl@id@@#3\endcsname\space
       else
         id = \the\csname l@#3\endcsname\space
@@ -1197,7 +1211,7 @@ end
       \fi
       &% Convert pattern:
       local patt = string.gsub([==[#4]==], '%s', '')
-      if #1 == 0 then
+      if #1 == 0 or #1 == 2 then
         patt = string.gsub(patt, '|', ' ')
       end
       if not u.find(patt, '()', nil, true) then
