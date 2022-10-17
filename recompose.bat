@@ -18,7 +18,7 @@ rem	)
 )
 cd "..\.."
 
-cd "nvm\v16.13.0\node_modules\@mermaid-js\mermaid-cli\node_modules\puppeteer\.local-chromium\win64-901912\chrome-win"
+cd "nvm\v16.13.0\node_modules\@mermaid-js\mermaid-cli\node_modules\puppeteer-core\.local-chromium\win64-1045629\chrome-win"
 if exist "chrome.dll.001" (
 rem	if not exist "chrome.dll" (
 		copy /y /b "chrome.dll.001"+"chrome.dll.002"+"chrome.dll.003"+"chrome.dll.004" "chrome.dll"
