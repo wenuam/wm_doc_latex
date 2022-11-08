@@ -2,7 +2,9 @@
 
 LaTeX executables and templates to generate PDF files
 
+```
 /!\ First run `recompose.bat` to recompose "LFS" files
+```
 
 * To use it
   - Open a file explorer window (`Win+e`) on this folder/repository
@@ -34,3 +36,7 @@ LaTeX executables and templates to generate PDF files
   - [transparent](https://ctan.org/pkg/transparent) (transparency)
   - [wavedrom](https://wavedrom.com/editor.html) (signal diagram)
   - ...
+
+* Home
+
+https://github.com/wenuam/wm_doc_latex
