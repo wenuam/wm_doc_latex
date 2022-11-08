@@ -1,4 +1,4 @@
-@echo off
+@echo off && setlocal enabledelayedexpansion && chcp 65001>nul
 
 rem Set destination folder as current folder (current if no drag'n drop)
 if "%~1"=="" (

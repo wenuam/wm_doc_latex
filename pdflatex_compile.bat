@@ -1,4 +1,4 @@
-@echo off
+@echo off && setlocal enabledelayedexpansion && chcp 65001>nul
 
 rem Change default helpers
 set "quiet=1>nul 2>nul"

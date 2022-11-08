@@ -1,4 +1,4 @@
-@echo off
+@echo off && setlocal enabledelayedexpansion && chcp 65001>nul
 
 rem Set this batch's folder as current folder (in case of drag'n drop use)
 set "cd=%~dp0"
