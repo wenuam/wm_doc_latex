@@ -5,8 +5,13 @@ miktex/texmfs/data/miktex/data/le/pdftex/
 miktex/texmfs/data/miktex/log/
 Thumbs.db
 
+nvm/v16.18.0/
+nvm/v18.11.0/
+nvm_cmd_v16.18.0.bat
+
 # Local files
 #.gitignore
+git_push_loop.bat
 decompose.bat
 fSplit.exe
 
