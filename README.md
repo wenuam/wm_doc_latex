@@ -6,6 +6,10 @@ LaTeX executables and templates to generate PDF files
 /!\ First run `recompose.bat` to recompose "LFS" files
 ```
 
+Install up-to-date `Java` binaries from :
+
+https://www.oracle.com/java/technologies/downloads/#jdk19-windows
+
 * To use it
   - Open a file explorer window (`Win+e`) on this folder/repository
   - Drag your `*.tex` file on the `pdflatex_compile.bat` file
