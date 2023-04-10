@@ -1,6 +1,6 @@
 # GdkPixbuf Image Loader Modules file
 # Automatically generated file, do not edit
-# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.8
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.10
 #
 # LoaderDir = C:\msys64\mingw64\lib\gdk-pixbuf-2.0\2.10.0\loaders
 #
@@ -53,6 +53,13 @@
 "image/jpeg" ""
 "jpeg" "jpe" "jpg" ""
 "\377\330" "" 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-jxl.dll"
+"jxl" 4 "gdk-pixbuf" "JPEG XL image" "BSD-3"
+"image/jxl" ""
+"jxl" ""
+"\377\n" "  " 100
+"...\fJXL \r\n\207\n" "zzz         " 100
 
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-png.dll"
 "png" 5 "gdk-pixbuf" "PNG" "LGPL"
@@ -116,4 +123,5 @@
 "image/x-xpixmap" ""
 "xpm" ""
 "/* XPM */" "" 100
+
 

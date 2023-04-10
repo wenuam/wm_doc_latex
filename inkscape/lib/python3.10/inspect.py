@@ -294,7 +294,7 @@ def _has_code_flag(f, flag):
     while ismethod(f):
         f = f.__func__
     f = functools._unwrap_partial(f)
-    if not isfunction(f):
+    if not (isfunction(f) or _signature_is_functionlike(f)):
         return False
     return bool(f.__code__.co_flags & flag)
 
@@ -1356,7 +1356,10 @@ def getargvalues(frame):
 
 def formatannotation(annotation, base_module=None):
     if getattr(annotation, '__module__', None) == 'typing':
-        return repr(annotation).replace('typing.', '')
+        def repl(match):
+            text = match.group()
+            return text.removeprefix('typing.')
+        return re.sub(r'[\w\.]+', repl, repr(annotation))
     if isinstance(annotation, types.GenericAlias):
         return str(annotation)
     if isinstance(annotation, type):

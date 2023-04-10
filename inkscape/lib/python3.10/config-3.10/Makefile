@@ -28,9 +28,9 @@ MODLIBS=           $(LOCALMODLIBS) $(BASEMODLIBS)
 
 # === Variables set by configure
 VERSION=	3.10
-srcdir=		../Python-3.10.5
-VPATH=		../Python-3.10.5
-abs_srcdir=	/c/M/mingw-w64-python/src/build-x86_64/../Python-3.10.5
+srcdir=		../Python-3.10.8
+VPATH=		../Python-3.10.8
+abs_srcdir=	/c/M/mingw-w64-python/src/build-x86_64/../Python-3.10.8
 abs_builddir=	/c/M/mingw-w64-python/src/build-x86_64
 
 
@@ -82,7 +82,7 @@ MAKESETUP=      $(srcdir)/Modules/makesetup
 OPT=		-DNDEBUG -g -fwrapv -O3 -Wall
 BASECFLAGS=	 -Wno-unused-result -Wsign-compare
 BASECPPFLAGS=	-IObjects -IInclude -IPython
-CONFIGURE_CFLAGS=	-march=x86-64 -mtune=generic -O2 -pipe -O3
+CONFIGURE_CFLAGS=	-march=nocona -msahf -mtune=generic -O2 -pipe -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong -O3
 # CFLAGS_NODIST is used for building the interpreter and stdlib C extensions.
 # Use it when a compiler flag should _not_ be part of the distutils CFLAGS
 # once Python is installed (Issue #21121).
@@ -120,7 +120,7 @@ PY_CORE_CFLAGS=	$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE
 PY_CORE_LDFLAGS=$(PY_LDFLAGS) $(PY_LDFLAGS_NODIST)
 # Strict or non-strict aliasing flags used to compile dtoa.c, see above
 CFLAGS_ALIASING=
-RCFLAGS= -DFIELD3=5150 -O COFF --target=pe-x86-64
+RCFLAGS= -DFIELD3=8150 -O COFF --target=pe-x86-64
 
 
 # Machine-dependent subdirectories
@@ -140,9 +140,9 @@ exec_prefix=	${prefix}
 datarootdir=    ${prefix}/share
 
 # Locations needed for semi-native fixup of sysconfig.
-srcdir_b2h=		C:/M/mingw-w64-python/src/Python-3.10.5
-VPATH_b2h=		C:/M/mingw-w64-python/src/Python-3.10.5
-abs_srcdir_b2h=		C:/M/mingw-w64-python/src/Python-3.10.5
+srcdir_b2h=		C:/M/mingw-w64-python/src/Python-3.10.8
+VPATH_b2h=		C:/M/mingw-w64-python/src/Python-3.10.8
+abs_srcdir_b2h=		C:/M/mingw-w64-python/src/Python-3.10.8
 abs_builddir_b2h=	C:/M/mingw-w64-python/src/build-x86_64
 prefix_b2h=		D:/a/msys64/mingw64
 
@@ -213,9 +213,9 @@ RUNSHARED=
 ENSUREPIP=      no
 
 # OpenSSL options for setup.py so sysconfig can pick up AC_SUBST() vars.
-OPENSSL_INCLUDES=-ID:/a/msys64/mingw64/include
+OPENSSL_INCLUDES=
 OPENSSL_LIBS=-lssl -lcrypto
-OPENSSL_LDFLAGS=-LD:/a/msys64/mingw64/lib
+OPENSSL_LDFLAGS=
 OPENSSL_RPATH=
 
 # Default zoneinfo.TZPATH. Added here to expose it in sysconfig.get_config_var
@@ -228,7 +228,7 @@ EXEMODE=	755
 FILEMODE=	644
 
 # configure script arguments
-CONFIG_ARGS=	 '--prefix=/mingw64' '--host=x86_64-w64-mingw32' '--build=x86_64-w64-mingw32' '--enable-shared' '--with-system-expat' '--with-system-ffi' '--with-system-libmpdec' '--without-ensurepip' '--enable-loadable-sqlite-extensions' '--with-tzpath=/mingw64/share/zoneinfo' '--enable-optimizations' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'CC=gcc' 'CFLAGS=-march=x86-64 -mtune=generic -O2 -pipe -O3' 'LDFLAGS=-pipe' 'CPPFLAGS=-D__USE_MINGW_ANSI_STDIO=1' 'PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig'
+CONFIG_ARGS=	 '--prefix=/mingw64' '--host=x86_64-w64-mingw32' '--build=x86_64-w64-mingw32' '--enable-shared' '--with-system-expat' '--with-system-ffi' '--with-system-libmpdec' '--without-ensurepip' '--enable-loadable-sqlite-extensions' '--with-tzpath=/mingw64/share/zoneinfo' '--enable-optimizations' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'CC=gcc' 'CFLAGS=-march=nocona -msahf -mtune=generic -O2 -pipe -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong -O3' 'LDFLAGS=-pipe' 'CPPFLAGS=-D__USE_MINGW_ANSI_STDIO=1' 'PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig'
 
 
 # Subdirectories with code
@@ -332,7 +332,7 @@ IO_OBJS=	\
 
 ##########################################################################
 
-LIBFFI_INCLUDEDIR=	D:/a/msys64/mingw64/include
+LIBFFI_INCLUDEDIR=	
 NCURSESW_INCLUDEDIR=	D:/a/msys64/mingw64/include/ncursesw
 
 ##########################################################################
@@ -1581,6 +1581,7 @@ TESTSUBDIRS=	ctypes/test \
 		test/test_warnings test/test_warnings/data \
 		test/test_zoneinfo test/test_zoneinfo/data \
 		test/tracedmodules \
+		test/typinganndata \
 		test/xmltestdata test/xmltestdata/c14n-20 \
 		test/ziptestdata \
 		tkinter/test tkinter/test/test_tkinter \
@@ -1965,8 +1966,7 @@ rmtestturds:
 	-rm -f gb-18030-2000.xml
 
 docclean:
-	-rm -rf Doc/build
-	-rm -rf Doc/tools/sphinx Doc/tools/pygments Doc/tools/docutils
+	$(MAKE) -C Doc clean
 
 # like the 'clean' target but retain the profile guided optimization (PGO)
 # data.  The PGO data is only valid if source code remains unchanged.
@@ -2010,7 +2010,7 @@ clobber: clean
 # Make things extra clean, before making a distribution:
 # remove all generated files, even Makefile[.pre]
 # Keep configure and Python-ast.[ch], it's possible they can't be generated
-distclean: clobber
+distclean: clobber docclean
 	for file in $(srcdir)/Lib/test/data/* ; do \
 	    if test "$$file" != "$(srcdir)/Lib/test/data/README"; then rm "$$file"; fi; \
 	done
