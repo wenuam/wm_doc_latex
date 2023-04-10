@@ -49,16 +49,9 @@ rem Check source file
 if exist "%~1" (
 	rem At least 1 run
 	set /a tries+=1
-	rem Check destination file (PDF)
+	rem Check destination file presence and date
 	if exist "%~dpn1.pdf" (
-		rem Write protect it
-		attrib +r "%~dpn1.pdf"
-		rem Try copy on destination file (only if more recent)
-		xcopy "%~1" "%~dpn1.pdf" /d /y %quiet%
-		rem Updated (more recent), 2 runs
-		if errorlevel 1 (set /a tries+=1)
-		rem Remove write protection
-		attrib -r "%~dpn1.pdf"
+		xcopy /D /L /Y "%~1" "%~dpn1.pdf" | findstr /BC:"1 ">nul && set /a tries+=1
 	) else (
 		rem Recreate PDF from scratch, 3 runs
 		set /a tries+=2
