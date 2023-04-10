@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{htex4ht.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref driver for TeX4ht]
 \Hy@VersionCheck{htex4ht.def}
 \providecommand*{\XR@ext}{html}

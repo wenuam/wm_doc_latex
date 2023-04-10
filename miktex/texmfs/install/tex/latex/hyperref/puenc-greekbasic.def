@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{puenc-greekbasic.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref: PDF Unicode definition (greek block) (HO)]
 \DeclareTextCommand{\textnumeralsigngreek}{PU}{\83\164}% U+0374
 \DeclareTextCommand{\textdexiakeraia}{PU}{\83\164}% U+0374

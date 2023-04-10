@@ -705,8 +705,8 @@
 %%% From File: ltvers.dtx
 \def\fmtname{LaTeX2e}
 \edef\fmtversion
-   {2022-06-01}
-\def\patch@level{5}
+   {2022-11-01}
+\def\patch@level{1}
 \edef\development@branch@name{}
 \iffalse
 \def\reserved@a#1/#2/#3\@nil{%
@@ -1367,7 +1367,7 @@
 \let\@iden\@firstofone
 \long\def\@thirdofthree#1#2#3{#3}
 \def\@expandtwoargs#1#2#3{%
-\edef\reserved@a{\noexpand#1{#2}{#3}}\reserved@a}
+\protected@edef\reserved@a{\noexpand#1{#2}{#3}}\reserved@a}
 \edef\@backslashchar{\expandafter\@gobble\string\\}
 \def\@unexpandable@protect{\noexpand\protect\noexpand}
 \def\DeclareRobustCommand{\@star@or@long\declare@robustcommand}
@@ -1731,8 +1731,8 @@
     \xdef#1{\the\toks@}%
   \endgroup}
 %%% From File: ltcmd.dtx
-\def\ltcmdversion{v1.0l}
-\def\ltcmddate{2022-03-18}
+\def\ltcmdversion{v1.1a}
+\def\ltcmddate{2022-08-16}
 \message{document commands,}
 \ExplSyntaxOn
 \tl_new:N \l__cmd_arg_spec_tl
@@ -1759,6 +1759,7 @@
 \bool_new:N \l__cmd_obey_spaces_bool
 \tl_new:N \l__cmd_last_delimiters_tl
 \bool_new:N \l__cmd_long_bool
+\bool_new:N \l__cmd_suppress_strip_bool
 \int_new:N \l__cmd_m_args_int
 \bool_new:N \l__cmd_prefixed_bool
 \tl_new:N \l__cmd_process_all_tl
@@ -1769,6 +1770,9 @@
 \bool_new:N \l__cmd_some_obey_spaces_bool
 \bool_new:N \l__cmd_some_long_bool
 \bool_new:N \l__cmd_some_short_bool
+\quark_new:N \q__cmd_recursion_tail
+\quark_new:N \q__cmd_recursion_stop
+\__kernel_quark_new_test:N \__cmd_if_recursion_tail_stop_do:Nn
 \prop_new:N \l__cmd_tmp_prop
 \tl_new:N \l__cmd_tmpa_tl
 \tl_new:N \l__cmd_tmpb_tl
@@ -2107,6 +2111,7 @@
     \bool_set_true:N \l__cmd_grab_expandably_bool
     \bool_set_false:N \l__cmd_obey_spaces_bool
     \bool_set_false:N \l__cmd_long_bool
+    \bool_set_false:N \l__cmd_suppress_strip_bool
     \bool_set_false:N \l__cmd_some_obey_spaces_bool
     \bool_set_false:N \l__cmd_some_long_bool
     \bool_set_false:N \l__cmd_some_short_bool
@@ -2197,30 +2202,48 @@
   }
 \cs_new_protected:cpn { __cmd_normalize_type_+:w } #1
   {
-    \quark_if_recursion_tail_stop_do:nn {#1} { \__cmd_bad_arg_spec:wn }
-    \bool_if:NT \l__cmd_long_bool
-      {
-        \msg_error:nnxx { cmd } { two-markers }
-          { \__cmd_environment_or_command: } { + }
-        \__cmd_bad_def:wn
-      }
-    \bool_set_true:N \l__cmd_long_bool
-    \int_decr:N \l__cmd_current_arg_int
-    \__cmd_normalize_arg_spec_loop:n {#1}
+    \__cmd_normalize_type_aux:NnNn + {#1}
+      \l__cmd_long_bool
+      { \bool_set_true:N \l__cmd_long_bool }
   }
 \cs_new_protected:cpn { __cmd_normalize_type_!:w } #1
   {
-    \quark_if_recursion_tail_stop_do:nn {#1} { \__cmd_bad_arg_spec:wn }
-    \bool_if:NT \l__cmd_obey_spaces_bool
+    \__cmd_normalize_type_aux:NnNn ! {#1}
+      \l__cmd_obey_spaces_bool
+      {
+        \bool_set_true:N \l__cmd_obey_spaces_bool
+        \bool_set_true:N \l__cmd_some_obey_spaces_bool
+      }
+  }
+\cs_new_protected:cpn { __cmd_normalize_type_=:w } #1#2
+  {
+    \__cmd_normalize_type_aux:NnNn = {#2}
+      \l__cmd_suppress_strip_bool
+      {
+        \bool_if:NT \l__cmd_expandable_bool
+          {
+            \msg_error:nnxx { cmd } { keyval-in-expandable }
+              { \iow_char:N \\ \l__cmd_function_tl } { \tl_to_str:n {#1} }
+            \__cmd_bad_def:wn
+          }
+        \bool_set_true:N \l__cmd_suppress_strip_bool
+        \bool_set_false:N \l__cmd_grab_expandably_bool
+        \tl_put_right:Nx \l__cmd_arg_spec_tl
+          { = { \tl_trim_spaces:n {#1} } }
+      }
+  }
+\cs_new_protected:Npn \__cmd_normalize_type_aux:NnNn #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:nn {#2} { \__cmd_bad_arg_spec:wn }
+    \bool_if:NT #3
       {
         \msg_error:nnxx { cmd } { two-markers }
-          { \__cmd_environment_or_command: } { ! }
+          { \__cmd_environment_or_command: } { #1 }
         \__cmd_bad_def:wn
       }
-    \bool_set_true:N \l__cmd_obey_spaces_bool
-    \bool_set_true:N \l__cmd_some_obey_spaces_bool
+    #4
     \int_decr:N \l__cmd_current_arg_int
-    \__cmd_normalize_arg_spec_loop:n {#1}
+    \__cmd_normalize_arg_spec_loop:n {#2}
   }
 \cs_new_protected:Npn \__cmd_normalize_type_D:w #1#2#3
   {
@@ -2417,6 +2440,7 @@
     \int_zero:N \l__cmd_current_arg_int
     \bool_set_false:N \l__cmd_long_bool
     \bool_set_false:N \l__cmd_obey_spaces_bool
+    \bool_set_false:N \l__cmd_suppress_strip_bool
     \int_zero:N \l__cmd_m_args_int
     \bool_set_false:N \l__cmd_defaults_bool
     \tl_clear:N \l__cmd_defaults_tl
@@ -2462,6 +2486,16 @@
     \bool_set_true:N \l__cmd_prefixed_bool
     \bool_set_true:N \l__cmd_process_some_bool
     \tl_put_left:Nn \l__cmd_process_one_tl { {#1} }
+    \__cmd_prepare_signature_bypass:N
+  }
+\cs_new_protected:cpn { __cmd_add_type_=:w } #1
+  {
+    \__cmd_flush_m_args:
+    \bool_set_true:N \l__cmd_prefixed_bool
+    \bool_set_true:N \l__cmd_suppress_strip_bool
+    \bool_set_true:N \l__cmd_process_some_bool
+    \tl_put_left:Nn \l__cmd_process_one_tl
+      { { \__cmd_arg_to_keyvalue:nn {#1} } }
     \__cmd_prepare_signature_bypass:N
   }
 \cs_new_protected:Npn \__cmd_add_type_b:w
@@ -2554,11 +2588,16 @@
             __cmd_grab_ #1
             \bool_if:NT \l__cmd_long_bool { _long }
             \bool_if:NT \l__cmd_obey_spaces_bool { _obey_spaces }
+            \bool_lazy_and:nnT
+              { \l__cmd_suppress_strip_bool }
+              { \str_if_eq_p:nn {#1} { D } }
+              { _no_strip }
             :w
           }
       }
     \bool_set_false:N \l__cmd_long_bool
     \bool_set_false:N \l__cmd_obey_spaces_bool
+    \bool_set_false:N \l__cmd_suppress_strip_bool
     \tl_put_right:Nx \l__cmd_process_all_tl
       {
         {
@@ -2969,7 +3008,7 @@
     \quark_if_nil:nF {#1}
       { \tl_const:cn { c__cmd_show_type_#1_tl } {#2} \__cmd_tmp:w }
   }
-\__cmd_tmp:w t0 r1 d1 R2 D2 O3 e4 E5 +6 !6 >7 \q_nil \q_nil
+\__cmd_tmp:w t0 r1 d1 R2 D2 O3 e4 E5 +6 !6 >7 =7 \q_nil \q_nil
 \cs_new_protected:Npn \__cmd_show_delim:Nw #1 #2
   { \__cmd_split_end_item:n { #1 #2 } \__cmd_split_signature_loop:Nw }
 \cs_new_protected:Npn \__cmd_show_delims:Nw #1 #2 #3
@@ -3030,7 +3069,7 @@
   { \__cmd_grab_b_aux:NNw \cs_set_protected:Npn \exp_not:n }
 \cs_new_protected:Npn \__cmd_grab_b_aux:NNw #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnN \begin \end {#3} #1
+    \__cmd_grab_D_aux:NNnNN \begin \end {#3} #1 \use_ii:nn
     \tl_put_left:Nn \l__cmd_signature_tl { \__cmd_grab_b_end:Nw #2 }
     \tl_set_eq:NN \l__cmd_saved_args_tl \l__cmd_args_tl
     \tl_clear:N \l__cmd_args_tl
@@ -3049,32 +3088,56 @@
   }
 \cs_new_protected:Npn \__cmd_grab_D:w #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnNN #1 #2 {#3} \cs_set_protected_nopar:Npn
-      \__cmd_peek_nonspace_remove:NTF
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected_nopar:Npn
+      \__cmd_peek_nonspace_remove:NTF \use_ii:nn
   }
 \cs_new_protected:Npn \__cmd_grab_D_long:w #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnNN #1 #2 {#3} \cs_set_protected:Npn
-      \__cmd_peek_nonspace_remove:NTF
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected:Npn
+      \__cmd_peek_nonspace_remove:NTF \use_ii:nn
   }
 \cs_new_protected:Npn \__cmd_grab_D_obey_spaces:w #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnNN #1 #2 {#3} \cs_set_protected_nopar:Npn
-      \__cmd_peek_meaning_remove:NTF
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected_nopar:Npn
+      \__cmd_peek_meaning_remove:NTF \use_ii:nn
   }
 \cs_new_protected:Npn \__cmd_grab_D_long_obey_spaces:w #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnNN #1 #2 {#3} \cs_set_protected:Npn
-      \__cmd_peek_meaning_remove:NTF
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected:Npn
+      \__cmd_peek_meaning_remove:NTF \use_ii:nn
   }
-\cs_new_protected:Npn \__cmd_grab_D_aux:NNnNN #1#2#3#4#5
+\cs_new_protected:Npn \__cmd_grab_D_no_strip:w
+  #1#2#3 \__cmd_run_code:
   {
-    \__cmd_grab_D_aux:NNnN #1#2 {#3} #4
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected_nopar:Npn
+      \__cmd_peek_nonspace_remove:NTF \use_none:n
+  }
+\cs_new_protected:Npn \__cmd_grab_D_long_no_strip:w
+  #1#2#3 \__cmd_run_code:
+  {
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected:Npn
+      \__cmd_peek_nonspace_remove:NTF \use_none:n
+  }
+\cs_new_protected:Npn \__cmd_grab_D_obey_spaces_no_strip:w
+  #1#2#3 \__cmd_run_code:
+  {
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected_nopar:Npn
+      \__cmd_peek_meaning_remove:NTF \use_none:n
+  }
+\cs_new_protected:Npn \__cmd_grab_D_long_obey_spaces_no_strip:w
+  #1#2#3 \__cmd_run_code:
+  {
+    \__cmd_grab_D_aux:NNnNNN #1 #2 {#3} \cs_set_protected:Npn
+      \__cmd_peek_meaning_remove:NTF \use_none:n
+  }
+\cs_new_protected:Npn \__cmd_grab_D_aux:NNnNNN #1#2#3#4#5#6
+  {
+    \__cmd_grab_D_aux:NNnNN #1#2 {#3} #4 #6
     #5 #1
       { \__cmd_grab_D_call:Nw #1 }
       { \__cmd_add_arg:o \c_novalue_tl }
   }
-\cs_new_protected:Npn \__cmd_grab_D_aux:NNnN #1#2#3#4
+\cs_new_protected:Npn \__cmd_grab_D_aux:NNnNN #1#2#3#4#5
   {
     \tl_set:Nn \l__cmd_signature_tl {#3}
     \exp_after:wN #4 \l__cmd_fn_tl ##1 #2
@@ -3088,7 +3151,7 @@
                 \str_if_eq:eeTF
                   { \exp_not:o { \use_none:n ##1 } }
                   { { \exp_not:o { \use_ii:nnn ##1 \q_nil } } }
-                  { \__cmd_add_arg:o { \use_ii:nn ##1 } }
+                  { \__cmd_add_arg:o { #5 ##1 } }
                   { \__cmd_add_arg:o { \use_none:n ##1 } }
               }
           }
@@ -3286,7 +3349,7 @@
   { \__cmd_grab_R_aux:NNnN #1 #2 {#3} \cs_set_protected:Npn }
 \cs_new_protected:Npn \__cmd_grab_R_aux:NNnN #1#2#3#4
   {
-    \__cmd_grab_D_aux:NNnN #1 #2 {#3} #4
+    \__cmd_grab_D_aux:NNnNN #1 #2 {#3} #4 \use_ii:nn
     \__cmd_peek_nonspace_remove:NTF #1
       { \__cmd_grab_D_call:Nw #1 }
       {
@@ -3742,6 +3805,121 @@
   }
 \cs_new_protected:Npn \__cmd_trim_spaces:n #1
   { \tl_set:Nx \ProcessedArgument { \tl_trim_spaces:n {#1} } }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue:nn #1#2
+  {
+    \tl_trim_spaces_apply:nN {#2} \__cmd_arg_to_keyvalue_braces:nnn
+      {#1} {#2}
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_braces:nnn #1#2#3
+  {
+    \tl_if_head_is_group:nT {#1}
+      {
+        \tl_if_blank:oT { \use_none:n #1 }
+          {
+            \tl_set:Nx \ProcessedArgument { #2 = { \exp_not:n #1 } }
+            \use_none:nnnn
+          }
+      }
+    \__cmd_arg_to_keyvalue_auxi:nnn {#1} {#2} {#3}
+  }
+\cs_new:Npn \__cmd_arg_to_keyvalue_auxi:nnn #1
+  {
+    \tl_if_head_is_N_type:nTF {#1}
+      { \__cmd_split_N_head_apply:Nn \__cmd_arg_to_keyvalue_auxii:Nnnn {#1} }
+      { \__cmd_arg_to_keyvalue_auxv:nn }
+  }
+\cs_new:Npn \__cmd_arg_to_keyvalue_auxii:Nnnn #1#2
+  {
+    \str_if_eq:eeTF { \exp_not:n {#1} } { = }
+      { \tl_trim_spaces_apply:nN {#2} \__cmd_arg_to_keyvalue_auxiii:nnn }
+      { \__cmd_arg_to_keyvalue_auxv:nn }
+  }
+\cs_new:Npn \__cmd_arg_to_keyvalue_auxiii:nnn #1
+  {
+    \tl_if_head_is_N_type:nTF {#1}
+      { \__cmd_split_N_head_apply:Nn \__cmd_arg_to_keyvalue_auxiv:Nnnn {#1} }
+      { \__cmd_arg_to_keyvalue_auxv:nn }
+  }
+\cs_new:Npn \__cmd_arg_to_keyvalue_auxiv:Nnnn #1#2
+  {
+    \str_if_eq:eeTF { \exp_not:n {#1} } { , }
+      { \tl_set:Nn \ProcessedArgument {#2} \use_none:nn }
+      { \__cmd_arg_to_keyvalue_auxv:nn }
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_auxv:nn #1#2
+  {
+    \__cmd_arg_to_keyvalue_loop:w #2
+      \q__cmd_recursion_tail \q__cmd_recursion_stop {#1} {#2}
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_loop:w #1 \q__cmd_recursion_stop
+  {
+    \tl_if_head_is_N_type:nTF {#1}
+      { \__cmd_arg_to_keyvalue_loop_N_type:N }
+      {
+        \tl_if_head_is_group:nTF {#1}
+          { \__cmd_arg_to_keyvalue_loop_group:n }
+          { \__cmd_arg_to_keyvalue_loop_space:w }
+      }
+        #1 \q__cmd_recursion_stop
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_loop_group:n #1
+  { \__cmd_arg_to_keyvalue_loop:w }
+\use:n { \cs_new_protected:Npn \__cmd_arg_to_keyvalue_loop_space:w } ~
+  { \__cmd_arg_to_keyvalue_loop:w }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_loop_N_type:N #1
+  {
+    \__cmd_if_recursion_tail_stop_do:Nn #1
+      { \__cmd_arg_to_keyvalue_set_default:nn }
+    \str_if_eq:nnTF {#1} { = }
+      {
+        \__cmd_use_i_delimit_by_q_recursion_stop:nw
+          { \__cmd_arg_to_keyvalue_set_keyvalue:nn }
+      }
+      {
+        \bool_lazy_or:nnTF
+            { \token_if_math_toggle_p:N #1 }
+            { \str_if_eq_p:nn {#1} { \( } }
+          { \__cmd_arg_to_keyvalue_math:w }
+          { \__cmd_arg_to_keyvalue_loop:w }
+      }
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_math:w #1 \q__cmd_recursion_stop
+  {
+    \tl_if_head_is_N_type:nTF {#1}
+      { \__cmd_arg_to_keyvalue_math_N_type:N }
+      {
+        \tl_if_head_is_group:nTF {#1}
+          { \__cmd_arg_to_keyvalue_math_group:n }
+          { \__cmd_arg_to_keyvalue_math_space:w }
+      }
+        #1 \q__cmd_recursion_stop
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_math_N_type:N #1
+  {
+    \__cmd_if_recursion_tail_stop_do:Nn #1
+      { \__cmd_arg_to_keyvalue_set_default:nn }
+    \bool_lazy_or:nnTF
+        { \token_if_math_toggle_p:N #1 }
+        { \str_if_eq_p:nn {#1} { \) } }
+      { \__cmd_arg_to_keyvalue_loop:w }
+      { \__cmd_arg_to_keyvalue_math:w }
+  }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_math_group:n #1
+  { \__cmd_arg_to_keyvalue_math:w }
+\use:n { \cs_new_protected:Npn \__cmd_arg_to_keyvalue_math_space:w } ~
+  { \__cmd_arg_to_keyvalue_math:w }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_set_default:nn #1#2
+  { \tl_set:Nn \ProcessedArgument { #1 = {#2} } }
+\cs_new_protected:Npn \__cmd_arg_to_keyvalue_set_keyvalue:nn #1#2
+  { \tl_set:Nn \ProcessedArgument {#2} }
+\cs_new:Npn \__cmd_split_N_head_apply:Nn #1#2
+  { \exp:w \if_false: { \fi: \__cmd_split_N_head_apply_aux:NNw #1#2 } }
+\cs_new:Npn \__cmd_split_N_head_apply_aux:NNw #1#2
+  {
+    \exp_after:wN \exp_end:
+    \exp_after:wN #1 \exp_after:wN #2 \exp_after:wN { \if_false: } \fi:
+  }
+
 \cs_new_protected:Npn \__cmd_get_arg_spec_error:N #1
   {
     \bool_set_false:N \l__cmd_environment_bool
@@ -4082,6 +4260,13 @@
   { Invalid~argument~prefix~'>'~in~command~'#1'. }
   {
     The~argument~specification~for~'#1'~contains~the~processor~function~'>{#2}'.~
+    This~is~only~supported~for~robust~commands,~but~not~for~expandable~ones.
+    \c__cmd_ignore_def_tl
+  }
+\msg_new:nnnn { cmd } { keyval-in-expandable }
+  { Invalid~argument~prefix~'='~in~command~'#1'. }
+  {
+    The~argument~specification~for~'#1'~contains~a~key--value~marker~'={#2}'.~
     This~is~only~supported~for~robust~commands,~but~not~for~expandable~ones.
     \c__cmd_ignore_def_tl
   }
@@ -6559,7 +6744,7 @@ Type  H <return>  for immediate help.}%
              \@xnewline}%
   \@xnewline}
 \let\\\@normalcr
-\def\@vspace@calcify#1{\begingroup\setlength\skip@{#1}\vskip\skip@\endgroup}
+\def\@vspace@calcify#1{\setlength\sp@ce@skip{#1}\vskip\sp@ce@skip}
 
 \DeclareRobustCommand\newline{\@normalcr\relax}
 \def\@xnewline{\@ifnextchar[% ] bracket matching
@@ -6727,7 +6912,8 @@ Type  H <return>  for immediate help.}%
 \expandafter\let\expandafter\@xobeysp\csname nobreakspace \endcsname
 \def\@{\spacefactor\@m{}}%
 \DeclareRobustCommand\hspace{\@ifstar\@hspacer\@hspace}
-\def\@hspace#1{\begingroup\setlength\skip@{#1}\hskip\skip@\endgroup}
+\newskip\sp@ce@skip
+\def\@hspace#1{\setlength\sp@ce@skip{#1}\hskip\sp@ce@skip}
 
 \def\@hspacer#1{\vrule \@width\z@\nobreak
                 \@hspace{#1}\hskip \z@skip}
@@ -9072,12 +9258,6 @@ Type  H <return>  for immediate help.}%
               (local:~  \int_use:N\c@localmathalphabets)      }
   \cs_gset_eq:cc { mv@#1@frozen }{ mv@#1 }
   \tl_gset:cx { g__nfss_frozen_mv_ #1 _tl }{ \int_use:c { c@mv@#1 } }
-  \group_insert_after:N \__nfss_init_mv_freeze:N
-  \exp_after:wN \group_insert_after:N \cs:w mv@#1@reset \cs_end:
-  \tl_gput_right:No \check@mathfonts
-       {
-         \exp_after:wN \group_insert_after:N \cs:w mv@#1@reset \cs_end:
-       }
   \cs_gset:cpn{mv@#1@reset}
      {
          \int_compare:nNnTF { \int_use:c{c@mv@#1} } >
@@ -9096,10 +9276,6 @@ Type  H <return>  for immediate help.}%
              }
          \if@ignore \ignorespaces \fi
     }
-}
-\cs_new_protected:Npn \__nfss_init_mv_freeze:N #1 {%
-  \mode_if_math:T { \group_insert_after:N \__nfss_init_mv_freeze:N
-                    \group_insert_after:N } #1
 }
 \ExplSyntaxOff
 \def\process@table{%
@@ -9148,6 +9324,11 @@ Type  H <return>  for immediate help.}%
 \@onlypreamble\process@table
 \def\DeclareMathVersion#1{%
   \@namedef{g__nfss_frozen_mv_#1_tl}{}%
+  \expandafter\ifx\csname mv@#1\endcsname \relax
+    \expandafter \g@addto@macro \expandafter \check@mathfonts
+         \expandafter {\expandafter \aftergroup \csname mv@#1@reset\endcsname}%
+    \@namedef{mv@#1@reset}{}%
+  \fi
   \expandafter\new@mathversion\csname mv@#1\endcsname}
 \@onlypreamble\DeclareMathVersion
 \def\new@mathversion#1{%
@@ -9182,7 +9363,13 @@ Type  H <return>  for immediate help.}%
   \xdef#1{\the\toks@}%
 }
 \@onlypreamble\new@mathversion
-\def\DeclareSymbolFont#1#2#3#4#5{%
+\def\DeclareSymbolFont #1#2#3#4#5{%
+ \def\reserved@a{\DeclareSymbolFont@m@dropped{#1}{#2}{#3}}%
+ \edef\reserved@b{#4}%
+ \series@maybe@drop@one@m\reserved@b\reserved@b
+ \expandafter\reserved@a\expandafter{\reserved@b}{#5}%
+}
+\def\DeclareSymbolFont@m@dropped #1#2#3#4#5{%
  \@tempswafalse
  \edef\reserved@b{#2}%
  \def\cdp@elt##1##2##3##4{\def\reserved@c{##1}%
@@ -9237,7 +9424,13 @@ Type  H <return>  for immediate help.}%
     \version@list
 }
 \@onlypreamble\new@symbolfont
-\def\SetSymbolFont#1#2#3#4#5#6{%
+\def\SetSymbolFont #1#2#3#4#5#6{%
+ \def\reserved@a{\SetSymbolFont@m@dropped{#1}{#2}{#3}{#4}}%
+ \edef\reserved@b{#5}%
+ \series@maybe@drop@one@m\reserved@b\reserved@b
+ \expandafter\reserved@a\expandafter{\reserved@b}{#6}%
+}
+\def\SetSymbolFont@m@dropped#1#2#3#4#5#6{%
  \@tempswafalse
  \edef\reserved@b{#3}%
  \def\cdp@elt##1##2##3##4{\def\reserved@c{##1}%
@@ -10407,7 +10600,7 @@ Type  H <return>  for immediate help.}%
    \@ifundefined{#1:#2}%
      {\@font@info{Setting #2 sub-encoding to #1/#3}}%
      {\@font@info{Changing #2 sub-encoding to #1/#3}}%
-     \@namedef{#1:#2}{#3}}
+     \global\@namedef{#1:#2}{#3}}
 \@onlypreamble\DeclareEncodingSubset
 \@onlypreamble\DeclareEncodingSubset@aux
 \@onlypreamble\@DeclareEncodingSubset
@@ -11380,7 +11573,8 @@ Type  H <return>  for immediate help.}%
 \def\makesm@sh#1{%
   \setbox\z@\hbox{\color@begingroup#1\color@endgroup}\finsm@sh}
 \def\mathsm@sh#1#2{%
-  \setbox\z@\hbox{$\m@th#1{#2}$}\finsm@sh}
+  \setbox\z@\hbox{$\m@th#1{#2}$}%
+  {}\finsm@sh}
 \def\finsm@sh{\ht\z@\z@ \dp\z@\z@ \leavevmode@ifvmode\box\z@}
 \def\buildrel#1\over#2{\mathrel{\mathop{\kern\z@#2}\limits^{#1}}}
 \DeclareRobustCommand*\cases[1]{\left\{\,\vcenter{\normalbaselines\m@th
@@ -11998,6 +12192,7 @@ Type  H <return>  for immediate help.}%
 \def\@minipagefalse{\global\let\if@minipage\iffalse}
 \def\@minipagetrue {\global\let\if@minipage\iftrue}
 \@minipagefalse
+\newif\if@in@minipage@env
 \def\minipage{%
   \@ifnextchar[%]
     \@iminipage
@@ -12019,6 +12214,14 @@ Type  H <return>  for immediate help.}%
     \color@begingroup
       \hsize\@tempdima
       \textwidth\hsize \columnwidth\hsize
+      \if@in@minipage@env
+        \ifvoid\@mpfootins\else
+          \@latex@warning{Nested minipage:
+            footnotes may be misplaced}%
+        \fi
+      \else
+        \@in@minipage@envtrue
+      \fi
       \@parboxrestore
       \def\@mpfn{mpfootnote}\def\thempfn{\thempfootnote}\c@mpfootnote\z@
       \let\@footnotetext\@mpfootnotetext
@@ -14055,7 +14258,7 @@ Type  H <return>  for immediate help.}%
     {\@expl@@@filehook@resolve@file@subst@@w #3.#1\@nil}%
       \reserved@a\reserved@b
   \@expl@@@filehook@clear@replacement@flag@@
-  \expandafter\xdef\csname opt@\reserved@a\endcsname{%
+  \expandafter\protected@xdef\csname opt@\reserved@a\endcsname{%
     \@ifundefined{opt@\reserved@a}\@empty
       {\csname opt@\reserved@a\endcsname,}%
     \zap@space#2 \@empty}%
@@ -14096,7 +14299,7 @@ Type  H <return>  for immediate help.}%
 \@onlypreamble\OptionNotUsed
 \def\ProcessOptions{%
   \let\ds@\@empty
-  \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
+  \protected@edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \@ifstar\@xprocess@ptions\@process@ptions}
 \@onlypreamble\ProcessOptions
 \def\@process@ptions{%
@@ -14117,7 +14320,7 @@ Type  H <return>  for immediate help.}%
    \ifx\@classoptionslist\relax\else
     \@for\CurrentOption:=\@classoptionslist\do{%
       \ifx\CurrentOption\@empty\else
-        \@ifundefined{ds@\CurrentOption}{}{%
+        \@ifundefined{ds@\detokenize\expandafter{\CurrentOption}}{}{%
           \@use@ption
           \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
         }%
@@ -14128,7 +14331,7 @@ Type  H <return>  for immediate help.}%
 \@onlypreamble\@xprocess@ptions
 \def\@process@pti@ns{%
   \@for\CurrentOption:=\@curroptions\do{%
-    \@ifundefined{ds@\CurrentOption}%
+    \@ifundefined{ds@\detokenize\expandafter{\CurrentOption}}%
       {\@use@ption
        \default@ds}%
       \@use@ption}%
@@ -14146,7 +14349,7 @@ Type  H <return>  for immediate help.}%
   \@expandtwoargs\@removeelement
      {\expandafter\@remove@eq@value\CurrentOption=\@nil}%
   \@unusedoptionlist\@unusedoptionlist
-  \csname ds@\CurrentOption\endcsname}
+  \csname ds@\detokenize\expandafter{\CurrentOption}\endcsname}
 \@onlypreamble\@use@ption
 \def\ExecuteOptions#1{%
   \edef\@fortmp{\zap@space#1 \@empty}%
@@ -14243,7 +14446,7 @@ Type  H <return>  for immediate help.}%
 \def\@fileswith@pti@ns#1[#2]#3[#4]{%
   \ifx#1\@clsextension
     \ifx\@classoptionslist\relax
-      \xdef\@classoptionslist{\zap@space#2 \@empty}%
+      \protected@xdef\@classoptionslist{\zap@space#2 \@empty}%
       \gdef\@raw@classoptionslist{#2}%
       \def\reserved@a{%
         \@onefilewithoptions#3[{#2}][{#4}]#1%
@@ -14278,15 +14481,13 @@ Type  H <return>  for immediate help.}%
   \global\let\@currext#4%
   \@ifl@aded\@currext\@currname
     {%
-      \@ifundefined{opt@fam@\@currname.\@currext}
+      \@ifundefined{opt@handler@\@currname.\@currext}
         {\@onefilewithoptions@clashchk{#2}}
         {%
-          \expandafter\edef\csname opt@\@currname.\@currext\endcsname
+          \expandafter\protected@edef\csname opt@\@currname.\@currext\endcsname
             {\zap@space#2 \@empty}%
           \@namedef{@raw@opt@\@currname.\@currext}{#2}%
-          \expandafter\expandafter\expandafter\ProcessKeyOptions
-            \expandafter\expandafter\expandafter
-              [\csname opt@fam@\@currname.\@currext\endcsname]%
+          \@nameuse{opt@handler@\@currname.\@currext}%
         }%
     }%
     {\makeatletter
@@ -14447,7 +14648,7 @@ Type  H <return>  for immediate help.}%
 \@onlypreamble\@unknownoptionerror
 \def\@@unprocessedoptions{%
   \ifx\@currext\@pkgextension
-    \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
+    \protected@edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
     \@for\CurrentOption:=\@curroptions\do{%
         \ifx\CurrentOption\@empty\else\@unknownoptionerror\fi}%
   \fi}
@@ -14816,6 +15017,7 @@ Type  H <return>  for immediate help.}%
   \__keys_tmp:nn
     { code:n }          { code }
     { legacy_if_set:n } { if }
+    { legacy_if_set_inverse:n } { ifnot }
     { tl_set:N }        { store }
     { usage:n }         { usage }
     { \q_recursion_tail } { }
@@ -14828,7 +15030,8 @@ Type  H <return>  for immediate help.}%
   { \__keys_options_expand_module:Nn \__keys_options_aux:n {#1} }
 \cs_new_protected:Npn \__keys_options_aux:n #1
   {
-    \cs_gset_nopar:cpn { opt@fam@\@currname.\@currext } {#1}
+    \cs_gset_protected:cpn { opt@handler@\@currname.\@currext }
+      { \ProcessKeyOptions [ #1 ] }
     \cs_set_protected:Npn \__keys_option_end: { }
     \clist_clear:N \l__keys_options_clist
     \__keys_options_global:n {#1}
@@ -14858,7 +15061,7 @@ Type  H <return>  for immediate help.}%
   { Unknown~option~'#1'~for~package~#2. }
   {
     LaTeX~has~been~asked~to~set~an~option~called~'#1'~
-    but~the~#2~package~has~not~created~an~option~with~this~name.
+    but~the~package~"\msg_module_name:n {#2}"~has~not~created~an~option~with~this~name.
   }
 \cs_new_protected:Npn \__keys_options_global:n #1
   {
@@ -14891,11 +15094,12 @@ Type  H <return>  for immediate help.}%
 \cs_new_protected:Npn \__keys_options_class:nnn #1#2#3
   {
     \keys_if_exist:nnTF {#3} {#1}
-      { \clist_put_right:Nn \l__keys_options_clist {#2} }
       {
-        \str_if_eq:eeF
-          { \exp_not:v { @raw@opt@ \@currname . \@currext } }
-          { \exp_not:V \@raw@classoptionslist }
+        \clist_put_right:Nn \l__keys_options_clist {#2}
+        \clist_remove_all:Nn \@unusedoptionlist {#1}
+      }
+      {
+        \clist_if_in:NnF \@unusedoptionlist {#1}
           { \clist_put_right:Nn \@unusedoptionlist {#1} }
       }
   }
@@ -14970,19 +15174,23 @@ Type  H <return>  for immediate help.}%
 \cs_new_protected:Npn \__keys_options_loaded:nn #1#2
   {
     \bool_if:NTF \l__keys_options_loading_bool
-      {
-        \msg_warning:nnxx { keys } { load-option-ignored }
-          { \use:c { opt@fam@\@currname.\@currext } } {#2}
-      }
-      { \msg_error:nnnn { keys } { load-only } {#1} {#2} }
+      { \msg_warning:nnnn { keys } { load-option-ignored } }
+      { \msg_error:nnnn { keys } { load-only } }
+        {#1} {#2}
   }
 \msg_new:nnn { keys } { load-option-ignored }
-  { Package~"#1"~has~already~been~loaded:~ignoring~load-time~option~"#2". }
+  {
+    Package~"\msg_module_name:n {#1}"~has~already~been~loaded:~
+    ignoring~load-time~option~"#2".
+  }
 \msg_new:nnnn { keys } { load-only }
-  { Key~"#2"~may~only~be~used~in~the~during~loading~of~package~"#1". }
+  {
+    Key~"#2"~may~only~be~used~during~loading~of~package~
+    "\msg_module_name:n {#1}".
+  }
   {
     LaTeX~was~asked~to~set~a~key~called~"#2",~but~this~is~only~allowed~
-    in~the~optional~argument~when~loading~package~"#1".
+    in~the~optional~argument~when~loading~package~"\msg_module_name:n{#1}".
   }
 \tl_gput_left:Nn \@kernel@after@begindocument
   {
@@ -15008,8 +15216,8 @@ Type  H <return>  for immediate help.}%
   { \__keys_options_expand_module:Nn \keys_set:nn {#1} {#2} }
 \ExplSyntaxOff
 %%% From File: ltfilehook.dtx
-\providecommand\ltfilehookversion{v1.0m}
-\providecommand\ltfilehookdate{2022/04/01}
+\providecommand\ltfilehookversion{v1.0n}
+\providecommand\ltfilehookdate{2022/08/18}
 \ExplSyntaxOn
 \tl_new:N \CurrentFile
 \tl_new:N \CurrentFilePath
@@ -15262,8 +15470,12 @@ Type  H <return>  for immediate help.}%
 \def\disable@package@load#1#2{%
   \global\@namedef{@pkg-disable@#1.\@pkgextension}{#2}}
 \def\@disable@packageload@do#1#2{%
-  \@ifundefined{@pkg-disable@#1}{#2}%
-     {\@nameuse{@pkg-disable@#1}}}
+  \@ifundefined{@pkg-disable@#1}%
+     {#2}%
+     {\@nameuse{@pkg-disable@#1}%
+      \@latex@info{Package '#1' has been disabled.%
+       \MessageBreak Load request ignored}%
+      \expandafter\@gobbletwo}}
 \def\reenable@package@load#1{%
   \global\expandafter\let
   \csname @pkg-disable@#1.\@pkgextension \endcsname \@undefined}
@@ -15297,8 +15509,7 @@ Type  H <return>  for immediate help.}%
 %%
 %%% From File: ltshipout.dtx
 \providecommand\ltshipoutversion{v1.0m}
-\providecommand\ltshipoutdate{2022/05/08}
- %    \cs{AtBeginDvi} is the existing \LaTeXe{} interface to fill the
+\providecommand\ltshipoutdate{2022/08/26}
 \ExplSyntaxOn
 \bool_new:N \g__shipout_debug_bool
 \cs_new_eq:NN \__shipout_debug:n  \use_none:n
@@ -15798,6 +16009,8 @@ Type  H <return>  for immediate help.}%
 \@maxdepth = \maxdepth
 \newdimen\paperheight
 \newdimen\paperwidth
+\newdimen\stockheight
+\newdimen\stockwidth
 \newif \if@insert
 \newif \if@fcolmade
 \newif \if@specialpage \@specialpagefalse
@@ -17137,12 +17350,69 @@ Type  H <return>  for immediate help.}%
 \lccode`\^^[=`\^^[   % oe in OT1
 \fi % End of reset block for 8-bit engines
 \ExplSyntaxOn
-\cs_new_protected_nopar:cpn{MakeUppercase~}{\text_uppercase:n}
-\cs_set_nopar:Npx\MakeUppercase#1{\use:c{MakeUppercase~}{#1}}
-\cs_new_protected_nopar:cpn{MakeLowercase~}{\text_lowercase:n}
-\cs_set_nopar:Npx\MakeLowercase#1{\use:c{MakeLowercase~}{#1}}
-\cs_new_protected_nopar:cpn{MakeTitlecase~}{\text_titlecase:n}
-\cs_set_nopar:Npx\MakeTitlecase#1{\use:c{MakeTitlecase~}{#1}}
+\keys_define:nn { __kernel }
+  {
+    lang   .str_set:N = \reserved@a ,
+    locale .str_set:N = \reserved@a
+  }
+\cs_new_protected:Npn \@@text@case@aux #1#2#3
+  {
+    \cs_set_nopar:Npn \reserved@a { }
+    \tl_if_blank:nTF {#2}
+      { \@@text@case@aux@ }
+      { \keys_set:nn { __kernel } {#2} }
+    \use:c { text_ #1 case:Vn } \reserved@a {#3}
+  }
+\cs_new_protected:Npn \@@text@case@aux@ { }
+\tl_gput_right:Nn \@kernel@after@begindocument
+  {
+    \@ifpackageloaded { babel }
+      {
+        \@ifpackagelater { babel } { 2020-01-15 }
+          {
+            \cs_gset_protected:Npn \@@text@case@aux@
+              {
+                \str_set:Nx \reserved@a
+                  { \localeinfo* { tag.bcp47 } }
+              }
+          }
+          { }
+      }
+      { }
+  }
+\exp_args_generate:n { cnx }
+\cs_set_protected:Npn \reserved@a #1
+  {
+    \cs_generate_variant:cn { text_ \str_lowercase:n {#1} case:nn } { V }
+    \ExpandArgs { cnx } \NewExpandableDocumentCommand
+       { Make#1case }
+       { O{} +m }
+       { \exp_not:c { Make#1case \c_space_tl \c_space_tl \c_space_tl } [####1] {####2} }
+  }
+\reserved@a { Upper }
+\reserved@a { Lower }
+\reserved@a { Title }
+\cs_new_protected:cpn { MakeLowercase \c_space_tl \c_space_tl \c_space_tl } [#1] #2
+  {
+    \let \kernel@saved@OE \OE
+    \let \OE \oe
+    \@@text@case@aux { lower } {#1} {#2}
+    \let \OE \kernel@saved@OE
+  }
+\cs_new_protected:cpn { MakeUppercase \c_space_tl \c_space_tl \c_space_tl } [#1] #2
+  {
+    \let \kernel@saved@oe \oe
+    \let \oe \OE
+    \@@text@case@aux { upper } {#1} {#2}
+    \let \oe \kernel@saved@oe
+  }
+\cs_new_protected:cpn { MakeTitlecase \c_space_tl \c_space_tl \c_space_tl } [#1] #2
+  {
+    \let \kernel@saved@oe \oe
+    \let \oe \OE
+    \@@text@case@aux { title } {#1} {#2}
+    \let \oe \kernel@saved@oe
+  }
 \cs_new_protected_nopar:Npn\AddToNoCaseChangeList
          {\tl_put_right:Nn \l_text_case_exclude_arg_tl}
 \AddToNoCaseChangeList{ \NoCaseChange }

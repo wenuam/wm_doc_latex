@@ -52,7 +52,7 @@
 %% scrkernel-listsandtabulars.dtx  (with options: `class,book,body')
 %% scrlogo.dtx  (with options: `logo')
 %% 
-%% Copyright (c) 1994-2021 Markus Kohm [komascript at gmx info]
+%% Copyright (c) 1994-2022 Markus Kohm [komascript at gmx info]
 %% 
 %% This file was generated from file(s) of the KOMA-Script bundle.
 %% ---------------------------------------------------------------
@@ -84,7 +84,7 @@
 %% find a complete unmodified copy of LaTeX2e at
 %% <http://mirror.ctan.org/tex-archive/macros/latex/base/>.
 %% 
-%%% From File: $Id: scrkernel-version.dtx 3920 2022-07-04 08:01:38Z kohm $
+%%% From File: $Id: scrkernel-version.dtx 3962 2022-10-12 06:33:06Z kohm $
 \begingroup
   \catcode`\@11\relax
   \ifx\KOMAScriptVersion\undefined
@@ -106,7 +106,7 @@
       \fi
     }
   \fi
-  \@CheckKOMAScriptVersion{2022/07/04 v3.37 KOMA-Script}%
+  \@CheckKOMAScriptVersion{2022/10/12 v3.38 KOMA-Script}%
 \endgroup
 \providecommand*{\scr@clsextension}{\@clsextension}
 \AtBeginDocument{%
@@ -121,7 +121,7 @@
   book%
 }
 \ProvidesClass{\KOMAClassName}[%
-  2022/07/04 v3.37 KOMA-Script
+  2022/10/12 v3.38 KOMA-Script
   document class (\ClassName)%
 ]
 %%% From File: $Id: scrkernel-basics.dtx 3913 2022-06-28 07:45:49Z kohm $
@@ -130,7 +130,7 @@
 %%% From File: $Id: scrkernel-listsof.dtx 3892 2022-06-17 16:26:06Z kohm $
 %%%            (run: prepare)
 \RequirePackage{tocbasic}[%
-  2022/07/04 v3.37 KOMA-Script
+  2022/10/12 v3.38 KOMA-Script
 ]
 \AtAddToTocList[\@currname.\@currext]{\setuptoc{\@currext}{onecolumn}}%
 \AtAddToTocList[ToC]{\setuptoc{\@currext}{onecolumn}}%
@@ -143,7 +143,7 @@
 \AtAddToTocList[float]{\setuptoc{\@currext}{onecolumn}}%
 %%% From File: $Id: scrkernel-tocstyle.dtx 3874 2022-06-05 10:38:02Z kohm $
 %%%            (run: prepare)
-%%% From File: $Id: scrkernel-sections.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-sections.dtx 3954 2022-10-04 09:20:19Z kohm $
 %%%            (run: prepare)
 \newif\if@openright
 \@openrighttrue
@@ -230,7 +230,7 @@
 \newcommand*{\size@subparagraph}{}
 \newcommand*{\scr@fnt@subparagraph}{\size@subparagraph}
 \newcommand*{\sectfont}{\normalcolor\@gr@gsffamily\bfseries}
-%%% From File: $Id: scrkernel-compatibility.dtx 3896 2022-06-21 09:06:07Z kohm $
+%%% From File: $Id: scrkernel-compatibility.dtx 3949 2022-08-09 10:05:50Z kohm $
 %%%            (run: init)
 \newcommand*
   {\scr@compatibility}{\scr@v@last}
@@ -314,11 +314,12 @@
 \@namedef{scr@v@3.34}{18}
 \@namedef{scr@v@3.35}{19}
 \@namedef{scr@v@3.36}{20}
-\@namedef{scr@v@3.37 BETA}{20}
+\@namedef{scr@v@3.37}{20}
+\@namedef{scr@v@3.38}{20}
 \@namedef{scr@v@last}{20}
 %%% From File: $Id: scrkernel-typearea.dtx 3889 2022-06-09 12:11:14Z kohm $
 %%%            (run: init)
-%%% From File: $Id: scrkernel-compatibility.dtx 3896 2022-06-21 09:06:07Z kohm $
+%%% From File: $Id: scrkernel-compatibility.dtx 3949 2022-08-09 10:05:50Z kohm $
 %%%            (run: option)
 \newif\if@scr@emulatestandardclasses
 \let\scr@emulatestandardclassestrue\relax
@@ -466,7 +467,7 @@
 }
 %%% From File: $Id: scrkernel-language.dtx 3874 2022-06-05 10:38:02Z kohm $
 %%%            (run: option)
-%%% From File: $Id: scrkernel-fonts.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-fonts.dtx 3958 2022-10-06 12:44:28Z kohm $
 %%%            (run: option)
 \providecommand*\@ptsize{%
   11%
@@ -504,6 +505,31 @@
     \@defaultunits\@tempdima#1pt\relax\@nnil
     \edef\@ptsize{#1}%
   }{%
+    \ifvmode\else
+      \par
+      \ClassError{\KOMAClassName}{%
+        Option `fontsize' inside paragraph not allowed%
+      }{%
+        Option `fontsize' has been designed to change the base font size of
+        a\MessageBreak
+        document. It has not been made to change the current font
+        size. Moreover\MessageBreak
+        using it inside a paragraph mostly will not have the intended result,
+        because\MessageBreak
+        TeX always uses the setting of `\string\baselineskip' and other
+        parameters from the\MessageBreak
+        end of a paragraph for the whole paragraph. Therefore using option
+        `fontsize'\MessageBreak
+        in TeX's horizontal mode does not make sense and is not
+        permitted.\MessageBreak
+        You should use font size commands like `\string\Huge'…`\string\tiny'
+        or `\string\fontsize' here.\MessageBreak
+        See a LaTeX introduction for more information.\MessageBreak
+        But maybe you've just forgotten to make a paragraph. So if you'd
+        continue,\MessageBreak
+        I'll add `\expandafter\string\csname par\endcsname'.%
+      }%
+    \fi
     \expandafter\@defaultunits\expandafter\@tempdima#1 pt\relax\@nnil
     \edef\@tempa{#1}%
     \setlength{\@tempdimb}{\@tempdima}%
@@ -879,7 +905,7 @@
   {notitlepage}{titlepage=false}
 %%% From File: $Id: scrkernel-tocstyle.dtx 3874 2022-06-05 10:38:02Z kohm $
 %%%            (run: option)
-%%% From File: $Id: scrkernel-sections.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-sections.dtx 3954 2022-10-04 09:20:19Z kohm $
 %%%            (run: option)
 \KOMA@key{open}{%
   \KOMA@set@ncmdkey{open}{@tempa}{%
@@ -1000,26 +1026,28 @@
             \RequirePackage{bookmark}%
           \fi
         }%
-        \ifx\@beginmainauxhook\relax
-        \else
-          \if@filesw
-            \ClassWarning{\KOMAClassName}{%
-              seems someone has broken package `auxhook'.\MessageBreak
-              Usually this happens, if `auxhook' is loaded or used\MessageBreak
-              implicitly or explicitly by patching
-              \string\document%
-              \scr@ifundefinedorrelax{AtEndPreamble}{}{%
-                \MessageBreak
-                or via etoolbox command \string\AtEndPreamble%
-              }.\MessageBreak
-              Trying an emergency workaround.\MessageBreak
-              You can avoid this warning adding:\MessageBreak
-              \space\space\string\usepackage{auxhook}\MessageBreak
-              before \string\begin{document}%
-            }%
-            \@beginmainauxhook
+        \@ifpackagelater{hyperref}{2022/09/22}{}{%
+          \ifx\@beginmainauxhook\relax
+          \else
+            \if@filesw
+              \ClassWarning{\KOMAClassName}{%
+                seems someone has broken package `auxhook'.\MessageBreak
+                Usually this happens, if `auxhook' is loaded or used\MessageBreak
+                implicitly or explicitly by patching
+                \string\document%
+                \scr@ifundefinedorrelax{AtEndPreamble}{}{%
+                  \MessageBreak
+                  or via etoolbox command \string\AtEndPreamble%
+                }.\MessageBreak
+                Trying an emergency workaround.\MessageBreak
+                You can avoid this warning adding:\MessageBreak
+                \space\space\string\usepackage{auxhook}\MessageBreak
+                before \string\begin{document}%
+              }%
+              \@beginmainauxhook
+            \fi
           \fi
-        \fi
+        }%
       \fi
     }%
   }%
@@ -1367,7 +1395,7 @@
 \KOMA@DeclareDeprecatedOption{cleardoubleempty}{cleardoublepage=empty}
 \KOMA@DeclareDeprecatedOption{cleardoubleplain}{cleardoublepage=plain}
 \KOMA@DeclareDeprecatedOption{cleardoublestandard}{cleardoublepage=current}
-%%% From File: $Id: scrkernel-floats.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-floats.dtx 3946 2022-07-20 10:37:02Z kohm $
 %%%            (run: option)
 \newif\if@captionabove\@captionabovefalse
 \newif\if@tablecaptionabove\@tablecaptionabovefalse
@@ -2110,7 +2138,7 @@
 \KOMA@DeclareDeprecatedOption{idxtotoc}{index=totoc}
 %%% From File: $Id: scrkernel-listsandtabulars.dtx 3874 2022-06-05 10:38:02Z kohm $
 %%%            (run: option)
-%%% From File: $Id: scrkernel-sections.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-sections.dtx 3954 2022-10-04 09:20:19Z kohm $
 %%%            (run: execoption)
 \KOMAExecuteOptions{headings=openright}
 \KOMAExecuteOptions{numbers=autoendperiod}
@@ -2121,7 +2149,7 @@
   headings=big%
 }
 \KOMAProcessOptions\relax
-%%% From File: $Id: scrkernel-compatibility.dtx 3896 2022-06-21 09:06:07Z kohm $
+%%% From File: $Id: scrkernel-compatibility.dtx 3949 2022-08-09 10:05:50Z kohm $
 %%%            (run: body)
 \AtBeginDocument{%
   \begingroup
@@ -2170,7 +2198,7 @@
     }%
   \endgroup
 }
-%%% From File: $Id: scrkernel-fonts.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-fonts.dtx 3958 2022-10-06 12:44:28Z kohm $
 %%%            (run: body)
 \newcommand*\scr@setlength[4]{%
   \expandafter\ifnum\scr@v@is@lt{3.12}\relax
@@ -2235,7 +2263,7 @@
                   {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
   \fi
   \setlength{\belowdisplayskip}{\abovedisplayskip}%
-  \edef\normalsize{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\normalsize
     {\the\@tempdima}{\the\@tempdimb}%
     \abovedisplayskip \the\abovedisplayskip
@@ -2244,6 +2272,8 @@
     \belowdisplayshortskip \the\belowdisplayshortskip
     \let\noexpand\@listi\noexpand\@listI
   }%
+  \let\normalsize\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\normalsize\expandafter{\reserved@a}%
   \setlength{\@tempdima}{0.9125\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
   \expandafter\ifnum\scr@v@is@lt{3.12}\relax
@@ -2260,7 +2290,7 @@
                   {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
   \fi
   \setlength{\belowdisplayskip}{\abovedisplayskip}%
-  \edef\small{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\small
     {\the\@tempdima}{\the\@tempdimb}%
     \abovedisplayskip \the\abovedisplayskip
@@ -2269,6 +2299,8 @@
     \belowdisplayshortskip \the\belowdisplayshortskip
     \let\noexpand\@listi\noexpand\@listi@small
   }%
+  \let\small\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\small\expandafter{\reserved@a}%
   \setlength{\@tempdima}{.83334\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
   \expandafter\ifnum\scr@v@is@lt{3.12}\relax
@@ -2285,7 +2317,7 @@
                   {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
   \fi
   \setlength{\belowdisplayskip}{\abovedisplayskip}%
-  \edef\footnotesize{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\footnotesize
     {\the\@tempdima}{\the\@tempdimb}%
     \abovedisplayskip \the\abovedisplayskip
@@ -2294,48 +2326,64 @@
     \belowdisplayshortskip \the\belowdisplayshortskip
     \let\noexpand\@listi\noexpand\@listi@footnotesize
   }%
+  \let\footnotesize\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\footnotesize\expandafter{\reserved@a}%
   \setlength{\@tempdima}{.66667\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\scriptsize{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\scriptsize
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\scriptsize\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\scriptsize\expandafter{\reserved@a}%
   \setlength{\@tempdima}{.5\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\tiny{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\tiny
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\tiny\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\tiny\expandafter{\reserved@a}%
   \setlength{\@tempdima}{1.2\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\large{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\large
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\large\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\large\expandafter{\reserved@a}%
   \setlength{\@tempdima}{1.44\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\Large{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\Large
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\Large\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\Large\expandafter{\reserved@a}%
   \setlength{\@tempdima}{1.728\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\LARGE{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\LARGE
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\LARGE\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\LARGE\expandafter{\reserved@a}%
   \setlength{\@tempdima}{2.074\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\huge{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\huge
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\huge\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\huge\expandafter{\reserved@a}%
   \setlength{\@tempdima}{2.488\@tempdimc}%
   \setlength{\@tempdimb}{\@tempb\@tempdima}%
-  \edef\Huge{%
+  \edef\reserved@a{%
     \noexpand\@setfontsize\noexpand\Huge
     {\the\@tempdima}{\the\@tempdimb}%
   }%
+  \let\Huge\@undefined
+  \expandafter\DeclareRobustCommand\expandafter\Huge\expandafter{\reserved@a}%
   \normalsize
   \expandafter\ifnum\scr@v@is@ge{3.17}\@nameuse{par@updaterelative}\fi
   \expandafter\ifnum\scr@v@is@lt{3.12}\relax
@@ -2572,10 +2620,14 @@
     \ifnum\scr@defineobsoletefonts>\tw@
       \DeclareOldFontCommand{#1}{#2}{#3}%
     \else
-      \DeclareOldFontCommand{#1}{%
-        \scr@ErrorWarningInfo{#1}{#2}#2%
-      }{%
-        \scr@ErrorWarningInfo{#1}{#3}#3%
+      \AtBeginDocument{%
+        \ifdefined#1\else
+          \DeclareOldFontCommand{#1}{%
+            \scr@ErrorWarningInfo{#1}{#2}#2%
+          }{%
+            \scr@ErrorWarningInfo{#1}{#3}#3%
+          }%
+        \fi
       }%
     \fi
   \fi
@@ -3312,7 +3364,7 @@
 %%% From File: $Id: scrkernel-tocstyle.dtx 3874 2022-06-05 10:38:02Z kohm $
 %%%            (run: class,style,default)
 \CloneTOCEntryStyle{section}{default}
-%%% From File: $Id: scrkernel-sections.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-sections.dtx 3954 2022-10-04 09:20:19Z kohm $
 %%%            (run: body)
 \BeforeClosingMainAux{%
   \if@autodot\if@filesw\immediate\write\@mainaux{%
@@ -4007,6 +4059,17 @@
       \fi
     \fi
   }%
+  \DeclareSectionCommandStyleOption{#1}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \ifscr@dsc@expandtopt
+        \setlength{\@tempskipa}{\@nameuse{#3##1#4}}%
+        \expandafter\edef\csname #3\scr@dsc@current#4\endcsname{\the\@tempskipa}%
+      \else
+        \@namedef{#3\scr@dsc@current#4}{\@nameuse{#3##1#4}}%
+      \fi
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\DeclareSectionCommandStyleNumberOption}[4]{%
   \DeclareSectionCommandStyleOption{#1}{#2}{%
@@ -4017,6 +4080,17 @@
       \expandafter\let\csname #3\scr@dsc@current#4\endcsname\reserved@a
     \fi
   }%
+  \DeclareSectionCommandStyleOption{#1}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \ifscr@dsc@expandtopt
+        \@tempcnta=\@nameuse{#3##1#4}%
+        \expandafter\edef\csname #3\scr@dsc@current#4\endcsname{\the\@tempcnta}%
+      \else
+        \@namedef{#3\scr@dsc@current#4}{\@nameuse{#3##1#4}}%
+      \fi
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\DeclareSectionCommandStyleFontOption}[4]{%
   \DeclareSectionCommandStyleOption{#1}{#2}{%
@@ -4026,6 +4100,16 @@
       \newkomafont
     }{#3\scr@dsc@current#4}{##1}%
     \FamilyKeyStateProcessed
+  }%
+  \DeclareSectionCommandStyleOption{#1}{#2:}{%
+    \IfExistskomafont{#3##1#4}{%
+      \IfExistskomafont{#3\scr@dsc@current#4}{%
+        \setkomafont
+      }{%
+        \newkomafont
+      }{#3\scr@dsc@current#4}{\usekomafont{#3##1#4}}%
+      \FamilyKeyStateProcessed
+    }{\FamilyKeyStateUnknownValue}%
   }%
 }
 \newcommand*{\DeclareSectionCommandStyleFuzzyOption}[5]{%
@@ -4046,6 +4130,19 @@
         \FamilyKeyStateProcessed
       }{}%
     \fi
+  }%
+  \DeclareSectionCommandStyleOption{#1}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \ifscr@dsc@expandtopt
+        \expandafter\let\csname #3\scr@dsc@current#4\expandafter\endcsname
+        \csname #3##1#4\endcsname
+      \else
+        \expandafter\def\csname #3\scr@dsc@current#4\endcsname{%
+          \@nameuse{#3##1#4}%
+        }%
+      \fi
+      \FamilyKeyStateProcessed
+    }%
   }%
 }
 \newcommand*{\scr@dsc@style@section@options}{}
@@ -6287,7 +6384,7 @@
 \newcommand*{\indexpagestyle}{plain}
 \pagestyle{headings}
 \pagenumbering{arabic}
-%%% From File: $Id: scrlayer.dtx 3894 2022-06-19 10:25:46Z kohm $
+%%% From File: $Id: scrlayer.dtx 3945 2022-07-19 09:16:17Z kohm $
 %%%            (run: body)
 \providecommand*{\@mkleft}{%
   \IfActiveMkBoth{\markleft}{\@gobble}%
@@ -6298,7 +6395,7 @@
 \providecommand{\@mkdouble}[1]{%
   \@mkboth{#1}{#1}%
 }
-%%% From File: $Id: scrkernel-floats.dtx 3874 2022-06-05 10:38:02Z kohm $
+%%% From File: $Id: scrkernel-floats.dtx 3946 2022-07-20 10:37:02Z kohm $
 %%%            (run: body)
 \newlength{\abovecaptionskip}
 \newlength{\belowcaptionskip}
@@ -6314,6 +6411,8 @@
 \newcommand*{\scap@move}{\z@}
 \newif\ifscap@alt
 \newcommand*{\scap@currentlabel}{}
+\newcommand*{\scap@currentlabelname}{}
+\newcommand*{\scap@currentHref}{}
 \newcommand*{\@captionbeside}{}
 \long\def\@captionbeside[#1]#2{%
   \kernel@ifnextchar [%]
@@ -6399,7 +6498,11 @@
   \if l\@tempa
     \rlap{%
       \parbox[\scap@valign]{\@tempdimb}{\scap@caption
-        \global\let\scap@currentlabel\@currentlabel}%
+        \global\let\scap@currentlabel\@currentlabel
+        \global\let\scap@currentcounter\@currentcounter
+        \global\let\scap@currentlabelname\@currentlabelname
+        \global\let\scap@currentHref\@currentHref
+      }%
       \nobreak\hskip\columnsep
       \parbox[\scap@valign]{\wd\c@pti@nb@sid@b@x}{\usebox\c@pti@nb@sid@b@x}%
     }%
@@ -6408,12 +6511,18 @@
       \parbox[\scap@valign]{\wd\c@pti@nb@sid@b@x}{\usebox\c@pti@nb@sid@b@x}%
       \nobreak\hskip\columnsep
       \parbox[\scap@valign]{\@tempdimb}{\scap@caption
-        \global\let\scap@currentlabel\@currentlabel}%
+        \global\let\scap@currentlabel\@currentlabel
+        \global\let\scap@currentcounter\@currentcounter
+        \global\let\scap@currentlabelname\@currentlabelname
+        \global\let\scap@currentHref\@currentHref
+      }%
     }%
   \fi
   \par
-  \aftergroup\let\aftergroup\@currentlabel
-  \aftergroup\scap@currentlabel
+  \aftergroup\let\aftergroup\@currentlabel\aftergroup\scap@currentlabel
+  \aftergroup\let\aftergroup\@currentcounter\aftergroup\scap@currentcounter
+  \aftergroup\let\aftergroup\@currentlabelname\aftergroup\scap@currentlabelname
+  \aftergroup\let\aftergroup\@currentHref\aftergroup\scap@currentHref
 }
 \newcommand*\capfont{\normalfont\normalcolor}
 \newcommand*\caplabelfont{\normalfont\normalcolor}

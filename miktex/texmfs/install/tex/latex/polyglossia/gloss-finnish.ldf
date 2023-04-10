@@ -1,4 +1,6 @@
-\ProvidesFile{gloss-finnish.ldf}[polyglossia: module for finnish]
+% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+%
+\ProvidesFile{gloss-finnish.ldf}[polyglossia: module for Finnish]
 \PolyglossiaSetup{finnish}{
   bcp47=fi,
   hyphennames={finnish},
@@ -34,10 +36,10 @@
   \bbl@activate{"}%
   \def\language@group{finnish}%
   \declare@shorthand{finnish}{"-}{\nobreak-\bbl@allowhyphens}
-  \declare@shorthand{finnish}{"|}{\textormath{\penalty@M\discretionary{-}{}{\kern.03em}}{}}%
+  \declare@shorthand{finnish}{"|}{\textormath{\penalty\@M\discretionary{-}{}{\kern.03em}}{}}%
   \declare@shorthand{finnish}{""}{\hskip\z@skip}%
   \declare@shorthand{finnish}{"~}{\textormath{\leavevmode\hbox{-}}{-}}%
-  \declare@shorthand{finnish}{"=}{\penalty@M-\hskip\z@skip}%
+  \declare@shorthand{finnish}{"=}{\penalty\@M-\hskip\z@skip}%
   \declare@shorthand{finnish}{"/}{\textormath
     {\bbl@allowhyphens\discretionary{/}{}{/}\bbl@allowhyphens}{}}%
 }

@@ -22,9 +22,9 @@
 %% 
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
 \ProvidesPackage{todonotes}
-    [2021/06/04 v1.1.5 Todonotes source and documentation.]
+    [2023/01/31 v1.1.6 Todonotes source and documentation.]
 
-\ProvidesPackage{todonotes}[2021/06/04]
+\ProvidesPackage{todonotes}[2023/01/31]
 \RequirePackage{ifthen}
 \RequirePackage{xkeyval}
 \RequirePackage{xcolor}
@@ -179,6 +179,9 @@ prior to loading the todonotes package.} \else\fi%
 \DeclareOptionX{prependcaption}{\@todonotes@prependcaptionglobaltrue}
 \define@key{todonotes.sty}%
     {textwidth}{\renewcommand{\@todonotes@textwidth}{#1}}
+\newcommand{\todoformat}[1]{#1}
+\define@key{todonotes.sty}%
+    {format}{\renewcommand{\todoformat}{\@nameuse{#1}}}
 \define@key{todonotes.sty}%
     {textsize}{\renewcommand{\@todonotes@textsize}{#1}}
 \define@key{todonotes.sty}%
@@ -234,6 +237,9 @@ prior to loading the todonotes package.} \else\fi%
 \define@key{todonotes}{noshadow}[]{\@todonotes@useshadowfalse}%
 \define@key{todonotes}{tickmarkheight}{%
     \renewcommand{\@todonotes@tickmarkheight}{#1}}%
+\newcommand{\@todonotes@format}{\todoformat}%
+\define@key{todonotes}{format}{%
+    \renewcommand{\@todonotes@format}{\@nameuse{#1}}}%
 \newcommand{\@todonotes@sizecommand}{}%
 \define@key{todonotes}{size}{\renewcommand{\@todonotes@sizecommand}{#1}%
 }%
@@ -289,6 +295,7 @@ prior to loading the todonotes package.} \else\fi%
     backgroundcolor=\@todonotes@backgroundcolor,%
     textcolor=\@todonotes@textcolor,%
     bordercolor=\@todonotes@bordercolor,%
+    format=todoformat,%
     tickmarkheight=\@todonotes@defaulttickmarkheight,%
     nofancyline,%
     nodisable,%
@@ -420,9 +427,10 @@ the todonotes package}%
          \end{tikzpicture}%
          \if@todonotes@inlinepar\par\fi}%
             \if@todonotes@authorgiven%
-                {\noindent \@todonotes@useSizeCommand \@todonotes@author:\,\@todonotes@text}%
+                {\noindent \@todonotes@useSizeCommand \@todonotes@author:\,\@todonotes@format{\@todonotes@text}}%
             \else%
-                {\noindent \@todonotes@useSizeCommand \@todonotes@text}%
+                {\noindent \@todonotes@useSizeCommand%
+                    \@todonotes@format{\@todonotes@text}}%
             \fi
         {\if@todonotes@inlinepar\par\noindent\fi%
          \begin{tikzpicture}[remember picture]%
@@ -434,9 +442,10 @@ the todonotes package}%
          \begin{tikzpicture}[remember picture]%
             \draw node[inlinenotestyle,font=\@todonotes@useSizeCommand]{%
                 \if@todonotes@authorgiven%
-                    {\noindent \@todonotes@author:\,\@todonotes@text}%
+                    {\noindent \@todonotes@author:\,%
+                        \@todonotes@format{\@todonotes@text}}%
                 \else%
-                    {\noindent \@todonotes@text}%
+                    {\noindent \@todonotes@format{\@todonotes@text}}%
                 \fi};%
          \end{tikzpicture}%
          \if@todonotes@inlinepar\par\fi}%
@@ -448,9 +457,10 @@ the todonotes package}%
     \end{tikzpicture}\\%
     \begin{minipage}{\@todonotes@textwidth}%
     \if@todonotes@authorgiven%
-      \@todonotes@useSizeCommand \@todonotes@author \@todonotes@text%
+      \@todonotes@useSizeCommand \@todonotes@author:\,
+         \@todonotes@format{\@todonotes@text}%
     \else%
-      \@todonotes@useSizeCommand \@todonotes@text%
+      \@todonotes@useSizeCommand\@todonotes@format{\@todonotes@text}%
     \fi%
     \end{minipage}\\%
     \begin{tikzpicture}[remember picture]%
@@ -466,10 +476,10 @@ the todonotes package}%
                 {\@todonotes@author};%
             \node(Y)[below=of X]{};%
             \draw node[notestyle,font=\@todonotes@useSizeCommand,anchor=north] (inNote) at (X.south)%
-                {\@todonotes@text};%
+                {\@todonotes@format{\@todonotes@text}};%
         \else%
             \draw node[notestyle,font=\@todonotes@useSizeCommand,anchor=north] (inNote) at (X.north)%
-                {\@todonotes@text};%
+                {\@todonotes@format{\@todonotes@text}};%
         \fi%
     \end{tikzpicture}%
     \hbadness \originalHbadness%
@@ -565,6 +575,9 @@ the todonotes package}%
     \@todo[#1]{#2}%
   \fi}
 \newif\if@todonotes@vmode
+\newcommand*{\todostyle}[2]{%
+    \define@key{todonotes}{#1}[]{%
+        \setkeys{todonotes}{#2}}}
 \endinput
 %%
 %% End of file `todonotes.sty'.

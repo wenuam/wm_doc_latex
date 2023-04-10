@@ -1,4 +1,6 @@
-\ProvidesFile{gloss-latin.ldf}[polyglossia: module for Latin v.2.5 2022-06-21]
+% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+%
+\ProvidesFile{gloss-latin.ldf}[polyglossia: module for Latin]
 
 \ExplSyntaxOn
 
@@ -617,7 +619,7 @@
 
 \shorthandoff {"}
 \shorthandoff {'}
-\shorthandoff {^}
+\shorthandoff* {^}
 \shorthandoff {=}
 
 % The active = character may cause problems with key=value interfaces.

@@ -34,8 +34,8 @@
 %%
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
-\def\LaTeXFirstAidDate{2022/02/20}
-\def\LaTeXFirstAidVersion{v1.0r}
+\def\LaTeXFirstAidDate{2022/10/29}
+\def\LaTeXFirstAidVersion{v1.0u}
 \ProvidesFile{latex2e-first-aid-for-external-files.ltx}
              [\LaTeXFirstAidDate\space \LaTeXFirstAidVersion\space
                LaTeX kernel fixes to external files and packages]
@@ -71,6 +71,7 @@
   }
 }
 \ExplSyntaxOff
+\AddToHook{file/babel.sty/before}[firstaid]{\def\BabelCaseHack{}}
 \AddToHook{file/bigfoot.sty/after}{%
    \ifnum\count10<\insc@unt
      \global\count10=\insc@unt
@@ -130,6 +131,19 @@
 \def\@active@dq{\protect\grmn@active@dq@}%
 \ngermanTeX
 }%
+}
+\AddToHook{file/memoir.cls/before}[firstaid]{%
+  \expandafter\def\expandafter\@tempa\string\dimen{}%
+  \edef\kernel@stockheight{\expandafter\@tempa\meaning\stockheight}%
+  \edef\kernel@stockwidth{\expandafter\@tempa\meaning\stockwidth}%
+  \let\stockheight\@undefined
+  \let\stockwidth\@undefined
+}
+\AddToHook{file/memoir.cls/after}[firstaid]{%
+  \dimen\kernel@stockheight=\stockheight
+  \dimen\kernel@stockwidth=\stockwidth
+  \dimendef\stockheight=\kernel@stockheight
+  \dimendef\stockwidth=\kernel@stockwidth
 }
 \ExplSyntaxOn
 \sys_if_engine_luatex:T

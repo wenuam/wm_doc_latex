@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossaries-extra-stylemods.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-xr.bib.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossaries-extra-stylemods}[2021/11/22 v1.48 (NLCT)]
+\DeclareRelease{v1.48}{2021-11-22}{glossaries-extra-stylemods-2021-11-22.sty}
+\DeclareCurrentRelease{v1.50}{2022-11-08}
+\ProvidesPackage{glossaries-extra-stylemods}[2022/11/08 v1.50 (NLCT)]
 \newcommand*{\@glsxtr@loadstyles}{}
 \DeclareOption{all}{%
   \appto\@glsxtr@loadstyles{%
@@ -55,6 +57,7 @@
     \RequirePackage{glossary-bookindex}%
     \RequirePackage{glossary-longextra}%
     \RequirePackage{glossary-topic}%
+    \RequirePackage{glossary-table}%
   }
 }
 \DeclareOption*{%
@@ -136,6 +139,7 @@
       {\glslistinit\begin{description}}{\end{description}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand*{\glossentry}[2]{%
       \glslistitem{##1}\glslistdesc{##1}\glslistprelocation ##2}%
     \renewcommand*{\subglossentry}[3]{%
@@ -229,6 +233,7 @@
        {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription
@@ -256,6 +261,7 @@
       {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription & ##2\tabularnewline
@@ -282,6 +288,7 @@
       {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription &
@@ -310,6 +317,7 @@
        {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription\glsxtrprelocation ##2%
@@ -339,6 +347,7 @@
       {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription & ##2\tabularnewline
@@ -366,6 +375,7 @@
       {\end{longtable}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription & \glossentrysymbol{##1} &
@@ -394,6 +404,7 @@
       {\end{supertabular}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription
@@ -422,6 +433,7 @@
       {\end{supertabular}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription & ##2\tabularnewline
@@ -449,6 +461,7 @@
        \end{supertabular}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription &
@@ -477,6 +490,7 @@
       {\end{supertabular}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription\glsxtrprelocation ##2%
@@ -507,6 +521,7 @@
       {\end{supertabular}}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
       \glossentrydesc{##1}\glspostdescription &
@@ -570,6 +585,7 @@
   \def\glstreegroupheaderfmt#1{\glstreedefaultnamefmt{#1}}
   \def\glstreenavigationfmt#1{\glstreedefaultnamefmt{#1}}
   \newcommand{\glstreePreHeader}[2]{}
+  \newcommand{\glstreeSubPreHeader}[5]{}
 }
 {}
 \ifdef{\@glsstyle@index}
@@ -589,6 +605,7 @@
     {\par}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand*{\glossentry}[2]{%
        \item\glsentryitem{##1}%
        \glstreenamefmt{\glstarget{##1}{\glossentryname{##1}}}%
@@ -614,6 +631,20 @@
 {}
 \ifdef{\@glsstyle@indexgroup}
 {%
+  \newcommand*{\glsindexsubgroupitem}[5]{%
+    \ifcase#2\relax
+     \item \glstreegroupheaderfmt{#5}%
+     \glstreegroupheaderskip
+    \or
+     \smallskip
+     \subitem \glstreegroupheaderfmt{#5}%
+     \smallskip
+    \else
+     \smallskip
+     \subsubitem \glstreegroupheaderfmt{#5}%
+     \smallskip
+    \fi
+  }
   \renewglossarystyle{indexgroup}{%
     \setglossarystyle{index}%
     \renewcommand*{\glsgroupheading}[1]{%
@@ -621,6 +652,12 @@
       \glstreePreHeader{##1}{\glsxtr@grptitle}%
       \item\glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glsindexsubgroupitem{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \@afterheading
     }%
   }
 }
@@ -638,13 +675,20 @@
       \item\glstreegroupheaderfmt
         {\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading}%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glsindexsubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
+      \@afterheading
+    }%
   }%
 }
 {}
 \ifdef{\@glsstyle@tree}
 {%
-\newcommand{\glsxtrtreepredesc}{\glstreepredesc}
-\newcommand{\glsxtrtreechildpredesc}{\glstreechildpredesc}
+  \newcommand{\glsxtrtreepredesc}{\glstreepredesc}
+  \newcommand{\glsxtrtreechildpredesc}{\glstreechildpredesc}
   \newcommand{\glstreedesc}[1]{%
     \glsxtrtreepredesc\glossentrydesc{#1}\glspostdescription
   }
@@ -679,6 +723,7 @@
       {}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \hangindent0pt\relax
       \parindent0pt\relax
@@ -702,6 +747,10 @@
 {}
 \ifdef{\@glsstyle@treegroup}
 {%
+  \newcommand*{\glstreesubgroupitem}[5]{%
+    \par\smallskip\noindent\hspace{#2\glstreeindent}%
+    \glstreegroupheaderfmt{#5}\smallskip\par
+  }
   \renewglossarystyle{treegroup}{%
     \setglossarystyle{tree}%
     \renewcommand{\glsgroupheading}[1]{%
@@ -709,6 +758,11 @@
       \glstreePreHeader{##1}{\glsxtr@grptitle}%
       \par\noindent\glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip\@afterheading}%
+    \renewcommand*{\glssubgroupheading}[4]{%
+     \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+     \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+     \glstreesubgroupitem{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+    }%
   }
 }
 {}
@@ -726,6 +780,12 @@
       \glstreegroupheaderfmt
         {\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading}%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glstreesubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
+    }%
   }
 }
 {}
@@ -753,6 +813,7 @@
       {}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \hangindent0pt\relax
       \parindent0pt\relax
@@ -826,7 +887,7 @@
   }
   \newlength\glsxtrtreetopindent
   \newcommand*{\glsxtralttreeInit}{%
-    \settowidth{\glsxtrtreetopindent}{\glstreenamefmt{\glsgetwidestname\space}}%
+    \glsmeasurewidth{\glsxtrtreetopindent}{\glstreenamefmt{\glsgetwidestname\space}}%
     \glsxtrAltTreeIndent=\parindent
   }
   \newcommand*{\gglssetwidest}[2][0]{%
@@ -842,8 +903,8 @@
     \ifcsundef{@glswidestname\romannumeral#1}%
     {\csdef{@glswidestname\romannumeral#1}{#2}}%
     {%
-      \settowidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
-      \settowidth{\dimen@ii}{#2}%
+      \glsmeasurewidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
+      \glsmeasurewidth{\dimen@ii}{#2}%
       \ifdim\dimen@ii>\dimen@
        \csdef{@glswidestname\romannumeral#1}{#2}%
       \fi
@@ -853,8 +914,8 @@
     \ifcsundef{@glswidestname\romannumeral#1}%
     {\csgdef{@glswidestname\romannumeral#1}{#2}}%
     {%
-      \settowidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
-      \settowidth{\dimen@ii}{#2}%
+      \glsmeasurewidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
+      \glsmeasurewidth{\dimen@ii}{#2}%
       \ifdim\dimen@ii>\dimen@
        \csgdef{@glswidestname\romannumeral#1}{#2}%
       \fi
@@ -864,8 +925,8 @@
     \ifcsundef{@glswidestname\romannumeral#1}%
     {\protected@csedef{@glswidestname\romannumeral#1}{#2}}%
     {%
-      \settowidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
-      \settowidth{\dimen@ii}{#2}%
+      \glsmeasurewidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
+      \glsmeasurewidth{\dimen@ii}{#2}%
       \ifdim\dimen@ii>\dimen@
        \protected@csedef{@glswidestname\romannumeral#1}{#2}%
       \fi
@@ -875,8 +936,8 @@
     \ifcsundef{@glswidestname\romannumeral#1}%
     {\protected@csxdef{@glswidestname\romannumeral#1}{#2}}%
     {%
-      \settowidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
-      \settowidth{\dimen@ii}{#2}%
+      \glsmeasurewidth{\dimen@}{\csuse{@glswidestname\romannumeral#1}}%
+      \glsmeasurewidth{\dimen@ii}{#2}%
       \ifdim\dimen@ii>\dimen@
        \protected@csxdef{@glswidestname\romannumeral#1}{#2}%
       \fi
@@ -901,7 +962,7 @@
           \ifglshasparent{\@glo@label}%
           {}%
           {%
-            \settowidth{\dimen@}%
+            \glsmeasurewidth{\dimen@}%
              {\glstreenamefmt{\glsentryname{\@glo@label}}}%
             \ifdim\dimen@>\gls@tmplen
               \gls@tmplen=\dimen@
@@ -922,7 +983,7 @@
       {%
         \ifglsused{\@glo@label}%
         {%
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glstreenamefmt{\glsentryname{\@glo@label}}}%
           \ifdim\dimen@>\gls@tmplen
             \gls@tmplen=\dimen@
@@ -940,7 +1001,7 @@
     {%
       \forglsentries[\@gls@type]{\@glo@label}%
       {%
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glstreenamefmt{\glsentryname{\@glo@label}}}%
         \ifdim\dimen@>\gls@tmplen
           \gls@tmplen=\dimen@
@@ -968,7 +1029,7 @@
               \ifglshasparent{\@glo@parent}%
               {}%
               {%
-                \settowidth{\gls@tmplen}%
+                \glsmeasurewidth{\gls@tmplen}%
                    {\glstreenamefmt{\glsentryname{\@glo@label}}}%
                 \ifdim\gls@tmplen>\dimen@ii
                   \dimen@ii=\gls@tmplen
@@ -977,7 +1038,7 @@
               }%
             }%
             {%
-              \settowidth{\gls@tmplen}%
+              \glsmeasurewidth{\gls@tmplen}%
                  {\glstreenamefmt{\glsentryname{\@glo@label}}}%
               \ifdim\gls@tmplen>\dimen@i
                 \dimen@i=\gls@tmplen
@@ -986,7 +1047,7 @@
             }%
           }%
           {%
-            \settowidth{\gls@tmplen}%
+            \glsmeasurewidth{\gls@tmplen}%
                {\glstreenamefmt{\glsentryname{\@glo@label}}}%
             \ifdim\gls@tmplen>\dimen@
               \dimen@=\gls@tmplen
@@ -1015,7 +1076,7 @@
             \ifglshasparent{\@glo@parent}%
             {}%
             {%
-              \settowidth{\gls@tmplen}%
+              \glsmeasurewidth{\gls@tmplen}%
                  {\glstreenamefmt{\glsentryname{\@glo@label}}}%
               \ifdim\gls@tmplen>\dimen@ii
                 \dimen@ii=\gls@tmplen
@@ -1024,7 +1085,7 @@
             }%
           }%
           {%
-            \settowidth{\gls@tmplen}%
+            \glsmeasurewidth{\gls@tmplen}%
                {\glstreenamefmt{\glsentryname{\@glo@label}}}%
             \ifdim\gls@tmplen>\dimen@i
               \dimen@i=\gls@tmplen
@@ -1033,7 +1094,7 @@
           }%
         }%
         {%
-          \settowidth{\gls@tmplen}%
+          \glsmeasurewidth{\gls@tmplen}%
              {\glstreenamefmt{\glsentryname{\@glo@label}}}%
           \ifdim\gls@tmplen>\dimen@
             \dimen@=\gls@tmplen
@@ -1053,13 +1114,13 @@
       {%
         \ifglsused{\@glo@label}%
         {%
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glstreenamefmt{\glsentryname{\@glo@label}}}%
           \ifdim\dimen@>\gls@tmplen
             \gls@tmplen=\dimen@
             \eglssetwidest{\glsentryname{\@glo@label}}%
           \fi
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glsentrysymbol{\@glo@label}}%
           \ifdim\dimen@>#2\relax
             #2=\dimen@
@@ -1077,13 +1138,13 @@
     {%
       \forglsentries[\@gls@type]{\@glo@label}%
       {%
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glstreenamefmt{\glsentryname{\@glo@label}}}%
         \ifdim\dimen@>\gls@tmplen
           \gls@tmplen=\dimen@
           \eglssetwidest{\glsentryname{\@glo@label}}%
         \fi
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glsentrysymbol{\@glo@label}}%
         \ifdim\dimen@>#2\relax
           #2=\dimen@
@@ -1102,18 +1163,18 @@
       {%
         \ifglsused{\@glo@label}%
         {%
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glstreenamefmt{\glsentryname{\@glo@label}}}%
           \ifdim\dimen@>\gls@tmplen
             \gls@tmplen=\dimen@
             \eglssetwidest{\glsentryname{\@glo@label}}%
           \fi
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glsentrysymbol{\@glo@label}}%
           \ifdim\dimen@>#2\relax
             #2=\dimen@
           \fi
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\GlsXtrFormatLocationList{\glsentrynumberlist{\@glo@label}}}%
           \ifdim\dimen@>#3\relax
             #3=\dimen@
@@ -1132,18 +1193,18 @@
     {%
       \forglsentries[\@gls@type]{\@glo@label}%
       {%
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glstreenamefmt{\glsentryname{\@glo@label}}}%
         \ifdim\dimen@>\gls@tmplen
           \gls@tmplen=\dimen@
           \eglssetwidest{\glsentryname{\@glo@label}}%
         \fi
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glsentrysymbol{\@glo@label}}%
         \ifdim\dimen@>#2\relax
           #2=\dimen@
         \fi
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
           {\GlsXtrFormatLocationList{\glsentrynumberlist{\@glo@label}}}%
         \ifdim\dimen@>#3\relax
           #3=\dimen@
@@ -1161,13 +1222,13 @@
       {%
         \ifglsused{\@glo@label}%
         {%
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\glstreenamefmt{\glsentryname{\@glo@label}}}%
           \ifdim\dimen@>\gls@tmplen
             \gls@tmplen=\dimen@
             \eglssetwidest{\glsentryname{\@glo@label}}%
           \fi
-          \settowidth{\dimen@}%
+          \glsmeasurewidth{\dimen@}%
            {\GlsXtrFormatLocationList{\glsentrynumberlist{\@glo@label}}}%
           \ifdim\dimen@>#2\relax
             #2=\dimen@
@@ -1185,13 +1246,13 @@
     {%
       \forglsentries[\@gls@type]{\@glo@label}%
       {%
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\glstreenamefmt{\glsentryname{\@glo@label}}}%
         \ifdim\dimen@>\gls@tmplen
           \gls@tmplen=\dimen@
           \eglssetwidest{\glsentryname{\@glo@label}}%
         \fi
-        \settowidth{\dimen@}%
+        \glsmeasurewidth{\dimen@}%
          {\GlsXtrFormatLocationList{\glsentrynumberlist{\@glo@label}}}%
         \ifdim\dimen@>#2\relax
           #2=\dimen@
@@ -1205,10 +1266,10 @@
   \newcommand*{\glsxtrComputeTreeSubIndent}[3]{%
     \ifcsundef{@glswidestname\romannumeral#1}%
     {%
-      \settowidth{#3}{\glstreenamefmt{\@glswidestname\space}}%
+      \glsmeasurewidth{#3}{\glstreenamefmt{\@glswidestname\space}}%
     }%
     {%
-      \settowidth{#3}{\glstreenamefmt{%
+      \glsmeasurewidth{#3}{\glstreenamefmt{%
              \csname @glswidestname\romannumeral#1\endcsname\space}}%
     }%
   }
@@ -1223,6 +1284,7 @@
       {\par}%
     \renewcommand*{\glossaryheader}{}%
     \renewcommand*{\glsgroupheading}[1]{}%
+    \renewcommand*{\glssubgroupheading}[4]{}%
     \renewcommand{\glossentry}[2]{%
       \ifnum\@gls@prevlevel=0\relax
       \else
@@ -1274,7 +1336,13 @@
 {%
 }
 \ifdef{\@glsstyle@alttreegroup}
-{%
+{
+ \newcommand*{\glsalttreesubgroupheader}[6]{%
+   \par\smallskip
+   \makebox[0pt][r]{\glstreenamebox{#6}%
+     {\glstreegroupheaderfmt{#5}}}%
+   \smallskip\par
+  }
   \renewglossarystyle{alttreegroup}{%
     \setglossarystyle{alttree}%
     \renewcommand{\glsgroupheading}[1]{\par
@@ -1285,6 +1353,45 @@
       \glstreePreHeader{##1}{\glsxtr@grptitle}%
       \glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \ifnum\@gls@prevlevel=##2\relax
+      \else
+        \ifcsundef{@glswidestname\romannumeral##2}%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{\@glswidestname\space}}%
+        }%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{%
+                 \csname @glswidestname\romannumeral##2\endcsname\space}}%
+        }%
+        \ifnum\@gls@prevlevel<##2\relax
+          \setlength\glstreeindent\gls@tmplen
+          \addtolength\glstreeindent\parindent
+          \parindent\glstreeindent
+        \else
+          \ifnum\@gls@prevlevel=0\relax
+            \glsxtrComputeTreeIndent{##2}%
+          \else
+            \ifcsundef{@glswidestname\romannumeral##2}%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{\@glswidestname\space}}%
+            }%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{%
+                     \csname @glswidestname\romannumeral##2\endcsname\space}}%
+            }%
+          \fi
+          \addtolength\parindent{-\glstreeindent}%
+          \setlength\glstreeindent\parindent
+        \fi
+      \fi
+      \glsxtrAltTreeSetSubHangIndent{##2}%
+      \glsalttreesubgroupheader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}{\gls@tmplen}%
+      \def\@gls@prevlevel{##2}%
+      \par
     }%
   }%
 }%
@@ -1312,6 +1419,46 @@
       \glstreegroupheaderfmt{\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip
     }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \ifnum\@gls@prevlevel=##2\relax
+      \else
+        \ifcsundef{@glswidestname\romannumeral##2}%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{\@glswidestname\space}}%
+        }%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{%
+                 \csname @glswidestname\romannumeral##2\endcsname\space}}%
+        }%
+        \ifnum\@gls@prevlevel<##2\relax
+          \setlength\glstreeindent\gls@tmplen
+          \addtolength\glstreeindent\parindent
+          \parindent\glstreeindent
+        \else
+          \ifnum\@gls@prevlevel=0\relax
+            \glsxtrComputeTreeIndent{##2}%
+          \else
+            \ifcsundef{@glswidestname\romannumeral##2}%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{\@glswidestname\space}}%
+            }%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{%
+                     \csname @glswidestname\romannumeral##2\endcsname\space}}%
+            }%
+          \fi
+          \addtolength\parindent{-\glstreeindent}%
+          \setlength\glstreeindent\parindent
+        \fi
+      \fi
+      \glsxtrAltTreeSetSubHangIndent{##2}%
+      \glsalttreesubgroupheader{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}{\gls@tmplen}%
+      \def\@gls@prevlevel{##2}%
+      \par
+    }%
   }
 }%
 {%
@@ -1325,6 +1472,12 @@
       \glstreePreHeader{##1}{\glsxtr@grptitle}%
       \item\glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glsindexsubgroupitem{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \@afterheading
     }%
   }
 }%
@@ -1344,6 +1497,13 @@
       \item\glstreegroupheaderfmt
         {\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glsindexsubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
+      \@afterheading
     }%
   }
 }%
@@ -1367,6 +1527,13 @@
         {\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading
     }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glsindexsubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
+      \@afterheading
+    }%
   }
 }%
 {%
@@ -1380,6 +1547,11 @@
       \glstreePreHeader{##1}{\glsxtr@grptitle}%
       \par\noindent\glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+     \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+     \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+     \glstreesubgroupitem{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
     }%
   }
 }%
@@ -1399,6 +1571,12 @@
       \par\noindent
       \glstreegroupheaderfmt{\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glstreesubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
     }%
   }
 }%
@@ -1422,6 +1600,12 @@
       \par\noindent
       \glstreegroupheaderfmt{\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip\@afterheading
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \glstreesubgroupitem{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}%
     }%
   }
 }%
@@ -1510,6 +1694,45 @@
       \glstreegroupheaderfmt{\glsxtr@grptitle}%
       \glstreegroupheaderskip
     }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \ifnum\@gls@prevlevel=##2\relax
+      \else
+        \ifcsundef{@glswidestname\romannumeral##2}%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{\@glswidestname\space}}%
+        }%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{%
+                 \csname @glswidestname\romannumeral##2\endcsname\space}}%
+        }%
+        \ifnum\@gls@prevlevel<##2\relax
+          \setlength\glstreeindent\gls@tmplen
+          \addtolength\glstreeindent\parindent
+          \parindent\glstreeindent
+        \else
+          \ifnum\@gls@prevlevel=0\relax
+            \glsxtrComputeTreeIndent{##2}%
+          \else
+            \ifcsundef{@glswidestname\romannumeral##2}%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{\@glswidestname\space}}%
+            }%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{%
+                     \csname @glswidestname\romannumeral##2\endcsname\space}}%
+            }%
+          \fi
+          \addtolength\parindent{-\glstreeindent}%
+          \setlength\glstreeindent\parindent
+        \fi
+      \fi
+      \glsxtrAltTreeSetSubHangIndent{##2}%
+      \glsalttreesubgroupheader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}{\gls@tmplen}%
+      \def\@gls@prevlevel{##2}%
+      \par
+    }%
   }
 }%
 {%
@@ -1536,6 +1759,46 @@
       \glstreegroupheaderfmt{\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip
     }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \ifnum\@gls@prevlevel=##2\relax
+      \else
+        \ifcsundef{@glswidestname\romannumeral##2}%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{\@glswidestname\space}}%
+        }%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{%
+                 \csname @glswidestname\romannumeral##2\endcsname\space}}%
+        }%
+        \ifnum\@gls@prevlevel<##2\relax
+          \setlength\glstreeindent\gls@tmplen
+          \addtolength\glstreeindent\parindent
+          \parindent\glstreeindent
+        \else
+          \ifnum\@gls@prevlevel=0\relax
+            \glsxtrComputeTreeIndent{##2}%
+          \else
+            \ifcsundef{@glswidestname\romannumeral##2}%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{\@glswidestname\space}}%
+            }%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{%
+                     \csname @glswidestname\romannumeral##2\endcsname\space}}%
+            }%
+          \fi
+          \addtolength\parindent{-\glstreeindent}%
+          \setlength\glstreeindent\parindent
+        \fi
+      \fi
+      \glsxtrAltTreeSetSubHangIndent{##2}%
+      \glsalttreesubgroupheader{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}{\gls@tmplen}%
+      \def\@gls@prevlevel{##2}%
+      \par
+    }%
   }
 }%
 {%
@@ -1561,6 +1824,46 @@
       \parindent0pt\relax
       \glstreegroupheaderfmt{\glsnavhypertarget{##1}{\glsxtr@grptitle}}%
       \glstreegroupheaderskip
+    }%
+    \renewcommand*{\glssubgroupheading}[4]{%
+      \glsxtrgetgrouptitle{##4}{\glsxtr@grptitle}%
+      \glstreeSubPreHeader{##1}{##2}{##3}{##4}{\glsxtr@grptitle}%
+      \ifnum\@gls@prevlevel=##2\relax
+      \else
+        \ifcsundef{@glswidestname\romannumeral##2}%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{\@glswidestname\space}}%
+        }%
+        {%
+          \glsmeasurewidth{\gls@tmplen}{\glstreenamefmt{%
+                 \csname @glswidestname\romannumeral##2\endcsname\space}}%
+        }%
+        \ifnum\@gls@prevlevel<##2\relax
+          \setlength\glstreeindent\gls@tmplen
+          \addtolength\glstreeindent\parindent
+          \parindent\glstreeindent
+        \else
+          \ifnum\@gls@prevlevel=0\relax
+            \glsxtrComputeTreeIndent{##2}%
+          \else
+            \ifcsundef{@glswidestname\romannumeral##2}%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{\@glswidestname\space}}%
+            }%
+            {%
+              \glsmeasurewidth{\glstreeindent}{\glstreenamefmt{%
+                     \csname @glswidestname\romannumeral##2\endcsname\space}}%
+            }%
+          \fi
+          \addtolength\parindent{-\glstreeindent}%
+          \setlength\glstreeindent\parindent
+        \fi
+      \fi
+      \glsxtrAltTreeSetSubHangIndent{##2}%
+      \glsalttreesubgroupheader{##1}{##2}{##3}{##4}%
+        {\glsnavhypertarget{##4}{\glsxtr@grptitle}}{\gls@tmplen}%
+      \def\@gls@prevlevel{##2}%
+      \par
     }%
   }
 }%

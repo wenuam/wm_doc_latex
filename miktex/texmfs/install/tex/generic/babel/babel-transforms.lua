@@ -7,7 +7,7 @@
 -- babel.dtx  (with options: `transforms')
 -- 
 --
--- Copyright (C) 2012-2022 Javier Bezos and Johannes L. Braams.
+-- Copyright (C) 2012-2023 Javier Bezos and Johannes L. Braams.
 -- Copyright (C) 1989-2012 Johannes L. Braams and
 --           any individual authors listed elsewhere in this file.
 -- All rights reserved.
@@ -364,7 +364,7 @@ function Babel.hyphenate_replace(head, mode)
             goto next
 
           elseif mode == 1 and crep and (crep.pre or crep.no or crep.post) then
-            d = node.new(7, 0)   -- (disc, discretionary)
+            d = node.new(7, 3)   -- (disc, regular)
             d.pre     = Babel.str_to_nodes(crep.pre, matches, item_base)
             d.post    = Babel.str_to_nodes(crep.post, matches, item_base)
             d.replace = Babel.str_to_nodes(crep.no, matches, item_base)

@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{puvnenc.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref: Additions to puenc.def for VnTeX]
 \DeclareTextCommand{\abreve}{PU}{\81\003}% U+0103
 \DeclareTextCommand{\acircumflex}{PU}{\80\342}% U+00E2

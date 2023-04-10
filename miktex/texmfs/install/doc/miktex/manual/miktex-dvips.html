@@ -1,11 +1,11 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>miktex-dvips</title><link rel="stylesheet" type="text/css" href="miktexman.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="MiKTeX Manual"><link rel="up" href="programs.html" title="Chapter 6. Programs"><link rel="prev" href="miktex-dvicopy.html" title="miktex-dvicopy"><link rel="next" href="findtexmf.html" title="findtexmf"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><nav><ul class="pager"><li><a aria-label="Prev" href="miktex-dvicopy.html"><span aria-hidden="true">Prev</span></a></li><li><a aria-label="Up" href="programs.html"><span aria-hidden="true">Up</span></a></li><li><a aria-label="Next" href="findtexmf.html"><span aria-hidden="true">Next</span></a></li></ul></nav><div class="refentry"><a name="miktex-dvips"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>miktex-dvips — convert a <acronym class="acronym">DVI</acronym> file to <span class="application">PostScript</span></p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">miktex-dvips</code>  [<em class="replaceable"><code>option</code></em>...]  <em class="replaceable"><code>dvifile</code></em> </p></div></div><div class="refsect1"><a name="id857816"></a><h2>Description</h2><p>This man page is an adaption of the corresponding <span class="application">TeX Live</span> man page.</p><p>This man page is obsolete! See the Texinfo documentation instead.</p><p><span class="application">Dvips</span> takes a <acronym class="acronym">DVI</acronym> file produced by <span class="application">TeX</span> (or by some other
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>miktex-dvips</title><link rel="stylesheet" type="text/css" href="miktexman.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="MiKTeX Manual"><link rel="up" href="programs.html" title="Chapter 6. Programs"><link rel="prev" href="miktex-dvicopy.html" title="miktex-dvicopy"><link rel="next" href="findtexmf.html" title="findtexmf"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><nav><ul class="pager"><li><a aria-label="Prev" href="miktex-dvicopy.html"><span aria-hidden="true">Prev</span></a></li><li><a aria-label="Up" href="programs.html"><span aria-hidden="true">Up</span></a></li><li><a aria-label="Next" href="findtexmf.html"><span aria-hidden="true">Next</span></a></li></ul></nav><div class="refentry"><a name="miktex-dvips"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>miktex-dvips — convert a <acronym class="acronym">DVI</acronym> file to <span class="application">PostScript</span></p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">miktex-dvips</code>  [<em class="replaceable"><code>option</code></em>...]  <em class="replaceable"><code>dvifile</code></em> </p></div></div><div class="refsect1"><a name="id934498"></a><h2>Description</h2><p>This man page is an adaption of the corresponding <span class="application">TeX Live</span> man page.</p><p>This man page is obsolete! See the Texinfo documentation instead.</p><p><span class="application">Dvips</span> takes a <acronym class="acronym">DVI</acronym> file produced by <span class="application">TeX</span> (or by some other
 processor such as <span class="command"><strong>miktex-gftodvi</strong></span>) and
-<a class="indexterm" name="id857822"></a>
+<a class="indexterm" name="id934509"></a>
 converts it to <span class="application">PostScript</span>.
-<a class="indexterm" name="id857851"></a>
+<a class="indexterm" name="id934577"></a>
 The <acronym class="acronym">DVI</acronym> file may be specified without the <code class="filename">.dvi</code>
-<a class="indexterm" name="id857868"></a>
-extension.</p></div><div class="refsect1"><a name="id857879"></a><h2>Options</h2><p>Many of the parameterless options listed here can be turned off
+<a class="indexterm" name="id934570"></a>
+extension.</p></div><div class="refsect1"><a name="id934576"></a><h2>Options</h2><p>Many of the parameterless options listed here can be turned off
 by suffixing the option with a zero (<code class="literal">0</code>); for
 instance, to turn off page reversal, use <code class="option">-r0</code>. Such
 options are marked with a trailing <code class="literal">*</code>.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">-</code></span></dt><dd><p>Read additional options from standard input after
@@ -210,7 +210,7 @@ etc. to standard output; report no warnings (only errors) to standard
 error.</p></dd><dt><span class="term"><code class="option">-r*</code></span></dt><dd><p> Output pages in reverse order.  By default, page 1 is
 output first.</p></dd><dt><span class="term"><code class="option">-R</code></span></dt><dd><p>Run securely.  <code class="option">-R2</code> disables both
 shell command execution
-<a class="indexterm" name="id796167"></a>
+<a class="indexterm" name="id820711"></a>
 in <span class="markup">\special</span> (via <code class="option">`</code>) and
 config files (via the <code class="option">E</code>), pipes as output files, and
 opening of any absolute or <code class="filename">..</code>-relative filenames.
@@ -248,7 +248,7 @@ the <acronym class="acronym">DVI</acronym> file.  Be careful, as the paper size 
 predefined size if there is one close enough.  To disable this
 behavior, use <code class="option">-tunknown</code></p></dd><dt><span class="term"><code class="option">-u <em class="replaceable"><code>psmapfile</code></em></code></span></dt><dd><p>Set <em class="replaceable"><code>psmapfile</code></em> to be the
 file that <span class="application">Dvips</span> uses for looking up <span class="application">PostScript</span> font aliases.
-<a class="indexterm" name="id796373"></a>
+<a class="indexterm" name="id818671"></a>
 If <em class="replaceable"><code>psmapfile</code></em> starts with a
 <code class="filename">+</code> character, then the rest of the name is used as
 the name of the map file, and the map file is appended to the list of
@@ -279,12 +279,12 @@ for increased precision.</p></dd><dt><span class="term"><code class="option">-X 
 <em class="replaceable"><code>num</code></em>.</p></dd><dt><span class="term"><code class="option">-z*</code></span></dt><dd><p>Pass <code class="option">html</code> hyperdvi specials through to
 the output for eventual distillation into
 <acronym class="acronym">PDF</acronym>.  This is not enabled by default to
-<a class="indexterm" name="id796560"></a>
+<a class="indexterm" name="id819112"></a>
 avoid including the header files unnecessarily, and use of
 temporary files in creating the output.</p></dd><dt><span class="term"><code class="option">-Z*</code></span></dt><dd><p>Compress bitmap fonts in the output file, thereby
 reducing the size of what gets downloaded.  Especially useful at high
 resolutions or when very large fonts are used.  May slow down
 printing, especially on early 68000-based <span class="application">PostScript</span> printers.
 Generally recommend today, and can be enabled in the configuration
-file.</p></dd></dl></div></div><div class="refsect1"><a name="id796604"></a><h2>Environment</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="envar">MIKTEX_TRACE</code></span></dt><dd><a class="indexterm" name="id796597"></a><p>Comma-separated list of trace stream names (see <a class="xref" href="tracestreams.html" title="Chapter 9. Trace Streams">Chapter 9, <i>Trace Streams</i></a>).  If this variable is set, then <span class="application">MiKTeX</span>
+file.</p></dd></dl></div></div><div class="refsect1"><a name="id819149"></a><h2>Environment</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="envar">MIKTEX_TRACE</code></span></dt><dd><a class="indexterm" name="id819125"></a><p>Comma-separated list of trace stream names (see <a class="xref" href="tracestreams.html" title="Chapter 9. Trace Streams">Chapter 9, <i>Trace Streams</i></a>).  If this variable is set, then <span class="application">MiKTeX</span>
 programs will write trace messages into the configured log sink.</p></dd></dl></div></div></div></body></html>

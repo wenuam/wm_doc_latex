@@ -43,7 +43,7 @@
 %% extension .ins) which are part of the distribution.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltxdoc}
-         [2022/06/22 v2.1h Standard LaTeX documentation class]
+         [2022/06/22 v2.1i Standard LaTeX documentation class]
 \DeclareOption{a5paper}{\@latexerr{Option not supported}%
    {}}
 \newif\ifltxdoc@load@cfg@ \ltxdoc@load@cfg@true
@@ -263,9 +263,7 @@ Bug reports can be opened (category \texttt{#1}) at\\%
   \par
   \vskip 1.5em}
 \def\task#1#2{}
-\DeclareRobustCommand\cs[1]{\texttt{\bslash\detokenize{#1}}}%
 \AtBeginDocument{%
-  \renewcommand\PrintMacroName[1]{\MacroFont\detokenize{#1}}%
   \providecommand\LuaTeX{Lua\TeX}
   \providecommand\cls{\textsf}
   \providecommand\pkg{\textsf}

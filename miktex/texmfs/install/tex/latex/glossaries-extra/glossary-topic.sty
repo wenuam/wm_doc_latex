@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossary-topic.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-xr.bib.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossary-topic}[2021/11/22 v1.48 (NLCT)]
+\DeclareRelease{v1.48}{2021-11-22}{glossary-topic-2021-11-22.sty}
+\DeclareCurrentRelease{v1.50}{2022-11-08}
+\ProvidesPackage{glossary-topic}[2022/11/08 v1.50 (NLCT)]
 \RequirePackage{multicol}
 \newglossarystyle{topic}{%
   \renewenvironment{theglossary}%
@@ -54,6 +56,7 @@
     \def\glstopic@prevlevel{-1}%
     \glstopicGroupHeading{##1}%
   }%
+  \renewcommand*{\glssubgroupheading}{\glstopicSubGroupHeading}%
   \renewcommand{\glossentry}[2]{%
     \hangindent0pt\relax
     \parindent\glstopicParIndent\relax
@@ -78,6 +81,17 @@
   \renewcommand*{\glsgroupskip}{}%
 }
 \newcommand*{\glstopicGroupHeading}[1]{}
+\newcommand*{\glstopicSubGroupHeading}[4]{%
+ \begingroup
+  \glspar\glstopicPreSkip\glspar\noindent
+  \glsxtrgetgrouptitle{#4}{\glstopicsubgrouptitle}%
+  \glstopicAssignSubIndent{#2}%
+  \glstopicSubItemBox{#2}{\glstopicTitleFont{\glstopicsubgrouptitle}}%
+  \glstopicSubItemSep
+  \glspar\nobreak\glstopicPostSkip
+  \par
+ \endgroup
+}
 \newcommand*{\glstopicItem}[2]{%
   \glspar\glstopicPreSkip\glspar\noindent
   \glstopicMarker{#1}%
@@ -87,7 +101,8 @@
   }%
   \ifglshasdesc{#1}%
   {\glspar\nobreak\glstopicMidSkip\glspar\nobreak
-   \@afterheading\glstopicDesc{#1}\glspar\glstopicPostSkip}%
+   \@afterheading\glstopicDesc{#1}\glspar\glstopicPostSkip
+  }%
   {\glspar\nobreak\glstopicPostSkip}%
   \glstopicLoc{#1}{#2}%
 }
@@ -121,7 +136,7 @@
   {%
     \ifcsdef{@glswidestname\romannumeral#1}%
     {%
-      \settowidth{\glstopicwidest}{%
+      \glsmeasurewidth{\glstopicwidest}{%
        \glstopicSubNameFont{\csuse{@glswidestname\romannumeral#1}}%
        \glstopicSubItemSep
       }%
@@ -171,6 +186,7 @@
     \def\glstopic@prevlevel{-1}%
     \glstopicGroupHeading{##1}%
   }%
+  \renewcommand*{\glssubgroupheading}{\glstopicSubGroupHeading}%
   \renewcommand{\glossentry}[2]{%
     \ifnum\glstopic@prevlevel>0\relax\glstopic@postchildren\fi
     \def\glstopic@prevlevel{0}%

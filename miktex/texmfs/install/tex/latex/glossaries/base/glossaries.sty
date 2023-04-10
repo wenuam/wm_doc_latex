@@ -7,7 +7,7 @@
 %% glossaries.dtx  (with options: `glossaries.sty,package')
 %% 
 %%  glossaries.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossaries-prefix.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list-2020-03-19.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-accsupp.sty, glossaries-babel.sty, glossaries-polyglossia.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, glossaries-2020-03-19.sty, glossaries.perl.
+%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-babel.sty, glossaries-polyglossia.sty, glossaries-prefix.sty, glossaries-accsupp.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-2020-03-19.sty, glossaries-accsupp-2020-03-19.sty, glossaries-babel-2020-03-19.sty, glossaries-compatible-207-2020-03-19.sty, glossaries-compatible-307-2020-03-19.sty, glossaries-polyglossia-2020-03-19.sty, glossaries-prefix-2020-03-19.sty, glossary-hypernav-2020-03-19.sty, glossary-inline-2020-03-19.sty, glossary-list-2020-03-19.sty, glossary-long-2020-03-19.sty, glossary-longbooktabs-2020-03-19.sty, glossary-longragged-2020-03-19.sty, glossary-mcols-2020-03-19.sty, glossary-super-2020-03-19.sty, glossary-superragged-2020-03-19.sty, glossary-tree-2020-03-19.sty, glossaries-2021-11-01.sty, glossaries-accsupp-2021-11-01.sty, glossaries-babel-2021-11-01.sty, glossaries-compatible-207-2021-11-01.sty, glossaries-compatible-307-2021-11-01.sty, glossaries-polyglossia-2021-11-01.sty, glossaries-prefix-2021-11-01.sty, glossary-hypernav-2021-11-01.sty, glossary-inline-2021-11-01.sty, glossary-list-2021-11-01.sty, glossary-long-2021-11-01.sty, glossary-longbooktabs-2021-11-01.sty, glossary-longragged-2021-11-01.sty, glossary-mcols-2021-11-01.sty, glossary-super-2021-11-01.sty, glossary-superragged-2021-11-01.sty, glossary-tree-2021-11-01.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, example-glossaries-user.tex, glossaries.l2h.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -40,13 +40,36 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \DeclareRelease{v4.46}{2020-03-19}{glossaries-2020-03-19.sty}
-\DeclareCurrentRelease{v4.49}{2021-11-01}
-\ProvidesPackage{glossaries}[2021/11/01 v4.49 (NLCT)]
+\DeclareRelease{v4.49}{2021-11-01}{glossaries-2021-11-01.sty}
+\DeclareCurrentRelease{v4.52}{2022-11-03}
+\ProvidesPackage{glossaries}[2022/11/03 v4.52 (NLCT)]
 \RequirePackage{ifthen}
 \RequirePackage{xkeyval}[2006/11/18]
 \RequirePackage{mfirstuc}
-\RequirePackage{textcase}
-\renewcommand*{\mfirstucMakeUppercase}{\MakeTextUppercase}%
+\newcommand{\glssentencecase}[1]{\makefirstuc{#1}}
+\ExplSyntaxOn
+\newcommand{\glslowercase}[1]{\text_lowercase:n{#1}}
+\newcommand{\glsuppercase}[1]{\text_uppercase:n{#1}}
+\ifdef\MFUsentencecase
+{%
+  \newcommand{\glsmfuexcl}[1]{\MFUexcl{#1}}
+  \newcommand{\glsmfublocker}[1]{\MFUblocker{#1}}
+  \newcommand{\glsmfuaddmap}[2]{\MFUaddmap{#1}{#2}}
+}
+{
+  \RequirePackage{textcase}
+  \providecommand{\MFUsentencecase}[1]{\text_titlecase_first:n{#1}}
+  \providecommand{\glsmfuexcl}[1]{
+    \tl_if_in:NnF \l_text_case_exclude_arg_tl {#1}
+     {
+       \tl_put_right:Nn \l_text_case_exclude_arg_tl {#1}
+     }
+  }
+  \renewcommand*{\mfirstucMakeUppercase}{\MakeTextUppercase}
+  \newcommand{\glsmfublocker}[1]{\glsmfuexcl{#1}}
+  \newcommand{\glsmfuaddmap}[2]{\glsmfuexcl{#1}\glsmfublocker{#2}}
+}
+\ExplSyntaxOff
 \RequirePackage{xfor}
 \RequirePackage{datatool-base}
 \RequirePackage{amsgen}
@@ -117,20 +140,25 @@
 }
 \newcommand*{\glsshowtarget}[1]{%
  \ifmmode
-   \nfss@text{\glsshowtargetfont [#1]}%
+   \glsshowtargetinner{#1}%
  \else
    \ifinner
-     {\glsshowtargetfont [#1]}%
+     \glsshowtargetinner{#1}%
    \else
      \glsshowtargetouter{#1}%
    \fi
  \fi
 }
+\newcommand*{\glsshowtargetfonttext}[1]{%
+ \ifmmode \nfss@text{\glsshowtargetfont #1}\else {\glsshowtargetfont #1}\fi
+}
+\newcommand*{\glsshowtargetinner}[1]{\glsshowtargetfonttext{[#1]}}
 \newcommand*{\glsshowtargetouter}[1]{%
  \glsshowtargetsymbol\marginpar{\glsshowtargetsymbol\glsshowtargetfont #1}}
 \newcommand*{\glsshowtargetsymbol}{{\tiny$\triangleright$}}
 \newcommand*{\glsshowtargetfont}{\ttfamily\footnotesize}
 \newcommand*{\@glsshowtarget}[1]{}
+\newcommand*{\glsdoshowtarget}[2]{\@glsshowtarget{#1}#2}
 \newrobustcmd*{\@@glsshowtarget}[1]{%
   \begingroup
   \protected@edef\@gls@tmp{#1}%
@@ -233,12 +261,13 @@ false,nolabel,autolabel,nameref}[nolabel]{%
    }%
 }
 \define@boolkey{glossaries.sty}[gls]{esclocations}[true]{}
-\glsesclocationstrue
+\glsesclocationsfalse
 \newcommand*{\@gls@loadlong}{\RequirePackage{glossary-long}}
 \@gls@declareoption{nolong}{\renewcommand*{\@gls@loadlong}{}}
 \IfFileExists{supertabular.sty}{%
   \newcommand*{\@gls@loadsuper}{\RequirePackage{glossary-super}}}{%
   \newcommand*{\@gls@loadsuper}{}}
+\@ifpackageloaded{xtab}{\renewcommand*{\@gls@loadsuper}{}}{}
 \@gls@declareoption{nosuper}{\renewcommand*{\@gls@loadsuper}{}}
 \newcommand*{\@gls@loadlist}{\RequirePackage{glossary-list}}
 \@gls@declareoption{nolist}{%
@@ -310,8 +339,9 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \define@boolkey{glossaries.sty}[gls]{subentrycounter}[true]{}
 \glssubentrycounterfalse
+\newcommand{\glsindexingsetting}{\ifglsxindy xindy\else makeindex\fi}
 \newcommand*{\@glo@default@sorttype}{standard}
-\define@choicekey{glossaries.sty}{sort}{standard,def,use,none}{%
+\define@choicekey{glossaries.sty}{sort}{standard,def,use,none,clear}{%
   \renewcommand*{\@glo@default@sorttype}{#1}%
   \csname @gls@setupsort@#1\endcsname
 }
@@ -390,6 +420,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \let\@glo@check@sortallowed\@gobble
 }
 \newcommand*{\@gls@setupsort@none}{%
+  \def\glsindexingsetting{none}%
   \def\do@glo@storeentry##1{}%
   \def\@gls@defsortcount##1{}%
   \def\@gls@defsort##1##2{%
@@ -398,6 +429,16 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \def\@gls@setsort##1{}%
   \renewcommand\@glo@check@sortallowed[1]{\PackageError{glossaries}
    {Option sort=none not allowed with \string##1}%
+   {(Use sort=def instead)}}%
+}
+\newcommand*{\@gls@setupsort@clear}{%
+  \def\glsindexingsetting{none}%
+  \def\do@glo@storeentry##1{}%
+  \def\@gls@defsortcount##1{}%
+  \def\@gls@defsort##1##2{\csgdef{glo@##2@sort}{}}%
+  \def\@gls@setsort##1{}%
+  \renewcommand\@glo@check@sortallowed[1]{\PackageError{glossaries}
+   {Option sort=clear not allowed with \string##1}%
    {(Use sort=def instead)}}%
 }
 \newcommand*{\glsdefmain}{%
@@ -432,12 +473,8 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \AtBeginDocument{%
   \ifglsacronym
-    \ifbool{glscompatible-3.07}%
-    {}%
-    {%
-      \providecommand*{\printacronyms}[1][]{%
-        \printglossary[type=\acronymtype,#1]}%
-    }%
+    \providecommand*{\printacronyms}[1][]{%
+      \printglossary[type=\acronymtype,#1]}%
   \fi
 }
 \newcommand*{\@gls@do@acronymsdef}{}
@@ -546,8 +583,6 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \renewcommand*{\@gls@warnonglossdefined}{}%
   \renewcommand*{\@gls@warnontheglossdefined}{}%
 }
-\newcommand*{\@gls@sanitizedesc}{%
-}
 \newcommand*{\glssetexpandfield}[1]{%
   \csdef{gls@assign@#1@field}##1##2{%
     \@@gls@expand@field{##1}{#1}{##2}%
@@ -649,6 +684,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
  \appto\glsnoidxstripaccents{\let\UTFviii@two@octets\UTFviii@two@octets@combine}%
 }
 {}
+\newcommand{\@gls@removedoption}[1]{%
+  \PackageError{glossaries}{obsolete package option `#1' has been
+removed. Rollback required or use a newer alternative}
+{Try \string\usepackage[#1]{glossaries}[=v4.46]}%
+}
 \define@boolkey[gls]{sanitize}{description}[true]{%
   \GlossariesWarning{sanitize={description} package option deprecated}%
   \ifgls@sanitize@description
@@ -803,34 +843,42 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     {}%
   }
 }
+\newcommand{\@gls@requested@languages}{}
+\define@key{glossaries.sty}{languages}{%
+ \renewcommand{\@gls@requested@languages}{#1}%
+ \glstranslatetrue
+ \let\@gls@usetranslator\relax
+ \let\glsifusetranslator\@secondoftwo
+}
 \define@boolkey{glossaries.sty}[gls]{indexonlyfirst}[true]{}
 \glsindexonlyfirstfalse
 \define@boolkey{glossaries.sty}[gls]{hyperfirst}[true]{}
 \glshyperfirsttrue
 \newcommand*{\@gls@setacrstyle}{}
 \define@boolkey{glossaries.sty}[glsacr]{footnote}[true]{%
-  \ifbool{glsacrdescription}%
-  {}%
-  {%
-    \renewcommand*{\@gls@sanitizedesc}{}%
-  }%
-  \renewcommand*{\@gls@setacrstyle}{\SetAcronymStyle}%
+ \ifglsacrfootnote
+   \@gls@removedoption{footnote}%
+ \fi
 }
 \define@boolkey{glossaries.sty}[glsacr]{description}[true]{%
-  \renewcommand*{\@gls@sanitizesymbol}{}%
-  \renewcommand*{\@gls@setacrstyle}{\SetAcronymStyle}%
+  \ifglsacrdescription
+   \@gls@removedoption{description}%
+  \fi
 }
 \define@boolkey{glossaries.sty}[glsacr]{smallcaps}[true]{%
-  \renewcommand*{\@gls@sanitizesymbol}{}%
-  \renewcommand*{\@gls@setacrstyle}{\SetAcronymStyle}%
+  \ifglsacrsmallcaps
+   \@gls@removedoption{smallcaps}%
+  \fi
 }
 \define@boolkey{glossaries.sty}[glsacr]{smaller}[true]{%
-  \renewcommand*{\@gls@sanitizesymbol}{}%
-  \renewcommand*{\@gls@setacrstyle}{\SetAcronymStyle}%
+  \ifglsacrsmaller
+   \@gls@removedoption{smaller}%
+  \fi
 }
 \define@boolkey{glossaries.sty}[glsacr]{dua}[true]{%
-  \renewcommand*{\@gls@sanitizesymbol}{}%
-  \renewcommand*{\@gls@setacrstyle}{\SetAcronymStyle}%
+  \ifglsacrdua
+   \@gls@removedoption{dua}%
+  \fi
 }
 \define@boolkey{glossaries.sty}[glsacr]{shortcuts}[true]{}
 \newcommand*{\glsorder}{word}
@@ -843,11 +891,19 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 \define@boolkey[gls]{xindy}{glsnumbers}[true]{}
 \gls@xindy@glsnumberstrue
 \def\@xdy@main@language{\languagename}%
-\define@key[gls]{xindy}{language}{\def\@xdy@main@language{#1}}
-\ifcsundef{inputencodingname}{%
-  \def\gls@codepage{}}{%
-  \def\gls@codepage{\inputencodingname}
+\newcommand*{\gls@xdy@set@lang}[1]{%
+ \ifcsundef{@xdy@#1@language}%
+  {%
+    \ifcsundef{@xdy@\glsdefaulttype @language}
+    {\let\@gls@langmod\@xdy@main@language}%
+    {\letcs\@gls@langmod{@xdy@\glsdefaulttype @language}}%
+  }%
+  {\letcs\@gls@langmod{@xdy@#1@language}}%
 }
+\define@key[gls]{xindy}{language}{\def\@xdy@main@language{#1}}
+\ifdefvoid\inputencodingname
+ {\def\gls@codepage{utf8}}%
+ {\def\gls@codepage{\inputencodingname}}
 \define@key[gls]{xindy}{codepage}{\def\gls@codepage{#1}}
 \define@key{glossaries.sty}{xindy}[]{%
   \glsxindytrue
@@ -860,7 +916,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glsxindytrue
   \gls@xindy@glsnumbersfalse
 }
-\providecommand{\@domakeglossaries}[1]{#1}
+\providecommand{\@domakeglossaries}[1]{\if@filesw #1\fi}
 \@gls@declareoption{disablemakegloss}{%
   \ifdefequal\makeglossaries\@no@makeglossaries
   {%
@@ -937,22 +993,42 @@ false,nolabel,autolabel,nameref}[nolabel]{%
  \let\do@write@glslabelsname\@write@glslabelsname}
 \newif\ifglsautomake
 \newcommand{\gls@automake@nr}{1}
+\newcommand{\gls@automake@makegloss}{}
+\newcommand{\gls@automake@option}{automake=\gls@automake@val}
+\newcommand*{\@gls@do@automake@err}{%
+  \PackageError{glossaries}{You must use
+  \string\makeglossaries\space with \gls@automake@option}
+  {%
+     Either remove the \gls@automake@option\space setting or
+     add \string\makeglossaries\space to your document preamble.%
+  }%
+}%
 \define@choicekey{glossaries.sty}{automake}%
-  [\gls@automake@val\gls@automake@nr]{true,false,immediate}[true]{%
-  \ifnum\gls@automake@nr=1\relax
-   \glsautomakefalse
-  \else
+  [\gls@automake@val\gls@automake@nr]{true,false,immediate,makegloss,lite,delayed}[immediate]{%
+  \ifcase\gls@automake@nr\relax
+    \GlossariesWarning{automake=true deprecated. Use automake=delayed for a delayed write}%
    \glsautomaketrue
+   \renewcommand{\gls@automake@makegloss}{}%
+  \or
+   \glsautomakefalse
+   \renewcommand{\gls@automake@makegloss}{}%
+  \or
+   \glsautomaketrue
+   \renewcommand{\gls@automake@makegloss}{}%
+  \or
+   \glsautomaketrue
+   \renewcommand{\gls@automake@makegloss}{makeglossaries}%
+  \or
+   \glsautomaketrue
+   \renewcommand{\gls@automake@makegloss}{makeglossaries-lite}%
+  \or
+   \def\gls@automake@nr{0}%
+   \glsautomaketrue
+   \renewcommand{\gls@automake@makegloss}{}%
   \fi
+  \renewcommand{\gls@automake@option}{automake=\gls@automake@val}%
   \ifglsautomake
-    \renewcommand*{\@gls@doautomake}{%
-      \PackageError{glossaries}{You must use
-      \string\makeglossaries\space with automake=true}
-      {%
-         Either remove the automake=true setting or
-         add \string\makeglossaries\space to your document preamble.%
-      }%
-    }%
+    \let\@gls@doautomake\@gls@do@automake@err
   \else
     \renewcommand*{\@gls@doautomake}{}%
   \fi
@@ -960,6 +1036,22 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 \glsautomakefalse
 \newcommand*{\@gls@doautomake}{}
 \AtEndDocument{\@gls@doautomake}
+\@gls@declareoption{automakegloss}{%
+  \glsautomaketrue
+  \renewcommand{\gls@automake@option}{automakegloss}%
+  \def\gls@automake@val{makegloss}%
+  \def\gls@automake@nr{3}%
+  \renewcommand{\gls@automake@makegloss}{makeglossaries}%
+  \let\@gls@doautomake\@gls@do@automake@err
+}
+\@gls@declareoption{automakeglosslite}{%
+  \glsautomaketrue
+  \renewcommand{\gls@automake@option}{automakeglosslite}%
+  \def\gls@automake@val{lite}%
+  \def\gls@automake@nr{4}%
+  \renewcommand{\gls@automake@makegloss}{makeglossaries-lite}%
+  \let\@gls@doautomake\@gls@do@automake@err
+}
 \define@boolkey{glossaries.sty}[gls]{savewrites}[true]{%
   \ifglssavewrites
     \renewcommand*{\glswritefiles}{\@glswritefiles}%
@@ -969,28 +1061,24 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \glssavewritesfalse
 \let\glswritefiles\@empty
-\define@boolkey{glossaries.sty}[gls]{compatible-3.07}[true]{}
+\define@boolkey{glossaries.sty}[gls]{compatible-3.07}[true]{%
+  \ifbool{glscompatible-3.07}%
+  {%
+    \@gls@removedoption{compatible-3.07}%
+  }%
+  {}%
+}
 \boolfalse{glscompatible-3.07}
 \define@boolkey{glossaries.sty}[gls]{compatible-2.07}[true]{%
   \ifbool{glscompatible-2.07}%
   {%
-    \booltrue{glscompatible-3.07}%
+    \@gls@removedoption{compatible-2.07}%
   }%
   {}%
 }
 \boolfalse{glscompatible-2.07}
 \let\gls@original@makeglossary\makeglossary
 \let\gls@original@glossary\glossary
-\def\makeglossary{%
- \GlossariesWarning{Use of \string\makeglossary\space with
- glossaries.sty is \MessageBreak deprecated. Use \string\makeglossaries\space
- instead. If you \MessageBreak need the original definition of
- \string\makeglossary\space use \MessageBreak the package options
- kernelglossredefs=false (to \MessageBreak restore the former definition of
- \string\makeglossary) and \MessageBreak nomain (if the file extensions cause a
- conflict)}%
- \makeglossaries
-}
 \newcommand*{\@gls@override@glossary}[1][main]{%
  \GlossariesWarning{Use of \string\glossary\space with
  glossaries.sty is deprecated. \MessageBreak Indexing should be performed
@@ -1002,14 +1090,10 @@ false,nolabel,autolabel,nameref}[nolabel]{%
  conflict)}%
  \gls@glossary{#1}%
 }
-\if@gls@docloaded
-\else
-  \def\glossary{\@gls@override@glossary}
-\fi
 \define@choicekey{glossaries.sty}{kernelglossredefs}%
- [\gls@debug@val\gls@debug@nr]{true,false,nowarn}[true]%
+ [\gls@kernelglossredefs@val\gls@kernelglossredefs@nr]{true,false,nowarn}[true]%
 {%
-  \ifcase\gls@debug@nr\relax
+  \ifcase\gls@kernelglossredefs@nr\relax
    \def\glossary{\@gls@override@glossary}%
    \def\makeglossary{%
     \GlossariesWarning{Use of \string\makeglossary\space with
@@ -1070,6 +1154,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     {type={index},name={##2},description={\nopostdesc},##1}}
   \let\@gls@do@indexdef\relax
 }%
+\define@choicekey{glossaries.sty}{mfirstuc}%
+ [\gls@mfirstuc@val\gls@mfirstuc@nr]%
+ {expanded,unexpanded}%
+ {%
+   \ifcase\gls@mfirstuc@nr
+    % expanded
+    \renewcommand*{\glsmakefirstuc}[1]{\MFUsentencecase{#1}}%
+   \or
+    % unexpanded
+    \renewcommand*{\glsmakefirstuc}[1]{\MFUsentencecase{\unexpanded{#1}}}%
+   \fi
+ }
 \@for\CurrentOption :=\@declaredoptions\do{%
   \ifx\CurrentOption\@empty
   \else
@@ -1082,10 +1178,12 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \fi
 }
 \ProcessOptionsX
-\RequirePackage{glossaries-compatible-307}
+\ifglsautomake
+ \ifdef\directlua{\RequirePackage{shellesc}}{}
+\fi
 \disable@keys{glossaries.sty}{compatible-2.07,%
  xindy,xindygloss,xindynoglsnumbers,makeindex,%
- acronym,translate,notranslate,nolong,nosuper,notree,nostyles,%
+ acronym,translate,notranslate,languages,nolong,nosuper,notree,nostyles,%
  nomain,noglossaryindex}
 \newcommand*{\setupglossaries}[1]{%
   \renewcommand*{\@gls@setacrstyle}{}%
@@ -1174,7 +1272,14 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \newcommand*{\addglossarytocaptions}[1]{}
 \ifglstranslate
-  \RequirePackage{tracklang}
+  \RequirePackage{tracklang}[2019/11/30]
+  \ifdefvoid\@gls@requested@languages{}%
+  {%
+    \@for\@gls@thislang:=\@gls@requested@languages\do{%
+     \TrackIfKnownLanguage{\@gls@thislang}{}%
+     {\GlossariesWarning{unknown language `\@gls@thislang'}}%
+    }%
+  }%
   \@gls@usetranslator
   \@ifpackageloaded{translator}
   {%
@@ -1294,6 +1399,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 {%
   \newcommand*{\glsnumberformat}[1]{\glshypernumber{#1}}%
 }
+\newcommand{\glslocationcstoencap}[3]{\csuse{#2}{\csuse{#1}{#3}}}
 \newcommand{\delimN}{, }
 \newcommand{\delimR}{--}
 \newcommand*{\glossarypreamble}{%
@@ -1334,7 +1440,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   {%
     \newcommand{\glsglossarymark}[1]{%
       \ifglsucmark
-        \@mkboth{\mfirstucMakeUppercase{#1}}{\mfirstucMakeUppercase{#1}}%
+        \@mkboth{\glsuppercase{#1}}{\glsuppercase{#1}}%
       \else
         \@mkboth{#1}{#1}%
       \fi
@@ -1343,7 +1449,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \providecommand{\glossarymark}[1]{%
   \ifglsucmark
-    \@mkboth{\mfirstucMakeUppercase{#1}}{\mfirstucMakeUppercase{#1}}%
+    \@mkboth{\glsuppercase{#1}}{\glsuppercase{#1}}%
   \else
     \@mkboth{#1}{#1}%
   \fi
@@ -1461,7 +1567,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \ifglsxindy
   \newcommand*\@glsaddxdyattribute[2]{%
-    \edef\@xdyattributes{\@xdyattributes ^^J \string"#1\string" ^^J
+    \edef\@xdyattributes{\@xdyattributes ^^J
       \string"#2#1\string"}%
     \expandafter\toks@\expandafter{\@xdylocref}%
     \edef\@xdylocref{\the\toks@ ^^J%
@@ -1481,6 +1587,8 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \else
       \edef\@xdyattributelist{\@xdyattributelist,#1}%
     \fi
+      \edef\@xdyattributes{\@xdyattributes ^^J
+        \string"#1\string"}%
     \@for\@this@counter:=\@xdycounters\do{%
       \protected@edef\gls@do@addxdyattribute{%
         \noexpand\@glsaddxdyattribute{#1}{\@this@counter}%
@@ -1667,7 +1775,6 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \newcommand*\GlsSetXdyStyles[1]{%
     \glsnoxindywarning\GlsSetXdyStyles}
 \fi
-\newcommand*{\findrootlanguage}{}
 \def\@xdylanguage#1#2{}
 \ifglsxindy
   \newcommand*\GlsSetXdyLanguage[2][\glsdefaulttype]{%
@@ -1848,6 +1955,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     {#2}%
   }%
 }
+\newcommand{\ifglsfieldvoid}[4]{\ifcsvoid{glo@\glsdetoklabel{#2}@#1}{#3}{#4}}
 \newrobustcmd*{\ifglshasfield}[4]{%
   \glsdoifexists{#2}%
   {%
@@ -1902,8 +2010,17 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \protected@write\@auxout{}{\string\providecommand\string\@newglossary[4]{}}%
   \let\@gls@provide@newglossary\relax
 }
+\newcommand*{\@gls@defaulttype}{\glsdefaulttype}
 \newcommand*{\defglsentryfmt}[2][\glsdefaulttype]{%
-  \csgdef{gls@#1@entryfmt}{#2}%
+  \protected@edef\@glo@tmp{#1}%
+  \ifx\@glo@tmp\@gls@defaulttype
+    \GlossariesWarning{\string\defglsentryfmt\space attempting to set
+     a display style for \string\glsdefaulttype\space but there
+     doesn't seem to be a default glossary. If you have used
+     `nomain', you need to define an alternative glossary}%
+  \else
+    \csgdef{gls@\@glo@tmp @entryfmt}{#2}%
+  \fi
 }
 \newcommand*{\gls@doentryfmt}[1]{\csuse{gls@#1@entryfmt}}
 \newcommand*{\@gls@forbidtexext}[1]{%
@@ -2083,6 +2200,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \@gls@savenonumberlist{false}%
   \fi
 }
+\newcommand*{\gls@noidx@nonumberlist}[1]{%
+  \cslet{glo@\@glo@label @prenumberlist}\@glo@prefix
+}%
+\newcommand{\glsnoidxprenumberlist}[1]{%
+ \csuse{glo@\glsdetoklabel{#1}@prenumberlist}}
 \newcommand*{\@gls@savenonumberlist}[1]{}
 \newcommand*{\@gls@initnonumberlist}{}%
 \newcommand*{\@gls@storenonumberlist}[1]{}
@@ -2146,7 +2268,6 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     You haven't specified the entry description%
   }%
 }%
-\newcommand*{\@glsdefaultplural}{}
 \newcommand*{\@gls@missingnumberlist}[1]{%
   ??%
   \ifglssavenumberlist
@@ -2427,7 +2548,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \gls@assign@field{#2}{\@glo@label}{#1}{\@glo@tmp}%
     }%
     \newcommand*{#3}[1]{\@gls@entry@field{##1}{#1}}%
-    \newcommand*{#4}[1]{\@Gls@entry@field{##1}{#1}}%
+    \newcommand*{#4}[1]{\@Glsentryfield{##1}{#1}}%
     \ifcsdef{@gls@user@#1@}%
     {%
        \PackageError{glossaries}%
@@ -2480,17 +2601,20 @@ false,nolabel,autolabel,nameref}[nolabel]{%
             {\csuse{@GLS@user@#1@}{##1}{##2}}%
             {\csuse{@GLS@user@#1@}{##1}{##2}[]}}%
       \csdef{@GLS@user@#1@}##1##2[##3]{%
-        \@gls@field@link{##1}{##2}{\mfirstucMakeUppercase{#3{##2}##3}}%
+        \@gls@field@link{##1}{##2}{\glsuppercase{#3{##2}##3}}%
       }%
       \newrobustcmd*{#7}{%
         \expandafter\@gls@hyp@opt\csname @GLS@user@#1\endcsname}%
     }%
+    \glsmfuaddmap{#3}{#4}%
+    \glsmfuaddmap{#5}{#6}%
+    \glsmfublocker{#7}%
   }%
   {%
     \PackageError{glossaries}{Key `#1' already exists}{}%
   }%
 }
-\newcommand{\glsfieldxdef}[3]{%
+\newrobustcmd{\glsfieldxdef}[3]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2499,11 +2623,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \protected@csxdef{glo@\@glo@label @#2}{#3}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
-\newcommand{\glsfieldedef}[3]{%
+\newrobustcmd{\glsfieldedef}[3]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2512,11 +2636,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \protected@csedef{glo@\@glo@label @#2}{#3}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
-\newcommand{\glsfieldgdef}[3]{%
+\newrobustcmd{\glsfieldgdef}[3]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2525,11 +2649,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \expandafter\gdef\csname glo@\@glo@label @#2\endcsname{#3}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
-\newcommand{\glsfielddef}[3]{%
+\newrobustcmd{\glsfielddef}[3]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2538,11 +2662,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \expandafter\def\csname glo@\@glo@label @#2\endcsname{#3}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
-\newcommand{\glsfieldfetch}[3]{%
+\newrobustcmd{\glsfieldfetch}[3]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2551,7 +2675,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \letcs#3{glo@\@glo@label @#2}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
@@ -2560,7 +2684,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
    \expandafter\expandonce\csname glo@\glsdetoklabel{#1}@#2\expandafter\endcsname
   \fi
 }
-\newcommand{\ifglsfieldeq}[5]{%
+\newrobustcmd{\ifglsfieldeq}[5]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
@@ -2569,21 +2693,20 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       \ifcsstring{glo@\@glo@label @#2}{#3}{#4}{#5}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+      \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
-\newcommand{\ifglsfielddefeq}[5]{%
+\newrobustcmd{\ifglsfielddefeq}[5]{%
  \glsdoifexists{#1}%
  {%
    \protected@edef\@glo@label{\glsdetoklabel{#1}}%
    \ifcsdef{glo@\@glo@label @#2}%
    {%
-      \expandafter\ifdefstrequal
-       \csname glo@\@glo@label @#2\endcsname{#3}{#4}{#5}%
+     \expandafter\ifdefstrequal\csname glo@\@glo@label @#2\endcsname{#3}{#4}{#5}%
    }%
    {%
-      \PackageError{glossaries}{Key `#2' doesn't exist}{}%
+     \PackageError{glossaries}{Field `#2' doesn't exist}{}%
    }%
  }%
 }
@@ -2896,20 +3019,66 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \fi
   \fi
 }
-\AtBeginDocument{%
-  \@ifpackageloaded{amsmath}%
-  {\let\gls@ifnotmeasuring\@gls@ifnotmeasuring}%
-  {}%
-}
-\newcommand*{\@gls@ifnotmeasuring}[1]{%
+\newcommand*{\@gls@if@measuring}[2]{%
   \ifmeasuring@
-  \else
     #1%
+  \else
+    #2%
   \fi
 }
-\newcommand*\gls@ifnotmeasuring[1]{#1}
+\let\gls@org@refstepcounter\refstepcounter
+\let\gls@org@label\label
+\newcommand{\gls@if@measuring}[2]{#2}
+\AtBeginDocument{%
+  \@ifpackageloaded{amsmath}%
+  {\let\gls@if@measuring\@gls@if@measuring}%
+  {}%
+  \let\gls@org@refstepcounter\refstepcounter
+  \let\gls@org@label\label
+}
+\newcommand*\gls@ifnotmeasuring[1]{\glsifmeasuring{}{#1}}
+\newcommand*{\glsifmeasuring}{\gls@if@measuring}
+\newcommand*{\gls@local@stepcounter}[1]{%
+ \ifcsdef{c@#1}%
+ {%
+   \epreto\gls@measuring@reset{\noexpand\setcounter{#1}{\number\value{#1}}}%
+   \expandafter\advance\csname c@#1\endcsname by \@ne
+ }%
+ {}%
+}
+\newcommand{\gls@start@measuring}{%
+  \ifx\glsifmeasuring\@firstoftwo
+  \else
+    \let\gls@org@target\glstarget
+    \let\gls@org@link\@glslink
+    \def\gls@measuring@reset{}%
+  \fi
+  \let\glsifmeasuring\@firstoftwo
+  \let\refstepcounter\gls@local@stepcounter
+  \let\label\@gobble
+  \let\glstarget\@secondoftwo
+  \let\@glslink\@secondoftwo
+}
+\newcommand{\gls@stop@measuring}{%
+  \renewcommand*{\glsifmeasuring}{\gls@if@measuring}%
+  \let\refstepcounter\gls@org@refstepcounter
+  \let\label\gls@org@label
+  \let\glstarget\gls@org@target
+  \let\@glslink\gls@org@link
+  \gls@measuring@reset
+  \def\gls@measuring@reset{}%
+}
+\newcommand{\glsmeasureheight}[2]{%
+  \settoheight{#1}{\gls@start@measuring#2\gls@stop@measuring}%
+}
+\newcommand{\glsmeasuredepth}[2]{%
+  \settodepth{#1}{\gls@start@measuring#2\gls@stop@measuring}%
+}
+\newcommand{\glsmeasurewidth}[2]{%
+  \settowidth{#1}{\gls@start@measuring#2\gls@stop@measuring}%
+}
 \def\@gls@patchtabularx#1\hbox#2#3!!{%
-  \def\TX@trial##1{#1\hbox{\let\glsunset\@gobble#2}#3}%
+  \def\TX@trial##1{#1\hbox{\gls@start@measuring#2\gls@stop@measuring}#3}%
 }
 \newcommand*\glspatchtabularx{%
  \ifdef\TX@trial
@@ -2999,6 +3168,8 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \csdef{glo@\@glo@label @currcount}{0}%
   \csdef{glo@\@glo@label @prevcount}{0}%
 }
+\newif\ifglsresetcurrcount
+\glsresetcurrcountfalse
 \newcommand*{\glsenableentrycount}{%
   \let\@newglossaryentry@defcounters\@@newglossaryentry@defcounters
   \renewcommand*{\gls@defdocnewglossaryentry}{%
@@ -3028,11 +3199,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   }%
   \renewcommand*{\@glsreset}[1]{%
     \@@glsreset{##1}%
-    \csgdef{glo@\glsdetoklabel{##1}@currcount}{0}%
+    \ifglsresetcurrcount\csgdef{glo@\glsdetoklabel{##1}@currcount}{0}\fi
   }%
   \renewcommand*{\@glslocalreset}[1]{%
     \@@glslocalreset{##1}%
-    \csdef{glo@\glsdetoklabel{##1}@currcount}{0}%
+    \ifglsresetcurrcount\csdef{glo@\glsdetoklabel{##1}@currcount}{0}\fi
   }%
  \def\@cgls@##1##2[##3]{%
    \ifnum\glsentryprevcount{##2}=1\relax
@@ -3105,6 +3276,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \ifglshaslong{#1}{\glsentrylong{#1}}{\glsentryfirst{#1}}#2%
 }
 \newrobustcmd*{\cGls}{\@gls@hyp@opt\@cGls}
+\glsmfuaddmap{\cgls}{\cGls}
 \newcommand*{\@cGls}[2][]{%
   \new@ifnextchar[{\@cGls@{#1}{#2}}{\@cGls@{#1}{#2}[]}%
 }
@@ -3129,6 +3301,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \ifglshaslong{#1}{\glsentrylongpl{#1}}{\glsentryfirstplural{#1}}#2%
 }
 \newrobustcmd*{\cGlspl}{\@gls@hyp@opt\@cGlspl}
+\glsmfuaddmap{\cglspl}{\cGlspl}
 \newcommand*{\@cGlspl}[2][]{%
   \new@ifnextchar[{\@cGlspl@{#1}{#2}}{\@cGlspl@{#1}{#2}[]}%
 }
@@ -3147,152 +3320,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \@onlypreamble{\loadglsentries}
 \newcommand*{\glstextformat}[1]{#1}
-\newcommand*{\glsentryfmt}{%
-  \@@gls@default@entryfmt\glsdisplayfirst\glsdisplay
-}
-\newcommand*{\@@gls@default@entryfmt}[2]{%
-  \ifdefempty\glscustomtext
-  {%
-    \glsifplural
-    {%
-      \glscapscase
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glsentryplural{\glslabel}}%
-            {\glsentrydescplural{\glslabel}}%
-            {\glsentrysymbolplural{\glslabel}}{\glsinsert}%
-        }%
-        {%
-          #1{\glsentryfirstplural{\glslabel}}%
-            {\glsentrydescplural{\glslabel}}%
-            {\glsentrysymbolplural{\glslabel}}{\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \ifbool{glscompatible-3.07}%
-          {%
-            \protected@edef\@glo@etext{%
-              #2{\glsentryplural{\glslabel}}%
-                {\glsentrydescplural{\glslabel}}%
-                {\glsentrysymbolplural{\glslabel}}{\glsinsert}}%
-            \xmakefirstuc\@glo@etext
-          }%
-          {%
-            #2{\Glsentryplural{\glslabel}}%
-              {\glsentrydescplural{\glslabel}}%
-              {\glsentrysymbolplural{\glslabel}}{\glsinsert}%
-          }%
-        }%
-        {%
-          \ifbool{glscompatible-3.07}%
-          {%
-            \protected@edef\@glo@etext{%
-              #1{\glsentryfirstplural{\glslabel}}%
-                {\glsentrydescplural{\glslabel}}%
-                {\glsentrysymbolplural{\glslabel}}{\glsinsert}}%
-            \xmakefirstuc\@glo@etext
-          }%
-          {%
-            #1{\Glsentryfirstplural{\glslabel}}%
-              {\glsentrydescplural{\glslabel}}%
-              {\glsentrysymbolplural{\glslabel}}{\glsinsert}%
-          }%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \mfirstucMakeUppercase{#2{\glsentryplural{\glslabel}}%
-            {\glsentrydescplural{\glslabel}}%
-            {\glsentrysymbolplural{\glslabel}}{\glsinsert}}%
-        }%
-        {%
-          \mfirstucMakeUppercase{#1{\glsentryfirstplural{\glslabel}}%
-            {\glsentrydescplural{\glslabel}}%
-            {\glsentrysymbolplural{\glslabel}}{\glsinsert}}%
-        }%
-      }%
-    }%
-    {%
-      \glscapscase
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glsentrytext{\glslabel}}%
-            {\glsentrydesc{\glslabel}}%
-            {\glsentrysymbol{\glslabel}}{\glsinsert}%
-        }%
-        {%
-          #1{\glsentryfirst{\glslabel}}%
-            {\glsentrydesc{\glslabel}}%
-            {\glsentrysymbol{\glslabel}}{\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \ifbool{glscompatible-3.07}%
-          {%
-            \protected@edef\@glo@etext{%
-              #2{\glsentrytext{\glslabel}}%
-                {\glsentrydesc{\glslabel}}%
-                {\glsentrysymbol{\glslabel}}{\glsinsert}}%
-            \xmakefirstuc\@glo@etext
-          }%
-          {%
-            #2{\Glsentrytext{\glslabel}}%
-              {\glsentrydesc{\glslabel}}%
-              {\glsentrysymbol{\glslabel}}{\glsinsert}%
-          }%
-        }%
-        {%
-          \ifbool{glscompatible-3.07}%
-          {%
-            \protected@edef\@glo@etext{%
-              #1{\glsentryfirst{\glslabel}}%
-                {\glsentrydesc{\glslabel}}%
-                {\glsentrysymbol{\glslabel}}{\glsinsert}}%
-              \xmakefirstuc\@glo@etext
-          }%
-          {%
-            #1{\Glsentryfirst{\glslabel}}%
-              {\glsentrydesc{\glslabel}}%
-              {\glsentrysymbol{\glslabel}}{\glsinsert}%
-          }%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \mfirstucMakeUppercase{#2{\glsentrytext{\glslabel}}%
-            {\glsentrydesc{\glslabel}}%
-            {\glsentrysymbol{\glslabel}}{\glsinsert}}%
-        }%
-        {%
-          \mfirstucMakeUppercase{#1{\glsentryfirst{\glslabel}}%
-            {\glsentrydesc{\glslabel}}%
-            {\glsentrysymbol{\glslabel}}{\glsinsert}}%
-        }%
-      }%
-    }%
-  }%
-  {%
-    \ifglsused{\glslabel}%
-    {%
-      #2{\glscustomtext}%
-        {\glsentrydesc{\glslabel}}%
-        {\glsentrysymbol{\glslabel}}{}%
-    }%
-    {%
-      #1{\glscustomtext}%
-        {\glsentrydesc{\glslabel}}%
-        {\glsentrysymbol{\glslabel}}{}%
-    }%
-  }%
-}
+\newcommand*{\glsentryfmt}{\glsgenentryfmt}
 \newcommand*{\glsgenentryfmt}{%
   \ifdefempty\glscustomtext
   {%
@@ -3320,12 +3348,10 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       {%
         \ifglsused\glslabel
         {%
-          \mfirstucMakeUppercase
-             {\glsentryplural{\glslabel}\glsinsert}%
+          \glsuppercase{\glsentryplural{\glslabel}\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase
-             {\glsentryfirstplural{\glslabel}\glsinsert}%
+          \glsuppercase{\glsentryfirstplural{\glslabel}\glsinsert}%
         }%
       }%
     }%
@@ -3352,10 +3378,10 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       {%
         \ifglsused\glslabel
         {%
-          \mfirstucMakeUppercase{\glsentrytext{\glslabel}\glsinsert}%
+          \glsuppercase{\glsentrytext{\glslabel}\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase{\glsentryfirst{\glslabel}\glsinsert}%
+          \glsuppercase{\glsentryfirst{\glslabel}\glsinsert}%
         }%
       }%
     }%
@@ -3379,7 +3405,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
           \acronymfont{\Glsentryshortpl{\glslabel}}\glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\acronymfont{\glsentryshortpl{\glslabel}}\glsinsert}%
         }%
       }%
@@ -3392,7 +3418,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
           \acronymfont{\Glsentryshort{\glslabel}}\glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\acronymfont{\glsentryshort{\glslabel}}\glsinsert}%
         }%
       }%
@@ -3408,7 +3434,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
           \Genplacrfullformat{\glslabel}{\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\genplacrfullformat{\glslabel}{\glsinsert}}%
         }%
       }%
@@ -3421,7 +3447,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
           \Genacrfullformat{\glslabel}{\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
            {\genacrfullformat{\glslabel}{\glsinsert}}%
         }%
       }%
@@ -3437,7 +3463,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \newcommand*{\Genacrfullformat}[2]{%
   \protected@edef\gls@text{\genacrfullformat{#1}{#2}}%
-  \xmakefirstuc\gls@text
+  \expandafter\glssentencecase\expandafter{\gls@text}%
 }
 \newcommand*{\genplacrfullformat}[2]{%
    \glsentrylongpl{#1}#2\space
@@ -3445,51 +3471,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \newcommand*{\Genplacrfullformat}[2]{%
   \protected@edef\gls@text{\genplacrfullformat{#1}{#2}}%
-  \xmakefirstuc\gls@text
-}
-\newcommand*{\glsdisplayfirst}[4]{#1#4}
-\newcommand*{\glsdisplay}[4]{#1#4}
-\newcommand*{\defglsdisplay}[2][\glsdefaulttype]{%
-  \GlossariesWarning{\string\defglsdisplay\space is now obsolete.^^J
-  Use \string\defglsentryfmt\space instead}%
-  \expandafter\def\csname gls@#1@display\endcsname##1##2##3##4{#2}%
-  \edef\@gls@doentrydef{%
-    \noexpand\defglsentryfmt[#1]{%
-      \noexpand\ifcsdef{gls@#1@displayfirst}%
-      {%
-        \noexpand\@@gls@default@entryfmt
-          {\noexpand\csuse{gls@#1@displayfirst}}%
-          {\noexpand\csuse{gls@#1@display}}%
-      }%
-      {%
-        \noexpand\@@gls@default@entryfmt
-          {\noexpand\glsdisplayfirst}%
-          {\noexpand\csuse{gls@#1@display}}%
-      }%
-    }%
-  }%
-  \@gls@doentrydef
-}
-\newcommand*{\defglsdisplayfirst}[2][\glsdefaulttype]{%
-  \GlossariesWarning{\string\defglsdisplayfirst\space is now obsolete.^^J
-  Use \string\defglsentryfmt\space instead}%
-  \expandafter\def\csname gls@#1@displayfirst\endcsname##1##2##3##4{#2}%
-  \edef\@gls@doentrydef{%
-    \noexpand\defglsentryfmt[#1]{%
-      \noexpand\ifcsdef{gls@#1@display}%
-      {%
-        \noexpand\@@gls@default@entryfmt
-          {\noexpand\csuse{gls@#1@displayfirst}}%
-          {\noexpand\csuse{gls@#1@display}}%
-      }%
-      {%
-        \noexpand\@@gls@default@entryfmt
-          {\noexpand\csuse{gls@#1@displayfirst}}%
-          {\noexpand\glsdisplay}%
-      }%
-    }%
-  }%
-  \@gls@doentrydef
+  \expandafter\glssentencecase\expandafter{\gls@text}%
 }
 \define@key{glslink}{counter}{%
   \ifcsundef{c@#1}%
@@ -3507,15 +3489,24 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 }
 \define@key{glslink}{format}{%
   \def\@glsnumberformat{#1}}
-\define@boolkey{glslink}{hyper}[true]{}
+\newcommand*{\@gls@glslink@hyper@update@hook}{}
+\define@boolkey{glslink}{hyper}[true]{\@gls@glslink@hyper@update@hook}
 \ifdef{\hyperlink}{\KV@glslink@hypertrue}{\KV@glslink@hyperfalse}
-\define@boolkey{glslink}{local}[true]{}
-\newcommand*{\glslinkvar}[3]{#1}
-\newcommand*{\glsifhyper}[2]{%
- \glslinkvar{#1}{#2}{#1}%
- \GlossariesWarning{\string\glsifhyper\space is deprecated. Did
-  you mean \string\glsifhyperon\space or \string\glslinkvar?}%
+\newcommand*{\@gls@save@glslocal}{%
+  \let\if@org@KV@glslink@local\ifKV@glslink@local
 }
+\newcommand*{\@gls@restore@glslocal}{%
+  \ifKV@glslink@local
+    \let\@gls@do@glsunset\glslocalunset
+  \else
+    \let\@gls@do@glsunset\glsunset
+  \fi
+  \let\ifKV@glslink@local\if@org@KV@glslink@local
+}
+\newcommand*{\@gls@do@glsunset}[1]{\glsunset{#1}}
+\define@boolkey{glslink}{local}[true]{}
+\@gls@save@glslocal
+\newcommand*{\glslinkvar}[3]{#1}
 \newcommand*{\@gls@hyp@opt}[1]{%
  \let\glslinkvar\@firstofthree
  \let\@gls@hyp@opt@cs#1\relax
@@ -3541,6 +3532,13 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   }%
   \glspostlinkhook
 }
+\newrobustcmd*{\Glslink}{%
+ \@gls@hyp@opt\@Gls@@link
+}
+\newcommand*{\@Gls@@link}[3][]{%
+  \@gls@@link[#1]{#2}{\glssentencecase{#3}}%
+}
+\glsmfuaddmap{\glslink}{\Glslink}
 \newcommand*{\glspostlinkhook}{}
 \newcommand*{\@gls@link@checkfirsthyper}{%
   \ifglsused{\glslabel}%
@@ -3577,6 +3575,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \protected@edef\@gls@counter{\csname glo@\glslabel @counter\endcsname}%
     \protected@edef\glstype{\csname glo@\glslabel @type\endcsname}%
     \let\org@ifKV@glslink@hyper\ifKV@glslink@hyper
+    \@gls@save@glslocal
     \@gls@setdefault@glslink@opts
     \do@glsdisablehyperinlist
     \do@gls@link@checkfirsthyper
@@ -3584,14 +3583,16 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \glslinkpostsetkeys
     \@gls@saveentrycounter
     \@gls@setsort{\glslabel}%
-    \@do@wrglossary{#2}%
+    \glsencapwrcontent{\@do@wrglossary{#2}}%
     \ifKV@glslink@hyper
       \@glslink{\glolinkprefix\glslabel}{\glstextformat{#3}}%
     \else
       \glsdonohyperlink{\glolinkprefix\glslabel}{\glstextformat{#3}}%
     \fi
     \let\ifKV@glslink@hyper\org@ifKV@glslink@hyper
+    \@gls@restore@glslocal
 }
+\newcommand*{\glsencapwrcontent}[1]{{#1}}
 \newcommand*{\glolinkprefix}{glo:}
 \def\glsentrycounter{\glscounter}%
 \newcommand*{\@gls@saveentrycounter}{%
@@ -3678,16 +3679,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \def\@gls@checkedmkidx{}%
   \expandafter\@gls@xdycheckquote\gls@xdystring\@nil""\null
   \expandafter\@gls@updatechecked\@gls@checkedmkidx{\gls@xdystring}%
-  \@for\@gls@tmp:=\gls@protected@pagefmts\do
-  {%
-    \edef\@gls@sanitized@tmp{\expandafter\@gobble\string\\\expandonce\@gls@tmp}%
-    \@onelevel@sanitize\@gls@sanitized@tmp
-    \edef\gls@dosubst{%
-      \noexpand\DTLsubstituteall\noexpand\gls@xdystring
-      {\@gls@sanitized@tmp}{\expandonce\@gls@tmp}%
+  \ifglsesclocations
+    \@for\@gls@tmp:=\gls@protected@pagefmts\do
+    {%
+      \edef\@gls@sanitized@tmp{\expandafter\@gobble\string\\\expandonce\@gls@tmp}%
+      \@onelevel@sanitize\@gls@sanitized@tmp
+      \edef\gls@dosubst{%
+        \noexpand\DTLsubstituteall\noexpand\gls@xdystring
+        {\@gls@sanitized@tmp}{\expandonce\@gls@tmp}%
+      }%
+      \gls@dosubst
     }%
-    \gls@dosubst
-  }%
+  \fi
   \let#1=\gls@xdystring
 }
 \newcommand{\@gls@checkmkidxchars}[1]{%
@@ -4006,13 +4009,15 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 
 \newlength\gls@tmplen
 \newcommand*{\glsdohypertarget}[2]{%
-  \@glsshowtarget{#1}%
-  \settoheight{\gls@tmplen}{#2}%
-  \raisebox{\gls@tmplen}{\hypertarget{#1}{}}#2%
+  \glsdoshowtarget{#1}%
+  {%
+    \glsmeasureheight{\gls@tmplen}{#2}%
+    \raisebox{\gls@tmplen}{\hypertarget{#1}{}}%
+    #2%
+  }%
 }
 \newcommand*{\glsdohyperlink}[2]{%
- \@glsshowtarget{#1}%
- \hyperlink{#1}{#2}%
+ \glsdoshowtarget{#1}{\hyperlink{#1}{#2}}%
 }
 \newcommand*{\glsdonohyperlink}[2]{#2}
 \ifcsundef{hyperlink}%
@@ -4055,15 +4060,12 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
 \newrobustcmd*{\Gls}{\@gls@hyp@opt\@Gls}
+\glsmfuaddmap{\gls}{\Gls}
 \newcommand*{\@Gls}[2][]{%
   \new@ifnextchar[{\@Gls@{#1}{#2}}{\@Gls@{#1}{#2}[]}%
 }
@@ -4077,15 +4079,12 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
 \newrobustcmd*{\GLS}{\@gls@hyp@opt\@GLS}
+\glsmfublocker{\GLS}
 \newcommand*{\@GLS}[2][]{%
   \new@ifnextchar[{\@GLS@{#1}{#2}}{\@GLS@{#1}{#2}[]}%
 }
@@ -4099,11 +4098,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
@@ -4121,15 +4116,12 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
 \newrobustcmd*{\Glspl}{\@gls@hyp@opt\@Glspl}
+\glsmfuaddmap{\glspl}{\Glspl}
 \newcommand*{\@Glspl}[2][]{%
   \new@ifnextchar[{\@Glspl@{#1}{#2}}{\@Glspl@{#1}{#2}[]}%
 }
@@ -4143,15 +4135,12 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
 \newrobustcmd*{\GLSpl}{\@gls@hyp@opt\@GLSpl}
+\glsmfublocker{\GLSpl}
 \newcommand*{\@GLSpl}[2][]{%
   \new@ifnextchar[{\@GLSpl@{#1}{#2}}{\@GLSpl@{#1}{#2}[]}%
 }
@@ -4165,11 +4154,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{#3}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
@@ -4183,14 +4168,15 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \def\glsinsert{}%
     \def\@glo@text{\csname gls@\glstype @entryfmt\endcsname}%
     \@gls@link[#1]{#2}{\@glo@text}%
-    \ifKV@glslink@local
-      \glslocalunset{#2}%
-    \else
-      \glsunset{#2}%
-    \fi
+    \@gls@do@glsunset{#2}%
   }%
   \glspostlinkhook
 }
+\newrobustcmd*{\Glsdisp}{\@gls@hyp@opt\@Glsdisp}
+\newcommand*{\@Glsdisp}[3][]{%
+  \@glsdisp[#1]{#2}{\glssentencecase{#3}}%
+}
+\glsmfuaddmap{\glsdisp}{\Glsdisp}
 \newcommand*{\@gls@link@nocheckfirsthyper}{}
 \newcommand{\@gls@field@link}[3]{%
   \glsdoifexists{#2}%
@@ -4207,12 +4193,14 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentrytext{#2}#3}%
 }
 \newrobustcmd*{\GLStext}{\@gls@hyp@opt\@GLStext}
+\glsmfublocker{\GLStext}
 \newcommand*{\@GLStext}[2][]{%
   \new@ifnextchar[{\@GLStext@{#1}{#2}}{\@GLStext@{#1}{#2}[]}}
 \def\@GLStext@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentrytext{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentrytext{#2}#3}}%
 }
 \newrobustcmd*{\Glstext}{\@gls@hyp@opt\@Glstext}
+\glsmfuaddmap{\glstext}{\Glstext}
 \newcommand*{\@Glstext}[2][]{%
   \new@ifnextchar[{\@Glstext@{#1}{#2}}{\@Glstext@{#1}{#2}[]}}
 \def\@Glstext@#1#2[#3]{%
@@ -4225,16 +4213,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryfirst{#2}#3}%
 }
 \newrobustcmd*{\Glsfirst}{\@gls@hyp@opt\@Glsfirst}
+\glsmfuaddmap{\glsfirst}{\Glsfirst}
 \newcommand*{\@Glsfirst}[2][]{%
   \new@ifnextchar[{\@Glsfirst@{#1}{#2}}{\@Glsfirst@{#1}{#2}[]}}
 \def\@Glsfirst@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryfirst{#2}#3}%
 }
 \newrobustcmd*{\GLSfirst}{\@gls@hyp@opt\@GLSfirst}
+\glsmfublocker{\GLSfirst}
 \newcommand*{\@GLSfirst}[2][]{%
   \new@ifnextchar[{\@GLSfirst@{#1}{#2}}{\@GLSfirst@{#1}{#2}[]}}
 \def\@GLSfirst@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryfirst{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryfirst{#2}#3}}%
 }
 \newrobustcmd*{\glsplural}{\@gls@hyp@opt\@glsplural}
 \newcommand*{\@glsplural}[2][]{%
@@ -4243,16 +4233,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryplural{#2}#3}%
 }
 \newrobustcmd*{\Glsplural}{\@gls@hyp@opt\@Glsplural}
+\glsmfuaddmap{\glsplural}{\Glsplural}
 \newcommand*{\@Glsplural}[2][]{%
   \new@ifnextchar[{\@Glsplural@{#1}{#2}}{\@Glsplural@{#1}{#2}[]}}
 \def\@Glsplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryplural{#2}#3}%
 }
 \newrobustcmd*{\GLSplural}{\@gls@hyp@opt\@GLSplural}
+\glsmfublocker{\GLSplural}
 \newcommand*{\@GLSplural}[2][]{%
   \new@ifnextchar[{\@GLSplural@{#1}{#2}}{\@GLSplural@{#1}{#2}[]}}
 \def\@GLSplural@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryplural{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryplural{#2}#3}}%
 }
 \newrobustcmd*{\glsfirstplural}{\@gls@hyp@opt\@glsfirstplural}
 \newcommand*{\@glsfirstplural}[2][]{%
@@ -4261,16 +4253,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryfirstplural{#2}#3}%
 }
 \newrobustcmd*{\Glsfirstplural}{\@gls@hyp@opt\@Glsfirstplural}
+\glsmfuaddmap{\glsfirstplural}{\Glsfirstplural}
 \newcommand*{\@Glsfirstplural}[2][]{%
   \new@ifnextchar[{\@Glsfirstplural@{#1}{#2}}{\@Glsfirstplural@{#1}{#2}[]}}
 \def\@Glsfirstplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryfirstplural{#2}#3}%
 }
 \newrobustcmd*{\GLSfirstplural}{\@gls@hyp@opt\@GLSfirstplural}
+\glsmfublocker{\GLSfirstplural}
 \newcommand*{\@GLSfirstplural}[2][]{%
   \new@ifnextchar[{\@GLSfirstplural@{#1}{#2}}{\@GLSfirstplural@{#1}{#2}[]}}
 \def\@GLSfirstplural@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryfirstplural{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryfirstplural{#2}#3}}%
 }
 \newrobustcmd*{\glsname}{\@gls@hyp@opt\@glsname}
 \newcommand*{\@glsname}[2][]{%
@@ -4279,16 +4273,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryname{#2}#3}%
 }
 \newrobustcmd*{\Glsname}{\@gls@hyp@opt\@Glsname}
+\glsmfuaddmap{\glsname}{\Glsname}
 \newcommand*{\@Glsname}[2][]{%
   \new@ifnextchar[{\@Glsname@{#1}{#2}}{\@Glsname@{#1}{#2}[]}}
 \def\@Glsname@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryname{#2}#3}%
 }
 \newrobustcmd*{\GLSname}{\@gls@hyp@opt\@GLSname}
+\glsmfublocker{\GLSname}
 \newcommand*{\@GLSname}[2][]{%
   \new@ifnextchar[{\@GLSname@{#1}{#2}}{\@GLSname@{#1}{#2}[]}}
 \def\@GLSname@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryname{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryname{#2}#3}}%
 }
 \newrobustcmd*{\glsdesc}{\@gls@hyp@opt\@glsdesc}
 \newcommand*{\@glsdesc}[2][]{%
@@ -4297,16 +4293,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentrydesc{#2}#3}%
 }
 \newrobustcmd*{\Glsdesc}{\@gls@hyp@opt\@Glsdesc}
+\glsmfuaddmap{\glsdesc}{\Glsdesc}
 \newcommand*{\@Glsdesc}[2][]{%
   \new@ifnextchar[{\@Glsdesc@{#1}{#2}}{\@Glsdesc@{#1}{#2}[]}}
 \def\@Glsdesc@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentrydesc{#2}#3}%
 }
 \newrobustcmd*{\GLSdesc}{\@gls@hyp@opt\@GLSdesc}
+\glsmfublocker{\GLSdesc}
 \newcommand*{\@GLSdesc}[2][]{%
   \new@ifnextchar[{\@GLSdesc@{#1}{#2}}{\@GLSdesc@{#1}{#2}[]}}
 \def\@GLSdesc@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentrydesc{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentrydesc{#2}#3}}%
 }
 \newrobustcmd*{\glsdescplural}{\@gls@hyp@opt\@glsdescplural}
 \newcommand*{\@glsdescplural}[2][]{%
@@ -4315,16 +4313,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentrydescplural{#2}#3}%
 }
 \newrobustcmd*{\Glsdescplural}{\@gls@hyp@opt\@Glsdescplural}
+\glsmfuaddmap{\glsdescplural}{\Glsdescplural}
 \newcommand*{\@Glsdescplural}[2][]{%
   \new@ifnextchar[{\@Glsdescplural@{#1}{#2}}{\@Glsdescplural@{#1}{#2}[]}}
 \def\@Glsdescplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentrydescplural{#2}#3}%
 }
 \newrobustcmd*{\GLSdescplural}{\@gls@hyp@opt\@GLSdescplural}
+\glsmfublocker{\GLSdescplural}
 \newcommand*{\@GLSdescplural}[2][]{%
   \new@ifnextchar[{\@GLSdescplural@{#1}{#2}}{\@GLSdescplural@{#1}{#2}[]}}
 \def\@GLSdescplural@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentrydescplural{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentrydescplural{#2}#3}}%
 }
 \newrobustcmd*{\glssymbol}{\@gls@hyp@opt\@glssymbol}
 \newcommand*{\@glssymbol}[2][]{%
@@ -4333,16 +4333,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentrysymbol{#2}#3}%
 }
 \newrobustcmd*{\Glssymbol}{\@gls@hyp@opt\@Glssymbol}
+\glsmfuaddmap{\glssymbol}{\Glssymbol}
 \newcommand*{\@Glssymbol}[2][]{%
   \new@ifnextchar[{\@Glssymbol@{#1}{#2}}{\@Glssymbol@{#1}{#2}[]}}
 \def\@Glssymbol@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentrysymbol{#2}#3}%
 }
 \newrobustcmd*{\GLSsymbol}{\@gls@hyp@opt\@GLSsymbol}
+\glsmfublocker{\GLSsymbol}
 \newcommand*{\@GLSsymbol}[2][]{%
   \new@ifnextchar[{\@GLSsymbol@{#1}{#2}}{\@GLSsymbol@{#1}{#2}[]}}
 \def\@GLSsymbol@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentrysymbol{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentrysymbol{#2}#3}}%
 }
 \newrobustcmd*{\glssymbolplural}{\@gls@hyp@opt\@glssymbolplural}
 \newcommand*{\@glssymbolplural}[2][]{%
@@ -4351,16 +4353,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentrysymbolplural{#2}#3}%
 }
 \newrobustcmd*{\Glssymbolplural}{\@gls@hyp@opt\@Glssymbolplural}
+\glsmfuaddmap{\glssymbolplural}{\Glssymbolplural}
 \newcommand*{\@Glssymbolplural}[2][]{%
   \new@ifnextchar[{\@Glssymbolplural@{#1}{#2}}{\@Glssymbolplural@{#1}{#2}[]}}
 \def\@Glssymbolplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentrysymbolplural{#2}#3}%
 }
 \newrobustcmd*{\GLSsymbolplural}{\@gls@hyp@opt\@GLSsymbolplural}
+\glsmfublocker{\GLSsymbolplural}
 \newcommand*{\@GLSsymbolplural}[2][]{%
   \new@ifnextchar[{\@GLSsymbolplural@{#1}{#2}}{\@GLSsymbolplural@{#1}{#2}[]}}
 \def\@GLSsymbolplural@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentrysymbolplural{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentrysymbolplural{#2}#3}}%
 }
 \newrobustcmd*{\glsuseri}{\@gls@hyp@opt\@glsuseri}
 \newcommand*{\@glsuseri}[2][]{%
@@ -4369,16 +4373,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuseri{#2}#3}%
 }
 \newrobustcmd*{\Glsuseri}{\@gls@hyp@opt\@Glsuseri}
+\glsmfuaddmap{\glsuseri}{\Glsuseri}
 \newcommand*{\@Glsuseri}[2][]{%
   \new@ifnextchar[{\@Glsuseri@{#1}{#2}}{\@Glsuseri@{#1}{#2}[]}}
 \def\@Glsuseri@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuseri{#2}#3}%
 }
 \newrobustcmd*{\GLSuseri}{\@gls@hyp@opt\@GLSuseri}
+\glsmfublocker{\GLSuseri}
 \newcommand*{\@GLSuseri}[2][]{%
   \new@ifnextchar[{\@GLSuseri@{#1}{#2}}{\@GLSuseri@{#1}{#2}[]}}
 \def\@GLSuseri@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuseri{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuseri{#2}#3}}%
 }
 \newrobustcmd*{\glsuserii}{\@gls@hyp@opt\@glsuserii}
 \newcommand*{\@glsuserii}[2][]{%
@@ -4387,16 +4393,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuserii{#2}#3}%
 }
 \newrobustcmd*{\Glsuserii}{\@gls@hyp@opt\@Glsuserii}
+\glsmfuaddmap{\glsuserii}{\Glsuserii}
 \newcommand*{\@Glsuserii}[2][]{%
   \new@ifnextchar[{\@Glsuserii@{#1}{#2}}{\@Glsuserii@{#1}{#2}[]}}
 \def\@Glsuserii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuserii{#2}#3}%
 }
 \newrobustcmd*{\GLSuserii}{\@gls@hyp@opt\@GLSuserii}
+\glsmfublocker{\GLSuserii}
 \newcommand*{\@GLSuserii}[2][]{%
   \new@ifnextchar[{\@GLSuserii@{#1}{#2}}{\@GLSuserii@{#1}{#2}[]}}
 \def\@GLSuserii@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuserii{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuserii{#2}#3}}%
 }
 \newrobustcmd*{\glsuseriii}{\@gls@hyp@opt\@glsuseriii}
 \newcommand*{\@glsuseriii}[2][]{%
@@ -4405,16 +4413,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuseriii{#2}#3}%
 }
 \newrobustcmd*{\Glsuseriii}{\@gls@hyp@opt\@Glsuseriii}
+\glsmfuaddmap{\glsuseriii}{\Glsuseriii}
 \newcommand*{\@Glsuseriii}[2][]{%
   \new@ifnextchar[{\@Glsuseriii@{#1}{#2}}{\@Glsuseriii@{#1}{#2}[]}}
 \def\@Glsuseriii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuseriii{#2}#3}%
 }
 \newrobustcmd*{\GLSuseriii}{\@gls@hyp@opt\@GLSuseriii}
+\glsmfublocker{\GLSuseriii}
 \newcommand*{\@GLSuseriii}[2][]{%
   \new@ifnextchar[{\@GLSuseriii@{#1}{#2}}{\@GLSuseriii@{#1}{#2}[]}}
 \def\@GLSuseriii@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuseriii{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuseriii{#2}#3}}%
 }
 \newrobustcmd*{\glsuseriv}{\@gls@hyp@opt\@glsuseriv}
 \newcommand*{\@glsuseriv}[2][]{%
@@ -4423,16 +4433,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuseriv{#2}#3}%
 }
 \newrobustcmd*{\Glsuseriv}{\@gls@hyp@opt\@Glsuseriv}
+\glsmfuaddmap{\glsuseriv}{\Glsuseriv}
 \newcommand*{\@Glsuseriv}[2][]{%
   \new@ifnextchar[{\@Glsuseriv@{#1}{#2}}{\@Glsuseriv@{#1}{#2}[]}}
 \def\@Glsuseriv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuseriv{#2}#3}%
 }
 \newrobustcmd*{\GLSuseriv}{\@gls@hyp@opt\@GLSuseriv}
+\glsmfublocker{\GLSuseriv}
 \newcommand*{\@GLSuseriv}[2][]{%
   \new@ifnextchar[{\@GLSuseriv@{#1}{#2}}{\@GLSuseriv@{#1}{#2}[]}}
 \def\@GLSuseriv@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuseriv{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuseriv{#2}#3}}%
 }
 \newrobustcmd*{\glsuserv}{\@gls@hyp@opt\@glsuserv}
 \newcommand*{\@glsuserv}[2][]{%
@@ -4441,16 +4453,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuserv{#2}#3}%
 }
 \newrobustcmd*{\Glsuserv}{\@gls@hyp@opt\@Glsuserv}
+\glsmfuaddmap{\glsuserv}{\Glsuserv}
 \newcommand*{\@Glsuserv}[2][]{%
 \new@ifnextchar[{\@Glsuserv@{#1}{#2}}{\@Glsuserv@{#1}{#2}[]}}
 \def\@Glsuserv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuserv{#2}#3}%
 }
 \newrobustcmd*{\GLSuserv}{\@gls@hyp@opt\@GLSuserv}
+\glsmfublocker{\GLSuserv}
 \newcommand*{\@GLSuserv}[2][]{%
 \new@ifnextchar[{\@GLSuserv@{#1}{#2}}{\@GLSuserv@{#1}{#2}[]}}
 \def\@GLSuserv@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuserv{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuserv{#2}#3}}%
 }
 \newrobustcmd*{\glsuservi}{\@gls@hyp@opt\@glsuservi}
 \newcommand*{\@glsuservi}[2][]{%
@@ -4459,16 +4473,18 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@field@link{#1}{#2}{\glsentryuservi{#2}#3}%
 }
 \newrobustcmd*{\Glsuservi}{\@gls@hyp@opt\@Glsuservi}
+\glsmfuaddmap{\glsuservi}{\Glsuservi}
 \newcommand*{\@Glsuservi}[2][]{%
   \new@ifnextchar[{\@Glsuservi@{#1}{#2}}{\@Glsuservi@{#1}{#2}[]}}
 \def\@Glsuservi@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\Glsentryuservi{#2}#3}%
 }
 \newrobustcmd*{\GLSuservi}{\@gls@hyp@opt\@GLSuservi}
+\glsmfublocker{\GLSuservi}
 \newcommand*{\@GLSuservi}[2][]{%
   \new@ifnextchar[{\@GLSuservi@{#1}{#2}}{\@GLSuservi@{#1}{#2}[]}}
 \def\@GLSuservi@#1#2[#3]{%
-  \@gls@field@link{#1}{#2}{\mfirstucMakeUppercase{\glsentryuservi{#2}#3}}%
+  \@gls@field@link{#1}{#2}{\glsuppercase{\glsentryuservi{#2}#3}}%
 }
 \newrobustcmd*{\acrshort}{\@gls@hyp@opt\ns@acrshort}
 \newcommand*{\ns@acrshort}[2][]{%
@@ -4489,6 +4505,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\Acrshort}{\@gls@hyp@opt\ns@Acrshort}
+\glsmfuaddmap{\Acrshort}{\Acrshort}
 \newcommand*{\ns@Acrshort}[2][]{%
   \new@ifnextchar[{\@Acrshort{#1}{#2}}{\@Acrshort{#1}{#2}[]}%
 }
@@ -4508,6 +4525,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\ACRshort}{\@gls@hyp@opt\ns@ACRshort}
+\glsmfublocker{\ACRshort}
 \newcommand*{\ns@ACRshort}[2][]{%
   \new@ifnextchar[{\@ACRshort{#1}{#2}}{\@ACRshort{#1}{#2}[]}%
 }
@@ -4520,7 +4538,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \let\glscapscase\@thirdofthree
     \let\glsinsert\@empty
     \def\glscustomtext{%
-      \mfirstucMakeUppercase{\acronymfont{\glsentryshort{#2}}#3}%
+      \glsuppercase{\acronymfont{\glsentryshort{#2}}#3}%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
@@ -4546,6 +4564,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\Acrshortpl}{\@gls@hyp@opt\ns@Acrshortpl}
+\glsmfuaddmap{\Acrshortpl}{\Acrshortpl}
 \newcommand*{\ns@Acrshortpl}[2][]{%
   \new@ifnextchar[{\@Acrshortpl{#1}{#2}}{\@Acrshortpl{#1}{#2}[]}%
 }
@@ -4565,6 +4584,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\ACRshortpl}{\@gls@hyp@opt\ns@ACRshortpl}
+\glsmfublocker{\ACRshortpl}
 \newcommand*{\ns@ACRshortpl}[2][]{%
   \new@ifnextchar[{\@ACRshortpl{#1}{#2}}{\@ACRshortpl{#1}{#2}[]}%
 }
@@ -4577,7 +4597,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \let\glscapscase\@thirdofthree
     \let\glsinsert\@empty
     \def\glscustomtext{%
-      \mfirstucMakeUppercase{\acronymfont{\glsentryshortpl{#2}}#3}%
+      \glsuppercase{\acronymfont{\glsentryshortpl{#2}}#3}%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
@@ -4603,6 +4623,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\Acrlong}{\@gls@hyp@opt\ns@Acrlong}
+\glsmfuaddmap{\Acrlong}{\Acrlong}
 \newcommand*{\ns@Acrlong}[2][]{%
   \new@ifnextchar[{\@Acrlong{#1}{#2}}{\@Acrlong{#1}{#2}[]}%
 }
@@ -4622,6 +4643,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\ACRlong}{\@gls@hyp@opt\ns@ACRlong}
+\glsmfublocker{\ACRlong}
 \newcommand*{\ns@ACRlong}[2][]{%
   \new@ifnextchar[{\@ACRlong{#1}{#2}}{\@ACRlong{#1}{#2}[]}%
 }
@@ -4634,7 +4656,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \let\glscapscase\@thirdofthree
     \let\glsinsert\@empty
     \def\glscustomtext{%
-      \mfirstucMakeUppercase{\glsentrylong{#2}#3}%
+      \glsuppercase{\glsentrylong{#2}#3}%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
@@ -4660,6 +4682,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\Acrlongpl}{\@gls@hyp@opt\ns@Acrlongpl}
+\glsmfuaddmap{\Acrlongpl}{\Acrlongpl}
 \newcommand*{\ns@Acrlongpl}[2][]{%
   \new@ifnextchar[{\@Acrlongpl{#1}{#2}}{\@Acrlongpl{#1}{#2}[]}%
 }
@@ -4679,6 +4702,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \glspostlinkhook
 }
 \newrobustcmd*{\ACRlongpl}{\@gls@hyp@opt\ns@ACRlongpl}
+\glsmfublocker{\ACRlongpl}
 \newcommand*{\ns@ACRlongpl}[2][]{%
   \new@ifnextchar[{\@ACRlongpl{#1}{#2}}{\@ACRlongpl{#1}{#2}[]}%
 }
@@ -4691,25 +4715,25 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \let\glscapscase\@thirdofthree
     \let\glsinsert\@empty
     \def\glscustomtext{%
-      \mfirstucMakeUppercase{\glsentrylongpl{#2}#3}%
+      \glsuppercase{\glsentrylongpl{#2}#3}%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
   \glspostlinkhook
 }
 \newcommand*{\@gls@entry@field}[2]{%
-  \csname glo@\glsdetoklabel{#1}@#2\endcsname
+  \csuse{glo@\glsdetoklabel{#1}@#2}%
 }
 \newcommand*{\glsletentryfield}[3]{%
   \letcs{#1}{glo@\glsdetoklabel{#2}@#3}%
 }
-\newcommand*{\@Gls@entry@field}[2]{%
+\newrobustcmd*{\@Gls@entry@field}[2]{%
   \glsdoifexistsordo{#1}%
   {%
     \letcs\@glo@text{glo@\glsdetoklabel{#1}@#2}%
     \ifdef\@glo@text
     {%
-      \xmakefirstuc{\@glo@text}%
+      \expandafter\glssentencecase\expandafter{\@glo@text}%
     }%
     {%
       ??\PackageError{glossaries}{The field `#2' doesn't exist for glossary
@@ -4721,14 +4745,33 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     ??%
   }%
 }
-\newcommand*{\glsentryname}[1]{\@gls@entry@field{#1}{name}}
-\newrobustcmd*{\Glsentryname}[1]{%
-  \@Gls@entryname{#1}%
+\newcommand{\@Glsentryfield}[2]{%
+  \glstexorpdfstring{\@Gls@entry@field{#1}{#2}}%
+  {\MFUsentencecase{\@gls@entry@field{#1}{#2}}}%
 }
+\ifdef\texorpdfstring
+{\newcommand{\glstexorpdfstring}{\texorpdfstring}}
+{\newcommand{\glstexorpdfstring}[2]{#1}}
+\newcommand*{\glsentryname}[1]{\@gls@entry@field{#1}{name}}
+\newcommand*{\Glsentryname}[1]{%
+  \glstexorpdfstring{\protect\@Gls@entryname{#1}}%
+  {\MFUsentencecase{\@gls@entry@field{#1}{name}}}%
+}
+\glsmfuaddmap{\glsentryname}{\Glsentryname}
 \newcommand*{\@Gls@entryname}[1]{%
   \@Gls@entry@field{#1}{name}%
 }
-\newcommand*{\@Gls@acrentryname}[1]{%
+\newrobustcmd*{\@Gls@acrentryname}[1]{%
+  \ifglshaslong{#1}%
+  {%
+    \protected@edef\@glo@text{\@gls@entry@field{#1}{name}}%
+    \expandafter\glssentencecase\expandafter{\@glo@text}%
+  }%
+  {%
+    \@Gls@entry@field{#1}{name}%
+  }%
+}
+\newcommand*{\@org@Gls@acrentryname}[1]{%
   \ifglshaslong{#1}%
   {%
     \letcs\@glo@text{glo@\glsdetoklabel{#1}@name}%
@@ -4751,7 +4794,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
               \@glo@text
             }%
           \else
-            \xmakefirstuc{\@glo@text}%
+            \expandafter\glssentencecase\expandafter{\@glo@text}%
           \fi
         \fi
       \fi
@@ -4762,51 +4805,62 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   }%
 }
 \newcommand*{\glsentrydesc}[1]{\@gls@entry@field{#1}{desc}}
-\newrobustcmd*{\Glsentrydesc}[1]{%
-  \@Gls@entry@field{#1}{desc}%
-}
+\newcommand*{\Glsentrydesc}[1]{\@Glsentryfield{#1}{desc}}
+\glsmfuaddmap{\glsentrydesc}{\Glsentrydesc}
 \newcommand*{\glsentrydescplural}[1]{%
   \@gls@entry@field{#1}{descplural}%
 }
-\newrobustcmd*{\Glsentrydescplural}[1]{%
-  \@Gls@entry@field{#1}{descplural}%
+\newcommand*{\Glsentrydescplural}[1]{%
+  \@Glsentryfield{#1}{descplural}%
 }
+\glsmfuaddmap{\glsentrydescplural}{\Glsentrydescplural}
 \newcommand*{\glsentrytext}[1]{\@gls@entry@field{#1}{text}}
-\newrobustcmd*{\Glsentrytext}[1]{%
-  \@Gls@entry@field{#1}{text}%
+\newcommand*{\Glsentrytext}[1]{%
+  \@Glsentryfield{#1}{text}%
 }
+\glsmfuaddmap{\glsentrytext}{\Glsentrytext}
 \newcommand*{\glsentryplural}[1]{%
   \@gls@entry@field{#1}{plural}%
 }
-\newrobustcmd*{\Glsentryplural}[1]{%
-  \@Gls@entry@field{#1}{plural}%
+\newcommand*{\Glsentryplural}[1]{%
+  \@Glsentryfield{#1}{plural}%
 }
+\glsmfuaddmap{\glsentryplural}{\Glsentryplural}
 \newcommand*{\glsentrysymbol}[1]{%
   \@gls@entry@field{#1}{symbol}%
 }
-\newrobustcmd*{\Glsentrysymbol}[1]{%
-  \@Gls@entry@field{#1}{symbol}%
+\newcommand*{\Glsentrysymbol}[1]{%
+  \@Glsentryfield{#1}{symbol}%
 }
+\glsmfuaddmap{\glsentrysymbol}{\Glsentrysymbol}
 \newcommand*{\glsentrysymbolplural}[1]{%
   \@gls@entry@field{#1}{symbolplural}%
 }
-\newrobustcmd*{\Glsentrysymbolplural}[1]{%
-  \@Gls@entry@field{#1}{symbolplural}%
+\newcommand*{\Glsentrysymbolplural}[1]{%
+  \@Glsentryfield{#1}{symbolplural}%
 }
+\glsmfuaddmap{\glsentrysymbolplural}{\Glsentrysymbolplural}
 \newcommand*{\glsentryfirst}[1]{%
   \@gls@entry@field{#1}{first}%
 }
-\newrobustcmd*{\Glsentryfirst}[1]{%
-  \@Gls@entry@field{#1}{first}%
+\newcommand*{\Glsentryfirst}[1]{%
+  \@Glsentryfield{#1}{first}%
 }
+\glsmfuaddmap{\glsentryfirst}{\Glsentryfirst}
 \newcommand*{\glsentryfirstplural}[1]{%
   \@gls@entry@field{#1}{firstpl}%
 }
-\newrobustcmd*{\Glsentryfirstplural}[1]{%
-  \@Gls@entry@field{#1}{firstpl}%
+\newcommand*{\Glsentryfirstplural}[1]{%
+  \@Glsentryfield{#1}{firstpl}%
 }
+\glsmfuaddmap{\glsentryfirstplural}{\Glsentryfirstplural}
 \newcommand{\glscapitalisewords}[1]{%
   \capitalisewords{#1}%
+}
+\newcommand*{\glsentrytitlecase}[2]{%
+  \glstexorpdfstring
+    {\@glsentrytitlecase{#1}{#2}}%
+    {\MFUsentencecase{\@gls@entry@field{#1}{#2}}}%
 }
 \newrobustcmd*{\@glsentrytitlecase}[2]{%
   \glsdoifexists{#1}%
@@ -4814,17 +4868,6 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \glsfieldfetch{#1}{#2}{\@gls@value}%
     \expandafter\glscapitalisewords\expandafter{\@gls@value}%
   }%
-}
-\ifdef\texorpdfstring
-{
-  \newcommand*{\glsentrytitlecase}[2]{%
-    \texorpdfstring
-      {\@glsentrytitlecase{#1}{#2}}%
-      {\@gls@entry@field{#1}{#2}}%
-  }
-}
-{
-  \newcommand*{\glsentrytitlecase}[2]{\@glsentrytitlecase{#1}{#2}}
 }
 \newcommand*{\glsentrytype}[1]{\@gls@entry@field{#1}{type}}
 \newcommand*{\glsentrysort}[1]{%
@@ -4836,67 +4879,79 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 \newcommand*{\glsentryuseri}[1]{%
   \@gls@entry@field{#1}{useri}%
 }
-\newrobustcmd*{\Glsentryuseri}[1]{%
-  \@Gls@entry@field{#1}{useri}%
+\newcommand*{\Glsentryuseri}[1]{%
+  \@Glsentryfield{#1}{useri}%
 }
+\glsmfuaddmap{\glsentryuseri}{\Glsentryuseri}
 \newcommand*{\glsentryuserii}[1]{%
   \@gls@entry@field{#1}{userii}%
 }
-\newrobustcmd*{\Glsentryuserii}[1]{%
-  \@Gls@entry@field{#1}{userii}%
+\newcommand*{\Glsentryuserii}[1]{%
+  \@Glsentryfield{#1}{userii}%
 }
+\glsmfuaddmap{\glsentryuserii}{\Glsentryuserii}
 \newcommand*{\glsentryuseriii}[1]{%
   \@gls@entry@field{#1}{useriii}%
 }
-\newrobustcmd*{\Glsentryuseriii}[1]{%
-  \@Gls@entry@field{#1}{useriii}%
+\newcommand*{\Glsentryuseriii}[1]{%
+  \@Glsentryfield{#1}{useriii}%
 }
+\glsmfuaddmap{\glsentryuseriii}{\Glsentryuseriii}
 \newcommand*{\glsentryuseriv}[1]{%
   \@gls@entry@field{#1}{useriv}%
 }
-\newrobustcmd*{\Glsentryuseriv}[1]{%
-  \@Gls@entry@field{#1}{useriv}%
+\newcommand*{\Glsentryuseriv}[1]{%
+  \@Glsentryfield{#1}{useriv}%
 }
+\glsmfuaddmap{\glsentryuseriv}{\Glsentryuseriv}
 \newcommand*{\glsentryuserv}[1]{%
   \@gls@entry@field{#1}{userv}%
 }
-\newrobustcmd*{\Glsentryuserv}[1]{%
-  \@Gls@entry@field{#1}{userv}%
+\newcommand*{\Glsentryuserv}[1]{%
+  \@Glsentryfield{#1}{userv}%
 }
+\glsmfuaddmap{\glsentryuserv}{\Glsentryuserv}
 \newcommand*{\glsentryuservi}[1]{%
   \@gls@entry@field{#1}{uservi}%
 }
-\newrobustcmd*{\Glsentryuservi}[1]{%
-  \@Gls@entry@field{#1}{uservi}%
+\newcommand*{\Glsentryuservi}[1]{%
+  \@Glsentryfield{#1}{uservi}%
 }
+\glsmfuaddmap{\glsentryuservi}{\Glsentryuservi}
 \newcommand*{\glsentryshort}[1]{\@gls@entry@field{#1}{short}}
-\newrobustcmd*{\Glsentryshort}[1]{%
-  \@Gls@entry@field{#1}{short}%
+\newcommand*{\Glsentryshort}[1]{%
+  \@Glsentryfield{#1}{short}%
 }
+\glsmfuaddmap{\glsentryshort}{\Glsentryshort}
 \newcommand*{\glsentryshortpl}[1]{\@gls@entry@field{#1}{shortpl}}
-\newrobustcmd*{\Glsentryshortpl}[1]{%
-  \@Gls@entry@field{#1}{shortpl}%
+\newcommand*{\Glsentryshortpl}[1]{%
+  \@Glsentryfield{#1}{shortpl}%
 }
+\glsmfuaddmap{\glsentryshortpl}{\Glsentryshortpl}
 \newcommand*{\glsentrylong}[1]{\@gls@entry@field{#1}{long}}
-\newrobustcmd*{\Glsentrylong}[1]{%
-  \@Gls@entry@field{#1}{long}%
+\newcommand*{\Glsentrylong}[1]{%
+  \@Glsentryfield{#1}{long}%
 }
+\glsmfuaddmap{\glsentrylong}{\Glsentrylong}
 \newcommand*{\glsentrylongpl}[1]{\@gls@entry@field{#1}{longpl}}
-\newrobustcmd*{\Glsentrylongpl}[1]{%
-  \@Gls@entry@field{#1}{longpl}%
+\newcommand*{\Glsentrylongpl}[1]{%
+  \@Glsentryfield{#1}{longpl}%
 }
+\glsmfuaddmap{\glsentrylongpl}{\Glsentrylongpl}
 \newcommand*{\glsentryfull}[1]{%
-  \acrfullformat{\glsentrylong{#1}}{\acronymfont{\glsentryshort{#1}}}%
+ \glsentrylong{#1} (\glsentryshort{#1})%
 }
-\newrobustcmd*{\Glsentryfull}[1]{%
-  \acrfullformat{\Glsentrylong{#1}}{\acronymfont{\glsentryshort{#1}}}%
+\newcommand*{\Glsentryfull}[1]{%
+ \Glsentrylong{#1} (\glsentryshort{#1})%
 }
+\glsmfuaddmap{\glsentryfull}{\Glsentryfull}
 \newcommand*{\glsentryfullpl}[1]{%
   \acrfullformat{\glsentrylongpl{#1}}{\acronymfont{\glsentryshortpl{#1}}}%
 }
-\newrobustcmd*{\Glsentryfullpl}[1]{%
-  \acrfullformat{\Glsentrylongpl{#1}}{\acronymfont{\glsentryshortpl{#1}}}%
+\newcommand*{\Glsentryfullpl}[1]{%
+ \Glsentrylongpl{#1} (\glsentryshortpl{#1})%
 }
+\glsmfuaddmap{\glsentryfullpl}{\Glsentryfullpl}
 \newcommand*{\glsentrynumberlist}[1]{%
   \glsdoifexists{#1}%
   {%
@@ -4969,6 +5024,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \@@do@wrglossary{#2}%
   }%
 }
+\glsmfuexcl{\glsadd}
 \newcommand*{\@gls@adjustmode}{}
 \AtBeginDocument{\renewcommand*{\@gls@adjustmode}{\ifvmode\mbox{}\fi}}
 \newrobustcmd*{\glsaddall}[1][]{%
@@ -5178,6 +5234,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \@gls@writeisthook
     \closeout\glswrite
     \let\writeist\relax
+    \let\noist\@gls@noist@toolate
   }
 \else
   \edef\@gls@actualchar{\string?}
@@ -5248,6 +5305,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
     \@gls@writeisthook
     \closeout\glswrite
     \let\writeist\relax
+    \let\noist\@gls@noist@toolate
   }
 \fi
 \newcommand*{\GlsSetWriteIstHook}[1]{\renewcommand*{\@gls@writeisthook}{#1}}
@@ -5402,6 +5460,10 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \@gls@addpredefinedattributes
   \let\writeist\relax
 }
+\newcommand{\@gls@noist@toolate}{%
+  \GlossariesWarning{too late to use \string\noist. The style file
+has already been written}%
+}
 \newcommand*{\@makeglossary}[1]{%
   \ifglossaryexists{#1}%
   {%
@@ -5436,15 +5498,16 @@ false,nolabel,autolabel,nameref}[nolabel]{%
      \ifdefstring{\glsorder}{letter}%
       {\def\@gls@order{-M ord/letorder }}%
       {\let\@gls@order\@empty}%
-     \ifcsundef{@xdy@#1@language}%
-      {\let\@gls@langmod\@xdy@main@language}%
-      {\letcs\@gls@langmod{@xdy@#1@language}}%
+     \gls@xdy@set@lang{#1}%
+     \ifdefvoid\gls@codepage
+      {\let\@@gls@codepage\@empty}%
+      {\def\@@gls@codepage{-C \gls@codepage\space}}%
      \edef\@gls@dothiswrite{\noexpand\write18{xindy
        -I xindy
        \@gls@order
        -L \@gls@langmod\space
        -M \gls@istfilebase\space
-       -C \gls@codepage\space
+       \@@gls@codepage
        -t \jobname.\csuse{@glotype@#1@log}
        -o \jobname.\csuse{@glotype@#1@in}
        \jobname.\csuse{@glotype@#1@out}}%
@@ -5485,15 +5548,16 @@ false,nolabel,autolabel,nameref}[nolabel]{%
        \ifdefstring{\glsorder}{letter}%
         {\def\@gls@order{-M ord/letorder }}%
         {\let\@gls@order\@empty}%
-       \ifcsundef{@xdy@#1@language}%
-        {\let\@gls@langmod\@xdy@main@language}%
-        {\letcs\@gls@langmod{@xdy@#1@language}}%
+      \gls@xdy@set@lang{#1}%
+       \ifdefvoid\gls@codepage
+        {\let\@@gls@codepage\@empty}%
+        {\def\@@gls@codepage{-C \gls@codepage\space}}%
        \edef\@gls@dothiswrite{\noexpand\immediate\noexpand\write18{xindy
          -I xindy
          \@gls@order
          -L \@gls@langmod\space
          -M \gls@istfilebase\space
-         -C \gls@codepage\space
+         \@@gls@codepage
          -t \jobname.\csuse{@glotype@#1@log}
          -o \jobname.\csuse{@glotype@#1@in}
          \jobname.\csuse{@glotype@#1@out}}%
@@ -5534,17 +5598,32 @@ false,nolabel,autolabel,nameref}[nolabel]{%
 \fi
 \newcommand*{\@warn@nomakeglossaries}{}
 \newcommand*{\warn@nomakeglossaries}{\@warn@nomakeglossaries}
+\newcommand{\@gls@automake@types}{\@glo@types}
 \newcommand{\@gls@@automake@immediate}{%
  \ifnum\gls@automake@nr=2\relax
-   \@for\@gls@type:=\@glo@types\do{%
+   \protected@edef\gls@tmp{\@gls@automake@types}%
+   \@for\@gls@type:=\gls@tmp\do{%
       \ifdefempty{\@gls@type}{}%
       {\@gls@automake@immediate{\@gls@type}}%
    }%
    \glsautomakefalse
    \renewcommand*{\@gls@doautomake}{}%
+ \else
+   \ifdefempty\gls@automake@makegloss{}%
+   {%
+     \IfFileExists{\jobname.aux}%
+     {\immediate\write18{\gls@automake@makegloss\space \jobname}}{}%
+     \glsautomakefalse
+     \renewcommand*{\@gls@doautomake}{}%
+   }%
  \fi
 }
 \newcommand*{\makeglossaries}{%
+ \ifglsxindy
+   \def\glsindexingsetting{xindy}%
+ \else
+   \def\glsindexingsetting{makeindex}%
+ \fi
  \@domakeglossaries
  {%
    \@gls@@automake@immediate
@@ -5587,7 +5666,8 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   }%
   \ifglsautomake
     \renewcommand*{\@gls@doautomake}{%
-      \@for\@gls@type:=\@glo@types\do{%
+      \protected@edef\gls@tmp{\@gls@automake@types}%
+      \@for\@gls@type:=\gls@tmp\do{%
         \ifdefempty{\@gls@type}{}%
         {\@gls@automake{\@gls@type}}%
       }%
@@ -5615,6 +5695,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \warn@noprintglossary
 }
 \newcommand*{\makenoidxglossaries}{%
+ \def\glsindexingsetting{noidx}%
  \@domakeglossaries
  {%
   \renewcommand{\@gls@noref@warn}[1]{%
@@ -5726,10 +5807,11 @@ false,nolabel,autolabel,nameref}[nolabel]{%
   \let\@@gls@nosanitizesort\@@gls@noidx@nosanitizesort
   \@gls@noidx@setsanitizesort
   \@glo@check@sortallowed\makenoidxglossaries
+  \let\@gls@savenonumberlist\gls@noidx@nonumberlist
  }%
 }
 \@onlypreamble{\makenoidxglossaries}
-\newcommand*{\glsnumberlistloop}[2]{%
+\newcommand*{\glsnumberlistloop}[3]{%
    \PackageError{glossaries}{\string\glsnumberlistloop\space
     only works with \string\makenoidxglossaries}{}%
 }
@@ -5747,7 +5829,7 @@ false,nolabel,autolabel,nameref}[nolabel]{%
    is required to make \string\printnoidxglossary[type={#1}] work}%
 }
 \newcommand*{\gls@noidxglossary}{%
-  \protected@write\@auxout{}{%
+  \protected@write\@auxout{\glswrglossdisablelocationcmds}{%
     \string\@gls@reference
       {\csname glo@\@gls@label @type\endcsname}%
       {\@gls@label}%
@@ -5759,7 +5841,6 @@ false,nolabel,autolabel,nameref}[nolabel]{%
       }%
   }%
 }
-\providecommand\istfile{\glswrite}
 \AtEndDocument{%
   \glswritefiles
 }
@@ -5825,7 +5906,7 @@ you
   \endgroup\@esphack
 }
 \newcommand*{\@do@wrglossary}[1]{%
-  \glswriteentry{#1}{\@@do@wrglossary{#1}}%
+  \gls@ifnotmeasuring{\glswriteentry{#1}{\@@do@wrglossary{#1}}}%
 }
 \newcommand*{\glswriteentry}[2]{%
   \ifglsindexonlyfirst
@@ -5837,11 +5918,15 @@ you
 \newcommand{\gls@protected@pagefmts}{\gls@numberpage,\gls@alphpage,%
  \gls@Alphpage,\gls@romanpage,\gls@Romanpage,\gls@arabicpage}
 \newcommand*{\gls@disablepagerefexpansion}{%
-  \@for\@gls@this:=\gls@protected@pagefmts\do
-  {%
-    \expandafter\let\@gls@this\relax
-  }%
+  \glswrglossdisablelocationcmds
+  \ifglsesclocations
+    \@for\@gls@this:=\gls@protected@pagefmts\do
+    {%
+      \expandafter\let\@gls@this\relax
+    }%
+  \fi
 }
+\newcommand{\glswrglossdisablelocationcmds}{}
 \newcommand*{\gls@alphpage}{\@alph\c@page}
 \newcommand*{\gls@Alphpage}{\@Alph\c@page}
 \newcommand*{\gls@numberpage}{\number\c@page}
@@ -5849,17 +5934,25 @@ you
 \newcommand*{\gls@romanpage}{\romannumeral\c@page}
 \newcommand*{\gls@Romanpage}{\@Roman\c@page}
 \newcommand*{\glsaddprotectedpagefmt}[1]{%
-  \protected@eappto\gls@protected@pagefmts{,\expandonce{\csname gls#1page\endcsname}}%
-  \csedef{gls#1page}{\expandonce{\csname#1\endcsname}\noexpand\c@page}%
-  \protected@eappto\@wrglossarynumberhook{%
-    \noexpand\let\expandonce{\csname org@gls#1\endcsname}%
-      \expandonce{\csname#1\endcsname}%
-    \noexpand\def\expandonce{\csname#1\endcsname}{%
-      \noexpand\@wrglossary@pageformat
-         \expandonce{\csname gls#1page\endcsname}%
-         \expandonce{\csname org@gls#1\endcsname}%
+  \ifglsesclocations
+    \protected@eappto\gls@protected@pagefmts{,\expandonce{\csname gls#1page\endcsname}}%
+    \csedef{gls#1page}{\expandonce{\csname#1\endcsname}\noexpand\c@page}%
+    \protected@eappto\@wrglossarynumberhook{%
+      \noexpand\let\expandonce{\csname org@gls#1\endcsname}%
+        \expandonce{\csname#1\endcsname}%
+      \noexpand\def\expandonce{\csname#1\endcsname}{%
+        \noexpand\@wrglossary@pageformat
+           \expandonce{\csname gls#1page\endcsname}%
+           \expandonce{\csname org@gls#1\endcsname}%
+      }%
     }%
-  }%
+  \else
+    \GlsWarnAddProtectedPageFmt
+  \fi
+}
+\newcommand{\GlsWarnAddProtectedPageFmt}{%
+  \GlossariesWarning{\string\glsaddprotectedpagefmt\space has no
+   effect with esclocations=false}%
 }
 \newcommand*\@wrglossarynumberhook{}
 \newcommand{\@wrglossary@pageformat}[3]{%
@@ -5872,22 +5965,26 @@ you
     \@@do@noesc@wrglossary{#1}%
   \fi
 }
+\newcommand{\glswrglossdisableanchorcmds}{\let\glstexorpdfstring\@secondoftwo}
+\ifdef\texorpdfstring
+ {\appto\glswrglossdisableanchorcmds{\let\texorpdfstring\@secondoftwo}}{}
+\ifdef\pdfstringdefPreHook
+ {\appto\glswrglossdisableanchorcmds{\pdfstringdefPreHook}}{}
+\newcommand{\glswrglosslocationtarget}[1]{#1}
+\newcommand{\glswrglosslocationtextfmt}[1]{#1}
 \newcommand*{\@@do@noesc@wrglossary}[1]{%
   \expandafter\def\expandafter\@glslocref\expandafter{\theglsentrycounter}%
   \expandafter\def\expandafter\@glsHlocref\expandafter{\theHglsentrycounter}%
   \ifx\@glsHlocref\@glslocref
     \def\@glo@counterprefix{}%
   \else
-    \protected@edef\@do@gls@getcounterprefix{\noexpand\@gls@getcounterprefix
-      {\@glslocref}{\@glsHlocref}%
-    }%
-    \@do@gls@getcounterprefix
+    \@xp@gls@getcounterprefix{\@glslocref}{\@glsHlocref}%
   \fi
   \protected@edef\@gls@label{\glsdetoklabel{#1}}%
   \@@do@@wrglossary
 }
 \newif\ifglswrallowprimitivemods
-\glswrallowprimitivemodstrue
+\glswrallowprimitivemodsfalse
 \newcommand*{\@@do@esc@wrglossary}[1]{% please read documented code!
   \begingroup
     \let\gls@orgthe\the
@@ -5904,11 +6001,11 @@ you
       \def\gls@number##1{%
         \ifx##1\c@page \gls@numberpage\else\gls@orgnumber##1\fi}%
       \def\number{\expandafter\gls@number}%
+      \def\romannumeral##1{%
+        \ifx##1\c@page \gls@romanpage \else \gls@orgromannumeral##1\fi}%
     \fi
     \def\@arabic##1{%
       \ifx##1\c@page \gls@arabicpage\else\gls@orgarabic##1\fi}%
-    \def\romannumeral##1{%
-      \ifx##1\c@page \gls@romanpage\else\gls@orgromannumeral##1\fi}%
     \def\@Roman##1{%
       \ifx##1\c@page \gls@Romanpage\else\gls@orgRoman##1\fi}%
     \def\@alph##1{%
@@ -5925,10 +6022,7 @@ you
   \else
     \protected@edef\@glsHlocref{\theHglsentrycounter}%
     \@gls@checkmkidxchars\@glsHlocref
-    \edef\@do@gls@getcounterprefix{\noexpand\@gls@getcounterprefix
-      {\@glslocref}{\@glsHlocref}%
-    }%
-    \@do@gls@getcounterprefix
+    \@xp@gls@getcounterprefix{\@glslocref}{\@glsHlocref}%
   \fi
   \protected@edef\@gls@label{\glsdetoklabel{#1}}%
   \@@do@@wrglossary
@@ -5959,8 +6053,17 @@ you
       \@gls@encapchar\@glo@numfmt}{\@glslocref}}%
   \fi
 }
+\newcommand*\@xp@gls@getcounterprefix[2]{%
+ \bgroup
+   \glswrglossdisableanchorcmds
+   \protected@edef\@do@gls@getcounterprefix{%
+     \noexpand\egroup
+     \noexpand\@gls@getcounterprefix{#1}{#2}%
+ }%
+ \@do@gls@getcounterprefix
+}
 \newcommand*\@gls@getcounterprefix[2]{%
-  \edef\@gls@thisloc{#1}\edef\@gls@thisHloc{#2}%
+  \def\@gls@thisloc{#1}\def\@gls@thisHloc{#2}%
   \ifx\@gls@thisloc\@gls@thisHloc
     \def\@glo@counterprefix{}%
   \else
@@ -6033,7 +6136,9 @@ you
 \newcommand*{\glsseelastsep}{\space\andname\space}
 \newcommand*{\glsseesep}{, }
 \newrobustcmd*{\glsseeitem}[1]{\glshyperlink[\glsseeitemformat{#1}]{#1}}
-\newcommand*{\glsseeitemformat}[1]{\glsentrytext{#1}}
+\newcommand*{\glsseeitemformat}[1]{%
+ \ifglshasshort{#1}{\glsentrytext{#1}}{\glsentryname{#1}}%
+}
 \newcommand*{\gls@save@numberlist}[1]{%
   \ifglssavenumberlist
     \toks@{#1}%
@@ -6090,7 +6195,7 @@ you
     \ifx\@glossary@default@style\relax
       \GlossariesWarning{No default glossary style provided \MessageBreak
         for the glossary `\@glo@type'. \MessageBreak
-        Using deprecated fallback. \MessageBreak
+        Using fallback. \MessageBreak
         To fix this set the style with \MessageBreak
         \string\setglossarystyle\space or use the \MessageBreak
         style key=value option}%
@@ -6139,26 +6244,13 @@ you
   {}%
   {\null}%
   \ifglsxindy
-    \ifcsundef{@xdy@\@glo@type @language}%
-    {%
-      \edef\@do@auxoutstuff{%
+    \gls@xdy@set@lang{\@glo@type}%
+    \edef\@do@auxoutstuff{%
         \noexpand\AtEndDocument{%
           \noexpand\immediate\noexpand\write\@auxout{%
             \string\providecommand\string\@xdylanguage[2]{}}%
           \noexpand\immediate\noexpand\write\@auxout{%
-            \string\@xdylanguage{\@glo@type}{\@xdy@main@language}}%
-        }%
-      }%
-    }%
-    {%
-      \edef\@do@auxoutstuff{%
-        \noexpand\AtEndDocument{%
-          \noexpand\immediate\noexpand\write\@auxout{%
-            \string\providecommand\string\@xdylanguage[2]{}}%
-          \noexpand\immediate\noexpand\write\@auxout{%
-            \string\@xdylanguage{\@glo@type}{\csname @xdy@\@glo@type
-              @language\endcsname}}%
-        }%
+          \string\@xdylanguage{\@glo@type}{\@gls@langmod}}%
       }%
     }%
     \@do@auxoutstuff
@@ -6435,6 +6527,7 @@ you
     {%
       \subglossentry{\gls@level}{#1}%
       {%
+        \glsnoidxprenumberlist{#1}%
         \glossaryentrynumbers{\glsnoidxloclist{\@gls@loclist}}%
       }%
     }%
@@ -6460,6 +6553,7 @@ you
     {%
       \glossentry{#1}%
       {%
+        \glsnoidxprenumberlist{#1}%
         \glossaryentrynumbers{\glsnoidxloclist{\@gls@loclist}}%
       }%
     }%
@@ -6524,8 +6618,7 @@ you
     {Glossary style `#1' undefined}{}%
   }%
   {%
-    \def\@glossarystyle{\setglossentrycompatibility
-      \csname @glsstyle@#1\endcsname}%
+    \def\@glossarystyle{\setglossarystyle{#1}}%
   }%
 }
 \define@choicekey{printgloss}{numberedsection}%
@@ -6658,17 +6751,7 @@ you
 }
 \newcommand*{\glossaryheader}{}
 \newcommand*{\glstarget}[2]{\@glstarget{\glolinkprefix#1}{#2}}
-\providecommand*{\compatibleglossentry}[2]{%
-  \toks@{#2}%
-  \protected@edef\@do@glossentry{\noexpand\glossaryentryfield{#1}%
-    {\noexpand\glsnamefont
-       {\expandafter\expandonce\csname glo@#1@name\endcsname}}%
-    {\expandafter\expandonce\csname glo@#1@desc\endcsname}%
-    {\expandafter\expandonce\csname glo@#1@symbol\endcsname}%
-    {\the\toks@}%
-  }%
-  \@do@glossentry
-}
+\newcommand{\glossentry}[2]{\glossentryname{#1} #2}
 \newcommand*{\glossentryname}[1]{%
   \glsdoifexistsorwarn{#1}%
   {%
@@ -6682,6 +6765,7 @@ you
     \glsnamefont{\Glsentryname{#1}}%
   }%
 }
+\glsmfuaddmap{\glossentryname}{\Glossentryname}
 \newcommand*{\glossentrydesc}[1]{%
   \glsdoifexistsorwarn{#1}%
   {%
@@ -6694,6 +6778,7 @@ you
     \Glsentrydesc{#1}%
   }%
 }
+\glsmfuaddmap{\glossentrydesc}{\Glossentrydesc}
 \newcommand*{\glossentrysymbol}[1]{%
   \glsdoifexistsorwarn{#1}%
   {%
@@ -6706,59 +6791,21 @@ you
      \Glsentrysymbol{#1}%
   }%
 }
-\providecommand*{\compatiblesubglossentry}[3]{%
-  \toks@{#3}%
-  \protected@edef\@do@subglossentry{\noexpand\glossarysubentryfield{\number#1}%
-  {#2}%
-    {\noexpand\glsnamefont
-      {\expandafter\expandonce\csname glo@#2@name\endcsname}}%
-    {\expandafter\expandonce\csname glo@#2@desc\endcsname}%
-    {\expandafter\expandonce\csname glo@#2@symbol\endcsname}%
-    {\the\toks@}%
-  }%
-  \@do@subglossentry
-}
-\newcommand*{\setglossentrycompatibility}{%
-  \let\glossentry\compatibleglossentry
-  \let\subglossentry\compatiblesubglossentry
-}
-\setglossentrycompatibility
-\newcommand{\glossaryentryfield}[5]{%
-  \GlossariesWarning
-  {Deprecated use of \string\glossaryentryfield.^^J
-   I recommend you change to \string\glossentry.^^J
-   If you've just upgraded, try removing your gls auxiliary
-   files^^J and recompile}%
-  \noindent\textbf{\glstarget{#1}{#2}} #4 #3. #5\par}
-\newcommand*{\glossarysubentryfield}[6]{%
-  \GlossariesWarning
-  {Deprecated use of \string\glossarysubentryfield.^^J
-   I recommend you change to \string\subglossentry.^^J
-   If you've just upgraded, try removing your gls auxiliary
-   files^^J and recompile}%
-  \glstarget{#2}{\strut}#4. #6\par}
+\glsmfuaddmap{\glossentrysymbol}{\Glossentrysymbol}
+\newcommand{\subglossentry}[3]{\glossentryname{#2} #3}
 \newcommand*{\glsgroupskip}{}
 \newcommand*{\glsgroupheading}[1]{}
-\newcommand*{\glsgetgrouptitle}[1]{%
+\newrobustcmd*{\glsgetgrouptitle}[1]{%
   \@gls@getgrouptitle{#1}{\@gls@grptitle}%
   \@gls@grptitle
 }
+\ExplSyntaxOn
 \newcommand*{\@gls@getgrouptitle}[2]{%
- \dtl@ifsingle{#1}%
- {%
-   \ifcsundef{#1groupname}{\def#2{#1}}{\letcs#2{#1groupname}}%
- }%
- {%
-   \ifboolexpr{test{\ifstrequal{#1}{glssymbols}}
-            or test{\ifstrequal{#1}{glsnumbers}}}%
-   {%
-     \ifcsundef{#1groupname}{\def#2{#1}}{\letcs#2{#1groupname}}%
-   }%
-   {%
-     \def#2{#1}%
-   }%
- }%
+  \def#2{#1}%
+  \regex_match:nnT { ^\A(.|glsnumbers|glssymbols)\Z } { #1 }
+  { \ifcsundef{#1groupname}{}{\letcs#2{#1groupname}} }
 }
+\ExplSyntaxOff
 \newcommand*{\@gls@noidx@getgrouptitle}[2]{%
   \DTLifint{#1}%
   {\edef#2{\char#1\relax}}%
@@ -6766,9 +6813,17 @@ you
     \ifcsundef{#1groupname}{\def#2{#1}}{\letcs#2{#1groupname}}%
   }%
 }
+\ExplSyntaxOn
 \newcommand*{\glsgetgrouplabel}[1]{%
-\ifthenelse{\equal{#1}{\glssymbolsgroupname}}{glssymbols}{%
-\ifthenelse{\equal{#1}{\glsnumbersgroupname}}{glsnumbers}{#1}}}
+ \str_if_eq:eeTF {#1} { \glssymbolsgroupname }
+ { glssymbols }
+ {
+   \str_if_eq:eeTF {#1} { \glsnumbersgroupname }
+   { glsnumbers }
+   { #1 }
+ }
+}
+\ExplSyntaxOff
 \newcommand*{\setentrycounter}[2][]{%
   \def\@glo@counterprefix{#1}%
   \ifx\@glo@counterprefix\@empty
@@ -6785,26 +6840,6 @@ you
   }%
   {%
     \csname @glsstyle@#1\endcsname
-  }%
-  \ifx\@glossary@default@style\relax
-    \protected@edef\@glossary@default@style{#1}%
-  \fi
-}
-\newcommand*{\glossarystyle}[1]{%
-  \ifcsundef{@glsstyle@#1}%
-  {%
-    \PackageError{glossaries}{Glossary style `#1' undefined}{}%
-  }%
-  {%
-    \GlossariesWarning
-    {Deprecated command \string\glossarystyle.^^J
-     I recommend you switch to \string\setglossarystyle\space unless
-     you want to maintain backward compatibility}%
-    \setglossentrycompatibility
-    \csname @glsstyle@#1\endcsname
-    \ifcsdef{@glscompstyle@#1}%
-    {\setglossentrycompatibility\csuse{@glscompstyle@#1}}%
-    {}%
   }%
   \ifx\@glossary@default@style\relax
     \protected@edef\@glossary@default@style{#1}%
@@ -6834,12 +6869,15 @@ you
   \def\glshypernumber#1{#1}%
 }%
 {%
-  \def\glshypernumber#1{\@glshypernumber#1\nohyperpage{}\@nil}
+  \def\glshypernumber#1{\@xp@glshypernumber{#1}}
+}
+\newrobustcmd{\@xp@glshypernumber}[1]{%
+  \@glshypernumber#1\nohyperpage{}\@nil
 }
 \def\@glshypernumber#1\nohyperpage#2#3\@nil{%
   \ifx\\#1\\%
   \else
-    \@delimR#1\delimR\delimR\\%
+    \gls@delimR#1\delimR\delimR\\%
   \fi
   \ifx\\#2\\%
   \else
@@ -6850,33 +6888,43 @@ you
     \@glshypernumber#3\@nil
   \fi
 }
-\def\@delimR#1\delimR #2\delimR #3\\{%
-\ifx\\#2\\%
-  \@delimN{#1}%
-\else
-  \@gls@numberlink{#1}\delimR\@gls@numberlink{#2}%
-\fi}
-\def\@delimN#1{\@@delimN#1\delimN \delimN\\}
-\def\@@delimN#1\delimN #2\delimN#3\\{%
-\ifx\\#3\\%
-  \@gls@numberlink{#1}%
-\else
-  \@gls@numberlink{#1}\delimN\@gls@numberlink{#2}%
-\fi
+\def\gls@delimR#1\delimR #2\delimR #3\\{%
+ \ifx\\#2\\%
+   \gls@delimN{#1}%
+ \else
+   \@gls@numberlink{#1}\delimR\@gls@numberlink{#2}%
+ \fi
+}
+\def\gls@delimN#1{\gls@@delimN#1\delimN \delimN\\}
+\def\gls@@delimN#1\delimN #2\delimN#3\\{%
+ \ifx\\#3\\%
+   \@gls@numberlink{#1}%
+ \else
+   \@gls@numberlink{#1}\delimN\@gls@numberlink{#2}%
+ \fi
 }
 \def\@gls@numberlink#1{%
-\begingroup
- \toks@={}%
- \@gls@removespaces#1 \@nil
-\endgroup}
+ \begingroup
+  \toks@={}%
+  \@gls@removespaces#1 \@nil
+ \endgroup
+}
 \def\@gls@removespaces#1 #2\@nil{%
  \toks@=\expandafter{\the\toks@#1}%
  \ifx\\#2\\%
    \edef\@gls@x{\the\toks@}%
    \ifx\@gls@x\empty
    \else
-     \hyperlink{\glsentrycounter\@glo@counterprefix\the\toks@}%
-               {\the\toks@}%
+    \bgroup
+     \glswrglossdisableanchorcmds
+     \protected@edef\@gls@tmp{\glsentrycounter\@glo@counterprefix
+      \glswrglosslocationtarget{\@gls@x}}%
+     \@onelevel@sanitize\@gls@tmp
+     \edef\@gls@x{\noexpand\egroup
+      \noexpand\hyperlink{\@gls@tmp}%
+       {\noexpand\glswrglosslocationtextfmt{\the\toks@}}%
+     }%
+     \@gls@x
    \fi
  \else
    \@gls@ReturnAfterFi{%
@@ -6911,13 +6959,48 @@ you
     }%
   }%
 }
-  \newcommand{\newacronym}[4][]{}
+\newcommand{\newacronym}[4][]{%
+ \gls@newacronym{#1}{#2}{#3}{#4}%
+}
+\newcommand{\gls@newacronym}[4]{%
+  \renewcommand{\gls@newacronym}[4]{%
+   \PackageError{glossaries}{incompatible acronym style:
+     rollback may be required}%
+   {something has gone wrong with \string\newacronym. Try
+    \string\usepackage{glossaries}[=v4.49]}%
+  }%
+  \setacronymstyle{long-short}%
+  \newacronym[#1]{#2}{#3}{#4}%
+}
 \newcommand*{\acrpluralsuffix}{\glsacrpluralsuffix}
 \newrobustcmd*{\glstextup}[1]{\ifdef\textulc{\textulc{#1}}{\textup{#1}}}
 \newcommand*{\glsshortkey}{short}
 \newcommand*{\glsshortpluralkey}{shortplural}
 \newcommand*{\glslongkey}{long}
 \newcommand*{\glslongpluralkey}{longplural}
+\newcommand{\acrlinkfullformat}[5]{%
+  \acrfullformat{#1{#3}{#4}[#5]}{#2{#3}{#4}[]}%
+}
+\newcommand{\acrfullformat}[2]{#1\glsspace(#2)}
+\newrobustcmd{\glsspace}{\space}
+\newcommand*{\acrfullfmt}[3]{%
+  \acrlinkfullformat{\@acrlong}{\@acrshort}{#1}{#2}{#3}%
+}
+\newcommand*{\Acrfullfmt}[3]{%
+  \acrlinkfullformat{\@Acrlong}{\@acrshort}{#1}{#2}{#3}%
+}
+\newcommand*{\ACRfullfmt}[3]{%
+  \acrlinkfullformat{\@ACRlong}{\@ACRshort}{#1}{#2}{#3}%
+}
+\newcommand*{\acrfullplfmt}[3]{%
+  \acrlinkfullformat{\@acrlongpl}{\@acrshortpl}{#1}{#2}{#3}%
+}
+\newcommand*{\Acrfullplfmt}[3]{%
+  \acrlinkfullformat{\@Acrlongpl}{\@acrshortpl}{#1}{#2}{#3}%
+}
+\newcommand*{\ACRfullplfmt}[3]{%
+  \acrlinkfullformat{\@ACRlongpl}{\@ACRshortpl}{#1}{#2}{#3}%
+}
 \newrobustcmd*{\acrfull}{\@gls@hyp@opt\ns@acrfull}
 \newcommand*\ns@acrfull[2][]{%
   \new@ifnextchar[{\@acrfull{#1}{#2}}%
@@ -6926,24 +7009,14 @@ you
 \def\@acrfull#1#2[#3]{%
   \acrfullfmt{#1}{#2}{#3}%
 }
-\newcommand*{\acrfullfmt}[3]{%
-  \acrlinkfullformat{\@acrlong}{\@acrshort}{#1}{#2}{#3}%
-}
-\newcommand{\acrlinkfullformat}[5]{%
-  \acrfullformat{#1{#3}{#4}[#5]}{#2{#3}{#4}[]}%
-}
-\newcommand{\acrfullformat}[2]{#1\glsspace(#2)}
-\newrobustcmd{\glsspace}{\space}
 \newrobustcmd*{\Acrfull}{\@gls@hyp@opt\ns@Acrfull}
+\glsmfuaddmap{\acrfull}{\Acrfull}
 \newcommand*\ns@Acrfull[2][]{%
   \new@ifnextchar[{\@Acrfull{#1}{#2}}%
                   {\@Acrfull{#1}{#2}[]}%
 }
 \def\@Acrfull#1#2[#3]{%
   \Acrfullfmt{#1}{#2}{#3}%
-}
-\newcommand*{\Acrfullfmt}[3]{%
-  \acrlinkfullformat{\@Acrlong}{\@acrshort}{#1}{#2}{#3}%
 }
 \newrobustcmd*{\ACRfull}{\@gls@hyp@opt\ns@ACRfull}
 \newcommand*\ns@ACRfull[2][]{%
@@ -6953,9 +7026,6 @@ you
 \def\@ACRfull#1#2[#3]{%
   \ACRfullfmt{#1}{#2}{#3}%
 }
-\newcommand*{\ACRfullfmt}[3]{%
-  \acrlinkfullformat{\@ACRlong}{\@ACRshort}{#1}{#2}{#3}%
-}
 \newrobustcmd*{\acrfullpl}{\@gls@hyp@opt\ns@acrfullpl}
 \newcommand*\ns@acrfullpl[2][]{%
   \new@ifnextchar[{\@acrfullpl{#1}{#2}}%
@@ -6964,19 +7034,14 @@ you
 \def\@acrfullpl#1#2[#3]{%
   \acrfullplfmt{#1}{#2}{#3}%
 }
-\newcommand*{\acrfullplfmt}[3]{%
-  \acrlinkfullformat{\@acrlongpl}{\@acrshortpl}{#1}{#2}{#3}%
-}
 \newrobustcmd*{\Acrfullpl}{\@gls@hyp@opt\ns@Acrfullpl}
+\glsmfuaddmap{\acrfullpl}{\Acrfullpl}
 \newcommand*\ns@Acrfullpl[2][]{%
   \new@ifnextchar[{\@Acrfullpl{#1}{#2}}%
                   {\@Acrfullpl{#1}{#2}[]}%
 }
 \def\@Acrfullpl#1#2[#3]{%
   \Acrfullplfmt{#1}{#2}{#3}%
-}
-\newcommand*{\Acrfullplfmt}[3]{%
-  \acrlinkfullformat{\@Acrlongpl}{\@acrshortpl}{#1}{#2}{#3}%
 }
 \newrobustcmd*{\ACRfullpl}{\@gls@hyp@opt\ns@ACRfullpl}
 \newcommand*\ns@ACRfullpl[2][]{%
@@ -6985,9 +7050,6 @@ you
 }
 \def\@ACRfullpl#1#2[#3]{%
   \ACRfullplfmt{#1}{#2}{#3}%
-}
-\newcommand*{\ACRfullplfmt}[3]{%
-  \acrlinkfullformat{\@ACRlongpl}{\@ACRshortpl}{#1}{#2}{#3}%
 }
 \newcommand{\acronymfont}[1]{#1}
 \newcommand{\firstacronymfont}[1]{\acronymfont{#1}}
@@ -7022,7 +7084,7 @@ you
         short={\the\glsshorttok},%
         shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
         long={\the\glslongtok},%
-        longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
+        longplural={\the\glslongtok\noexpand\glspluralsuffix},%
         \GenericAcronymFields,%
         \the\glskeylisttok
       }%
@@ -7035,14 +7097,14 @@ you
     \glslink[##1]{##2}{\Genacrfullformat{##2}{##3}}}%
   \renewcommand*{\ACRfullfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\genacrfullformat{##2}{##3}}}}%
+      \glsuppercase{\genacrfullformat{##2}{##3}}}}%
   \renewcommand*{\acrfullplfmt}[3]{%
     \glslink[##1]{##2}{\genplacrfullformat{##2}{##3}}}%
   \renewcommand*{\Acrfullplfmt}[3]{%
     \glslink[##1]{##2}{\Genplacrfullformat{##2}{##3}}}%
   \renewcommand*{\ACRfullplfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\genplacrfullformat{##2}{##3}}}}%
+      \glsuppercase{\genplacrfullformat{##2}{##3}}}}%
   \renewcommand*{\glsentryfull}[1]{\genacrfullformat{##1}{}}%
   \renewcommand*{\Glsentryfull}[1]{\Genacrfullformat{##1}{}}%
   \renewcommand*{\glsentryfullpl}[1]{\genplacrfullformat{##1}{}}%
@@ -7308,7 +7370,7 @@ you
           \Glsentrylongpl{\glslabel}\glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\glsentrylongpl{\glslabel}\glsinsert}%
         }%
       }%
@@ -7321,7 +7383,7 @@ you
           \Glsentrylong{\glslabel}\glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\glsentrylong{\glslabel}\glsinsert}%
         }%
       }%
@@ -7342,7 +7404,7 @@ you
       (\acronymfont{\glsentryshort{##2}})}}%
   \renewcommand*{\ACRfullfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\glsentrylong{##2}##3\space
+      \glsuppercase{\glsentrylong{##2}##3\space
       (\acronymfont{\glsentryshort{##2}})}}}%
   \renewcommand*{\acrfullplfmt}[3]{%
     \glslink[##1]{##2}{\glsentrylongpl{##2}##3\space
@@ -7352,7 +7414,7 @@ you
       (\acronymfont{\glsentryshortpl{##2}})}}%
   \renewcommand*{\ACRfullplfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\glsentrylongpl{##2}##3\space
+      \glsuppercase{\glsentrylongpl{##2}##3\space
       (\acronymfont{\glsentryshortpl{##2}})}}}%
   \renewcommand*{\glsentryfull}[1]{%
     \glsentrylong{##1}\space(\acronymfont{\glsentryshort{##1}})%
@@ -7378,7 +7440,7 @@ you
 {%
   \GlsUseAcrStyleDefs{dua}%
   \renewcommand*{\GenericAcronymFields}{}%
-  \renewcommand*{\acronymentry}[1]{\acronymfont{\glsentrylong{##1}}}%
+  \renewcommand*{\acronymentry}[1]{\glsentrylong{##1}}%
   \renewcommand*{\acronymsort}[2]{##2}%
 }%
 \newacronymstyle{footnote}%
@@ -7416,7 +7478,7 @@ you
       (\glsentrylong{##2})}}%
   \renewcommand*{\ACRfullfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\acronymfont{\glsentryshort{##2}}##3\space
+      \glsuppercase{\acronymfont{\glsentryshort{##2}}##3\space
       (\glsentrylong{##2})}}}%
   \renewcommand*{\acrfullplfmt}[3]{%
     \glslink[##1]{##2}{\acronymfont{\glsentryshortpl{##2}}##3\space
@@ -7426,7 +7488,7 @@ you
       (\glsentrylongpl{##2})}}%
   \renewcommand*{\ACRfullplfmt}[3]{%
     \glslink[##1]{##2}{%
-      \mfirstucMakeUppercase{\acronymfont{\glsentryshortpl{##2}}##3\space
+      \glsuppercase{\acronymfont{\glsentryshortpl{##2}}##3\space
       (\glsentrylongpl{##2})}}}%
   \renewcommand*{\glsentryfull}[1]{%
      \acronymfont{\glsentryshort{##1}}\space(\glsentrylong{##1})}%
@@ -7514,82 +7576,6 @@ you
 \newcommand*{\SetDefaultAcronymDisplayStyle}[1]{%
   \defglsentryfmt[#1]{\glsgenentryfmt}%
 }
-\newcommand*{\DefaultNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\the\glsshorttok},%
-      sort={\the\glsshorttok},%
-      text={\the\glsshorttok},%
-      first={\acrfullformat{\the\glslongtok}{\the\glsshorttok}},%
-      plural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      firstplural={\acrfullformat{\noexpand\expandonce\noexpand\@glo@longpl}%
-                                 {\noexpand\expandonce\noexpand\@glo@shortpl}},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\the\glslongtok},%
-      descriptionplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-  \@@gls@noexpand@assign@default@plurals
-}
-\newcommand*{\@@gls@noexpand@assign@default@plurals}{%
-  \expandafter\ifx\csname glo@\the\glslabeltok @plural\endcsname\@@gls@@default@acr@plural
-    \csxdef{glo@\the\glslabeltok @plural}{\expandonce\@glo@shortpl}%
-  \fi
-  \expandafter\ifx\csname glo@\the\glslabeltok @firstpl\endcsname\@@gls@@default@acr@firstplural
-    \csxdef{glo@\the\glslabeltok @firstpl}{%
-      \expandonce\@glo@longpl\glsspace(\expandonce\@glo@shortpl)}%
-  \fi
-  \expandafter\ifx\csname glo@\the\glslabeltok @descplural\endcsname\@@gls@@default@acr@descplural
-    \csxdef{glo@\the\glslabeltok @descplural}{\expandonce\@glo@longpl}%
-  \fi
-}
-\newcommand*{\@@gls@@default@acr@plural}{\expandonce\@glo@shortpl}
-\newcommand*{\@@gls@@default@acr@firstplural}{%
- \expandonce\@glo@longpl\glsspace(\expandonce\@glo@shortpl)%
-}
-\newcommand*{\@@gls@@default@acr@descplural}{\expandonce\@glo@longpl}
-\newcommand*{\SetDefaultAcronymStyle}{%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetDefaultAcronymDisplayStyle{\@gls@type}%
-  }%
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetDefaultAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \DefaultNewAcronymDef
-  }%
-  \renewcommand*{\acrpluralsuffix}{\glsacrpluralsuffix}%
-}
 \newcommand*{\acrfootnote}[3]{\acrlinkfootnote{#1}{#2}{#3}}
 \newcommand*{\acrlinkfootnote}[3]{%
   \footnote{\glslink[#1]{#2}{#3}}%
@@ -7597,395 +7583,7 @@ you
 \newcommand*{\acrnolinkfootnote}[3]{%
   \footnote{#3}%
 }
-\newcommand*{\SetDescriptionFootnoteAcronymDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{%
-    \ifdefempty\glscustomtext
-    {%
-      \ifglsused{\glslabel}%
-      {%
-        \acronymfont{\glsgenentryfmt}%
-      }%
-      {%
-        \firstacronymfont{\glsgenentryfmt}%
-        \ifglshassymbol{\glslabel}%
-        {%
-          \expandafter\protect\expandafter\acrfootnote\expandafter
-           {\@gls@link@opts}{\@gls@link@label}%
-           {%
-            \glsifplural
-              {\glsentrysymbolplural{\glslabel}}%
-              {\glsentrysymbol{\glslabel}}%
-           }%
-        }%
-      }%
-    }%
-    {\glscustomtext\glsinsert}%
-  }%
-}
-\newcommand*{\DescriptionFootnoteNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      sort={\the\glsshorttok},%
-      first={\the\glsshorttok},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      text={\the\glsshorttok},%
-      plural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      symbol={\the\glslongtok},%
-      symbolplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\newcommand*{\SetDescriptionFootnoteAcronymStyle}{%
-  \ifglsacrsmallcaps
-    \@gls@deprecated@acr@warning{footnote,smallcaps,description}%
-      {footnote-sc-desc}{short-sc-footnote-desc}%
-  \else
-    \ifglsacrsmaller
-      \@gls@deprecated@acr@warning{footnote,smaller,description}%
-       {footnote-sm-desc}{short-sm-footnote-desc}%
-    \else
-      \@gls@deprecated@acr@warning{footnote,description}%
-       {footnote-desc}{short-footnote-desc}%
-    \fi
-  \fi
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetDescriptionFootnoteAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \DescriptionFootnoteNewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetDescriptionFootnoteAcronymDisplayStyle{\@gls@type}%
-  }%
-  \ifglsacrsmallcaps
-    \renewcommand*{\acronymfont}[1]{\textsc{##1}}%
-    \renewcommand*{\acrpluralsuffix}{\glsupacrpluralsuffix}%
-  \else
-    \ifglsacrsmaller
-      \renewcommand*{\acronymfont}[1]{\textsmaller{##1}}%
-    \fi
-  \fi
-  \ifglsacrdua
-    \PackageError{glossaries}{Option clash: `footnote' and `dua'
-    can't both be set}{}%
-  \fi
-}%
-\newcommand*{\SetDescriptionDUAAcronymDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{\glsgenentryfmt}%
-}
-\newcommand*{\DescriptionDUANewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\the\glslongtok},%
-      sort={\the\glslongtok},
-      text={\the\glslongtok},%
-      first={\the\glslongtok},%
-      plural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      symbol={\the\glsshorttok},%
-      symbolplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\newcommand*{\SetDescriptionDUAAcronymStyle}{%
-  \ifglsacrsmallcaps
-    \PackageError{glossaries}{Option clash: `smallcaps' and `dua'
-    can't both be set}{}%
-  \else
-    \ifglsacrsmaller
-      \PackageError{glossaries}{Option clash: `smaller' and `dua'
-      can't both be set}{}%
-    \fi
-  \fi
-  \@gls@deprecated@acr@warning{dua,description}{dua-desc}{long-noshort-desc}%
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetDescriptionDUAAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \DescriptionDUANewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetDescriptionDUAAcronymDisplayStyle{\@gls@type}%
-  }%
-}%
-\newcommand*{\SetDescriptionAcronymDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{%
-    \ifdefempty\glscustomtext
-    {%
-      \ifglsused{\glslabel}%
-      {%
-        \let\gls@org@insert\glsinsert
-        \let\glsinsert\@empty
-        \acronymfont{\glsgenentryfmt}\gls@org@insert
-      }%
-      {%
-        \glsgenentryfmt
-        \ifglshassymbol{\glslabel}%
-          {%
-             \glsifplural
-             {%
-               \def\@glo@symbol{\glsentrysymbolplural{\glslabel}}%
-             }%
-             {%
-               \def\@glo@symbol{\glsentrysymbol{\glslabel}}%
-             }%
-             \space(\protect\firstacronymfont
-             {\glscapscase
-              {\@glo@symbol}
-              {\@glo@symbol}
-              {\mfirstucMakeUppercase{\@glo@symbol}}})%
-          }%
-          {}%
-      }%
-    }%
-    {\glscustomtext\glsinsert}%
-  }%
-}
-\newcommand*{\DescriptionNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand
-        \acrnameformat{\the\glsshorttok}{\the\glslongtok}},%
-      sort={\the\glsshorttok},%
-      first={\the\glslongtok},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      text={\the\glsshorttok},%
-      plural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      symbol={\noexpand\@glo@text},%
-      symbolplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      \the\glskeylisttok}%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\newcommand*{\SetDescriptionAcronymStyle}{%
-  \ifglsacrsmallcaps
-    \@gls@deprecated@acr@warning{smallcaps,description}%
-      {long-sc-short-desc}{long-short-sc-desc}%
-  \else
-    \ifglsacrsmaller
-      \@gls@deprecated@acr@warning{smaller,description}%
-        {long-sm-short-desc}{long-short-sm-desc}%
-    \else
-      \@gls@deprecated@acr@warning{description}%
-        {long-short-desc}{long-short-desc}%
-    \fi
-  \fi
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetDescriptionAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \DescriptionNewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetDescriptionAcronymDisplayStyle{\@gls@type}%
-  }%
-  \ifglsacrsmallcaps
-    \renewcommand{\acronymfont}[1]{\textsc{##1}}
-    \renewcommand*{\acrpluralsuffix}{\glsupacrpluralsuffix}%
-  \else
-    \ifglsacrsmaller
-      \renewcommand*{\acronymfont}[1]{\textsmaller{##1}}%
-    \fi
-  \fi
-}%
-\newcommand*{\SetFootnoteAcronymDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{%
-    \ifdefempty\glscustomtext
-    {%
-      \let\gls@org@insert\glsinsert
-      \let\glsinsert\@empty
-      \ifglsused{\glslabel}%
-      {%
-        \acronymfont{\glsgenentryfmt}\gls@org@insert
-      }%
-      {%
-        \firstacronymfont{\glsgenentryfmt}\gls@org@insert
-        \ifglshaslong{\glslabel}%
-        {%
-          \expandafter\protect\expandafter\acrfootnote\expandafter
-           {\@gls@link@opts}{\@gls@link@label}%
-           {%
-            \glsifplural
-              {\glsentrylongpl{\glslabel}}%
-              {\glsentrylong{\glslabel}}%
-           }%
-        }%
-        {}%
-      }%
-    }%
-    {\glscustomtext\glsinsert}%
-  }%
-}
-\newcommand*{\FootnoteNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      sort={\the\glsshorttok},%
-      text={\the\glsshorttok},%
-      plural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      first={\the\glsshorttok},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\the\glslongtok},%
-      descriptionplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@descplural\@org@gls@assign@descplural
-}
-\newcommand*{\SetFootnoteAcronymStyle}{%
-  \ifglsacrsmallcaps
-    \@gls@deprecated@acr@warning{footnote,smallcaps}{footnote-sc}{short-sc-footnote}%
-  \else
-    \ifglsacrsmaller
-      \@gls@deprecated@acr@warning{footnote,smaller}{footnote-sm}{short-sm-footnote}%
-    \else
-      \@gls@deprecated@acr@warning{footnote}{footnote}{short-footnote}%
-    \fi
-  \fi
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetFootnoteAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \FootnoteNewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetFootnoteAcronymDisplayStyle{\@gls@type}%
-  }%
-  \ifglsacrsmallcaps
-     \renewcommand*{\acronymfont}[1]{\textsc{##1}}%
-     \renewcommand*{\acrpluralsuffix}{\glsupacrpluralsuffix}%
-  \else
-     \ifglsacrsmaller
-        \renewcommand*{\acronymfont}[1]{\textsmaller{##1}}%
-     \fi
-  \fi
-  \ifglsacrdua
-     \PackageError{glossaries}{Option clash: `footnote' and `dua'
-     can't both be set}{}%
-  \fi
-}%
-\DeclareRobustCommand*{\glsdoparenifnotempty}[2]{%
+\newrobustcmd*{\glsdoparenifnotempty}[2]{%
   \protected@edef\gls@tmp{#1}%
   \ifdefempty\gls@tmp
   {}%
@@ -7996,274 +7594,11 @@ you
     \fi
   }%
 }
-\newcommand*{\SetSmallAcronymDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{%
-    \ifdefempty\glscustomtext
-    {%
-      \let\gls@org@insert\glsinsert
-      \let\glsinsert\@empty
-      \ifglsused{\glslabel}%
-      {%
-        \acronymfont{\glsgenentryfmt}\gls@org@insert
-      }%
-      {%
-        \glsgenentryfmt
-        \ifglshassymbol{\glslabel}%
-        {%
-          \glsifplural
-          {%
-            \def\@glo@symbol{\glsentrysymbolplural{\glslabel}}%
-          }%
-          {%
-            \def\@glo@symbol{\glsentrysymbol{\glslabel}}%
-          }%
-          \space
-            (\glscapscase
-            {\firstacronymfont{\@glo@symbol}}%
-            {\firstacronymfont{\@glo@symbol}}%
-            {\firstacronymfont{\mfirstucMakeUppercase{\@glo@symbol}}})%
-        }%
-        {}%
-      }%
-    }%
-    {\glscustomtext\glsinsert}%
-  }%
-}
-\newcommand*{\SmallNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      sort={\the\glsshorttok},%
-      text={\the\glsshorttok},%
-      plural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      first={\the\glslongtok},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\noexpand\@glo@first},%
-      descriptionplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      symbol={\the\glsshorttok},%
-      symbolplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@descplural\@org@gls@assign@descplural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\newcommand*{\SetSmallAcronymStyle}{%
-  \ifglsacrsmallcaps
-    \@gls@deprecated@acr@warning{smallcaps}{long-sc-short}{long-short-sc}%
-  \else
-    \@gls@deprecated@acr@warning{smaller}{long-sm-short}{long-short-sm}%
-  \fi
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetSmallAcronymDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \SmallNewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetSmallAcronymDisplayStyle{\@gls@type}%
-  }%
-  \ifglsacrsmallcaps
-    \renewcommand*{\acronymfont}[1]{\textsc{##1}}
-    \renewcommand*{\acrpluralsuffix}{\glsupacrpluralsuffix}%
-  \else
-    \renewcommand*{\acronymfont}[1]{\textsmaller{##1}}
-  \fi
-  \ifglsacrdua
-    \ifglsacrsmallcaps
-      \PackageError{glossaries}{Option clash: `smallcaps' and `dua'
-      can't both be set}{}%
-    \else
-      \PackageError{glossaries}{Option clash: `smaller' and `dua'
-      can't both be set}{}%
-    \fi
-  \fi
-}%
-\newcommand*{\SetDUADisplayStyle}[1]{%
-  \defglsentryfmt[#1]{\glsgenentryfmt}%
-}
-\newcommand*{\DUANewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\the\glsshorttok},%
-      text={\the\glslongtok},%
-      first={\the\glslongtok},%
-      plural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      firstplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\the\glslongtok},%
-      descriptionplural={\noexpand\expandonce\noexpand\@glo@longpl},%
-      symbol={\the\glsshorttok},%
-      symbolplural={\noexpand\expandonce\noexpand\@glo@shortpl},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-  \let\gls@assign@descplural\@org@gls@assign@descplural
-}
-\newcommand*{\SetDUAStyle}{%
-  \@gls@deprecated@acr@warning{dua}{dua}{long-noshort}%
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetDUADisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \DUANewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetDUADisplayStyle{\@gls@type}%
-  }%
-}
 \newcommand*{\@gls@deprecated@acr@warning}[3]{%
    \GlossariesWarning{Acronym style option #1 deprecated.
    Use \string\setacronymstyle{#2} with just glossaries.sty or
    use \string\setabbreviationstyle[acronym]{#3} with
    glossaries-extra.sty}%
-}
-\newcommand*{\SetAcronymStyle}{%
-  \SetDefaultAcronymStyle
-  \ifglsacrdescription
-    \ifglsacrfootnote
-      \SetDescriptionFootnoteAcronymStyle
-    \else
-      \ifglsacrdua
-        \SetDescriptionDUAAcronymStyle
-      \else
-        \SetDescriptionAcronymStyle
-      \fi
-    \fi
-  \else
-    \ifglsacrfootnote
-      \SetFootnoteAcronymStyle
-    \else
-      \ifthenelse{\boolean{glsacrsmallcaps}\OR
-        \boolean{glsacrsmaller}}%
-      {%
-        \SetSmallAcronymStyle
-      }%
-      {%
-        \ifglsacrdua
-          \SetDUAStyle
-        \fi
-      }%
-    \fi
-  \fi
-}
-\SetAcronymStyle
-\newcommand*{\SetCustomDisplayStyle}[1]{%
-  \defglsentryfmt[#1]{\glsgenentryfmt}%
-}
-\newcommand*{\CustomAcronymFields}{%
-  name={\the\glsshorttok},%
-  description={\the\glslongtok},%
-  first={\acrfullformat{\the\glslongtok}{\the\glsshorttok}},%
-  firstplural={\acrfullformat
-    {\noexpand\glsentrylongpl{\the\glslabeltok}}%
-    {\noexpand\glsentryshortpl{\the\glslabeltok}}},%
-  text={\the\glsshorttok},%
-  plural={\the\glsshorttok\noexpand\acrpluralsuffix}%
-}
-\newcommand*{\CustomNewAcronymDef}{%
-  \protected@edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      user1={\the\glsshorttok},%
-      user2={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      user3={\the\glslongtok},%
-      user4={\the\glslongtok\noexpand\acrpluralsuffix},%
-      \CustomAcronymFields,%
-      \the\glskeylisttok
-    }%
-  }%
-  \@do@newglossaryentry
-}
-\newcommand*{\SetCustomStyle}{%
-  \renewcommand{\newacronym}[4][]{%
-    \ifx\@glsacronymlists\@empty
-      \def\@glo@type{\acronymtype}%
-      \setkeys{glossentry}{##1}%
-      \DeclareAcronymList{\@glo@type}%
-      \SetCustomDisplayStyle{\@glo@type}%
-    \fi
-    \glskeylisttok{##1}%
-    \glslabeltok{##2}%
-    \glsshorttok{##3}%
-    \glslongtok{##4}%
-    \newacronymhook
-    \CustomNewAcronymDef
-  }%
-  \@for\@gls@type:=\@glsacronymlists\do{%
-    \SetCustomDisplayStyle{\@gls@type}%
-  }%
 }
 \RequirePackage{glossary-hypernav}
 \@gls@loadlist
@@ -8373,9 +7708,6 @@ you
 \newcommand*{\showglossaryentries}[1]{%
   \expandafter\show\csname glolist@#1\endcsname
 }
-\csname ifglscompatible-2.07\endcsname
-  \RequirePackage{glossaries-compatible-207}
-\fi
 \endinput
 %%
 %% End of file `glossaries.sty'.

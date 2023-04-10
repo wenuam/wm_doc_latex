@@ -34,10 +34,10 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hluatex.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref driver for luaTeX]
 \Hy@VersionCheck{hluatex.def}
-%% 2022-09-22 v7.00t
+%% 2023-02-07 v7.00v
 %% force unicode encoding, see issue #101
 %% code mostly copied from hxetex.def
 \HyPsd@LoadUnicode

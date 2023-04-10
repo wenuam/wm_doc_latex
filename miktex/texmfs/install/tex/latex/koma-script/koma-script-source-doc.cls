@@ -23,7 +23,7 @@
 %% in the same archive or directory.)
 %%
 \ProvidesClass{koma-script-source-doc}
-[2022-03-10 v0.91 KOMA-Script source documentation]
+[2022-07-08 v0.92 KOMA-Script source documentation]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 \newif \ifkdoc@indexlatex \kdoc@indexlatexfalse
@@ -258,14 +258,14 @@
   macrolike = false,
   toplevel  = true,
   idxtype   = \textit{pgstyle},
-  idxgroup  = page styles,
+  idxgroup  = Page styles,
   printtype = \textit{style}
 ]{PageStyle}{pgstyle}
 \NewDocElement[%
   macrolike = false,
   toplevel  = true,
   idxtype   = \textit{do hook},
-  idxgroup  = do hooks,
+  idxgroup  = Do hooks,
   printtype = \textit{dohook}
 ]{DoHook}{dohook}
 %%% From File: $Id: scrlogo.dtx 3688 2022-02-10 08:26:37Z kohm $

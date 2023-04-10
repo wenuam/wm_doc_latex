@@ -46,7 +46,7 @@
 \DeclareCurrentRelease{}{2020-10-01}
 
 \ProvidesPackage{array}
-         [2022/03/10 v2.5f Tabular extension package (FMi)]
+         [2022/09/04 v2.5g Tabular extension package (FMi)]
 %%
 
 \def\@addtopreamble#1{\xdef\@preamble{\@preamble #1}}
@@ -126,7 +126,7 @@
 
 \newbox\ar@mcellbox
 \def\ar@align@mcell{%
-  \ifdim \ht\ar@mcellbox > \ht\@arstrutbox
+  \ifdim \ht\ar@mcellbox > \ht\strutbox
     \begingroup
      \dimen@\ht\ar@mcellbox
      \advance\dimen@-\ht\@arstrutbox

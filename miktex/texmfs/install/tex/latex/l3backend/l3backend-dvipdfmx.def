@@ -12,7 +12,7 @@
 %% l3backend-pdf.dtx  (with options: `package,dvipdfmx')
 %% l3backend-opacity.dtx  (with options: `package,dvipdfmx')
 %% 
-%% Copyright (C) 2019-2022 The LaTeX Project
+%% Copyright (C) 2019-2023 The LaTeX Project
 %% 
 %% It may be distributed and/or modified under the conditions of
 %% the LaTeX Project Public License (LPPL), either version 1.3c of
@@ -26,7 +26,7 @@
 %% 
 %% File: l3backend-basics.dtx
 \ProvidesExplFile
-  {l3backend-dvipdfmx.def}{2022-09-28}{}
+  {l3backend-dvipdfmx.def}{2023-03-30}{}
   {L3 backend support: dvipdfmx}
 \cs_if_exist:NTF \__kernel_dependency_version_check:nn
   {
@@ -66,21 +66,6 @@
 \cs_new_protected:Npn \__kernel_backend_scope_end:
   { \__kernel_backend_literal:n { x:grestore } }
 %% File: l3backend-color.dtx
-\cs_new_protected:Npn \__color_backend_pickup:N #1
-  {
-    \exp_args:NV \tl_if_head_is_space:nTF \current@color
-      {
-        \tl_set:Nn #1 { { gray } { 0 } }
-        \msg_warning:nnx { color } { unhandled }
-          { \current@color }
-      }
-      {
-        \exp_last_unbraced:Nx \__color_backend_pickup:w
-          { \current@color } \s__color_stop #1
-      }
-  }
-\cs_new_protected:Npn \__color_backend_pickup:w #1 ~ #2 \s__color_stop #3
-  { \tl_set:Nn #3 { {#1} {#2} } }
 \cs_new_protected:Npn \__color_backend_select:n #1
   { \__kernel_backend_literal:n { pdf : bc ~ [ #1 ] } }
 \cs_new_eq:NN \__color_backend_select_cmyk:n \__color_backend_select:n
@@ -799,20 +784,18 @@
   { \__kernel_backend_literal_page:n { /#1 ~ #2 ~ BDC } }
 \cs_new_protected:Npn \__pdf_backend_emc:
   { \__kernel_backend_literal_page:n { EMC } }
-\cs_new_protected:Npn \__pdf_backend_pagesize_set:nn #1#2
+\cs_new_protected:Npn \__pdf_backend_pagesize_gset:nn #1#2
   {
     \__kernel_backend_first_shipout:n
       {
         \__kernel_backend_literal:e
           {
             pdf:pagesize ~
-              width  ~ \__pdf_backend_pagesize_set:n {#1} ~
-              height ~ \__pdf_backend_pagesize_set:n {#2}
+              width  ~ \dim_eval:n {#1} ~
+              height ~ \dim_eval:n {#2}
           }
       }
   }
-\cs_new:Npn \__pdf_backend_pagesize_set:n #1
-  { \fp_to_dim:n { \tex_mag:D / 1000 * (#1) } }
 %% File: l3backend-opacity.dtx
 \bool_lazy_and:nnT
   { \cs_if_exist_p:N \pdfmanagement_if_active_p: }

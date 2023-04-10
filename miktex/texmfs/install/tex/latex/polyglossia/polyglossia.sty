@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{polyglossia}[2022/07/18 v1.57
+\ProvidesPackage{polyglossia}[2023/02/11 v1.60
   Modern multilingual typesetting with XeLaTeX and LuaLaTeX]
 \RequirePackage{etoolbox}
 \RequirePackage{makecmds}
@@ -153,13 +153,12 @@
 }
 \msg_redirect_name:nnn { polyglossia } { languagenotloaded } { critical }
 
-\cs_new_nopar:Nn \__xpg_msg_if_lang_not_loaded:n
+\msg_new:nnn { polyglossia } { languagenolongerloaded }
 {
-  \tl_if_blank:eT {\xpg_alias_base_lang:n{#1}}
-  {
-    \msg_show:nnn { polyglossia } { languagenotloaded } {#1}
-  }
+  The~ language~ #1~ is~ no~ longer~ loaded.~ Please~ rerun~ LaTeX.
 }
+\msg_redirect_name:nnn { polyglossia } { languagenolongerloaded } { warning }
+
 % 
 
 %% use macro if defined, else warn that it is not
@@ -918,25 +917,41 @@
 
 % add fontfeature Script=#2 to scripttag #1
 % do nothing if #1 or #2 is empty
-\cs_new:Nn \polyglossia@addfontfeature@script:nn {
-  \bool_if:nTF{\tl_if_empty_p:n{#1} || \tl_if_empty_p:n{#2}}
+\cs_new:Nn \polyglossia@addfontfeature@script:nnn {
+  \bool_if:nTF{\tl_if_empty_p:n{#2} || \tl_if_empty_p:n{#3}}
   {
     % maybe an error ?
     \xpg@warning{Asking~ to~ add~ empty~ feature~to~ latin~ font
-                 (Script="#2"~ to~ scripttag~ "#1")}
+                 (Script="#3"~ to~ scripttag~ "#2")}
   }
   {
-    \fontspec_if_script:nTF{#1}
-       {\addfontfeature{Script=#2}}
-       {\xpg@error{
-          The~ current~ latin ~ font~ \l_fontspec_family_tl\space does~ not~ contain~ the~"#2"~ script!\MessageBreak
-          Please~ define~\csname\tl_if_empty:nF{#2}{\str_lowercase:n#2}font\endcsname~
+    \fontspec_if_script:nTF{#2}
+       {\addfontfeature{Script=#3}}
+       {
+        \tl_set:Nn \l_ffamily_tl {}
+        \tl_set:Nn \l_ffamilysh_tl { #1 }
+        \str_if_eq:nnT { #1 } { rm }
+           {
+             \tl_set:Nn \l_ffamily_tl { roman }
+             \tl_set:Nn \l_ffamilysh_tl {}
+           }
+        \str_if_eq:nnT { #1 } { sf }
+           {
+             \tl_set:Nn \l_ffamily_tl { sans~ serif }
+           }
+        \str_if_eq:nnT { #1 } { tt }
+           {
+             \tl_set:Nn \l_ffamily_tl { monospace }
+           }
+        \xpg@error{
+          The~ current~ latin ~ \l_ffamily_tl\space font~ does~ not~ contain~ the~"#3"~ script!\MessageBreak
+          Please~ define~\csname\tl_if_empty:nF{#3}{\str_lowercase:n#3}font\l_ffamilysh_tl\endcsname~
           with~ \string\newfontfamily\space command
           }
         }
   }
 }
-\cs_generate_variant:Nn  \polyglossia@addfontfeature@script:nn { on , no, oo , Vn, nV, VV , xn, nx, xx}
+\cs_generate_variant:Nn  \polyglossia@addfontfeature@script:nnn { non , nno, noo , nVn, nnV, nVV , nxn, nnx, nxx}
 
 \def\xpg@fontsetup@latin#1{%
   \begingroup
@@ -981,7 +996,8 @@
            }
        }
        \iftoggle{#1@use@script@font}{}{%
-           \polyglossia@addfontfeature@script:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
+           \polyglossia@addfontfeature@script:nxx{rm}
+                                                 {\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
                                                  {\prop_item:Nn{\polyglossia@langsetup}{#1/script}}
        }%
        \polyglossia@addfontfeature@language:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/langtag}}
@@ -1004,7 +1020,8 @@
            }
        }
        \iftoggle{#1@use@script@fontsf}{}{%
-           \polyglossia@addfontfeature@script:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
+           \polyglossia@addfontfeature@script:nxx{sf}
+                                                 {\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
                                                  {\prop_item:Nn{\polyglossia@langsetup}{#1/script}}
        }%
        \polyglossia@addfontfeature@language:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/langtag}}
@@ -1027,7 +1044,8 @@
            }
        }
        \iftoggle{#1@use@script@fonttt}{}{%
-           \polyglossia@addfontfeature@script:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
+           \polyglossia@addfontfeature@script:nxx{tt}
+                                                 {\prop_item:Nn{\polyglossia@langsetup}{#1/scripttag}}
                                                  {\prop_item:Nn{\polyglossia@langsetup}{#1/script}}
        }%
        \polyglossia@addfontfeature@language:xx{\prop_item:Nn{\polyglossia@langsetup}{#1/langtag}}
@@ -1841,21 +1859,29 @@
   \__xpg_foreignlanguage:eeen {#1} {#2} {\xpg_alias_base_lang:n{#2}} {#3}
 }
 
-% internal wrapper for foreing language
+% Direct access to polyglossia@setforeignlanguage
+% used in captions
+\newcommand{\setforeignlanguage}[2][]
+{
+  \polyglossia@setforeignlanguage[#1]{#2}%
+}
+
+% internal wrapper for foreign language
 % #1 option
 % #2 alias
 % #3 base lang
 % #4 text
 \cs_new:Nn \__xpg_foreignlanguage:nnnn
 {
-  \tl_if_blank:nT {#3}
+  \tl_if_blank:nTF {#3}
   {
     \msg_show:nnn { polyglossia } { languagenotloaded } {#2}
+  }{
+    \group_begin:
+      \xpg@otherlanguage[\xpg_alias_add_to_option_i:nn{#2}{#1}]{#3}%
+      \polyglossia@lang@settextdirection:nn{#3}{#4}%
+    \group_end:
   }
-  \group_begin:
-    \xpg@otherlanguage[\xpg_alias_add_to_option_i:nn{#2}{#1}]{#3}%
-    \polyglossia@lang@settextdirection:nn{#3}{#4}%
-  \group_end:
 }
 \cs_generate_variant:Nn \__xpg_foreignlanguage:nnnn {eeen}
 
@@ -1875,13 +1901,14 @@
 % #3 base lang
 \cs_new:Nn \__xpg_otherlanguage:nnn
 {
-  \tl_if_blank:nT {#3}
+  \tl_if_blank:nTF {#3}
   {
     \msg_show:nnn { polyglossia } { languagenotloaded } {#2}
+  }{
+    \xpg@otherlanguage[\xpg_alias_add_to_option_i:nn{#2}{#1}]{#3}%
+    \polyglossia@lang@settextdirection:nn{#3}%
+    \bgroup
   }
-  \xpg@otherlanguage[\xpg_alias_add_to_option_i:nn{#2}{#1}]{#3}%
-  \polyglossia@lang@settextdirection:nn{#3}%
-  \bgroup
 }
 \cs_generate_variant:Nn \__xpg_otherlanguage:nnn {
   eee
@@ -1906,20 +1933,22 @@
 % #4: text
 \cs_new:Nn \__xpg_textlanguage:nnnn
 {
-  \tl_if_blank:nT {#3}
+  \tl_if_blank:nTF {#3}
   {
     \msg_show:nnn { polyglossia } { languagenotloaded } {#2}
   }
-  \group_begin:
-    \xpg@otherlanguage[#1]{#3}%
-    \csuse{date#3}%
-    % This is a hook for external packages which want to access variants
-    % via babelname (such as biblatex)
-    \cs_if_exist_use:c{date@bbl@\babelname}%
-    \polyglossia@lang@settextdirection:nn{#3}{#4}%
-  \group_end:
-  % Reset the language's/script's font families
-  \str_if_eq:eeTF{\prop_item:Nn{\polyglossia@langsetup}{#3/lcscript}}{latin}{}{\resetfontlatin}%
+  {
+    \group_begin:
+      \xpg@otherlanguage[#1]{#3}%
+      \csuse{date#3}%
+      % This is a hook for external packages which want to access variants
+      % via babelname (such as biblatex)
+      \cs_if_exist_use:c{date@bbl@\babelname}%
+      \polyglossia@lang@settextdirection:nn{#3}{#4}%
+    \group_end:
+    % Reset the language's/script's font families
+    \str_if_eq:eeTF{\prop_item:Nn{\polyglossia@langsetup}{#3/lcscript}}{latin}{}{\resetfontlatin}%
+  }
 }
 \cs_generate_variant:Nn \__xpg_textlanguage:nnnn {nnen}
 
@@ -1943,12 +1972,23 @@
   \xpg@hook@setlanguage
   \let\emp@langname\@undefined}
 
+\newif\ifxpglanginaux\xpglanginauxfalse
+
 \DeclareDocumentCommand \selectlanguage {s O{} m}
 {
-  \__xpg_msg_if_lang_not_loaded:n {#3}
-  \polyglossia@select@language:nee {#1}
-    {\xpg_alias_add_to_option_i:nn{#3}{#2}}
-    {\xpg_alias_base_lang:n{#3}}
+  \tl_if_blank:eTF {\xpg_alias_base_lang:n{#3}}
+  {
+    \ifxpglanginaux
+      \msg_show:nnn { polyglossia } { languagenolongerloaded } {#3}
+    \else
+      \msg_show:nnn { polyglossia } { languagenotloaded } {#3}
+    \fi
+  }
+  {
+    \polyglossia@select@language:nee {#1}
+      {\xpg_alias_add_to_option_i:nn{#3}{#2}}
+      {\xpg_alias_base_lang:n{#3}}
+  }
 }
 
 \cs_new:Nn \polyglossia@select@language:nnn
@@ -2180,18 +2220,24 @@
 \newcommand*{\xpg@set@language@only@aux}[2][]{%
     % Write to the aux
    \if@filesw%
+      \protected@write\@auxout{}{\protect\xpglanginauxtrue}%
       \ifx#1\\\\%
           \protected@write\@auxout{}{\protect\selectlanguage*{#2}}%
           \addtocontents{toc}{\protect\selectlanguage*{#2}}%
-          \addtocontents{lof}{\protect\selectlanguage*{#2}}%
-          \addtocontents{lot}{\protect\selectlanguage*{#2}}%
        \else
           \protected@write\@auxout{}{\protect\selectlanguage*[#1]{#2}}%
           \addtocontents{toc}{\protect\selectlanguage*[#1]{#2}}%
-          \addtocontents{lof}{\protect\selectlanguage*[#1]{#2}}%
-          \addtocontents{lot}{\protect\selectlanguage*[#1]{#2}}%
        \fi
+       \protected@write\@auxout{}{\protect\xpglanginauxfalse}%
    \fi
+}
+
+% Since captions might float to other language regions,
+% we need to change the language here (#542)
+\AddToHook{cmd/caption/before}{%
+    \ifhmode\unskip\fi%
+    \addtocontents{lof}{\protect\setforeignlanguage{\languagename}}%
+    \addtocontents{lot}{\protect\setforeignlanguage{\languagename}}%
 }
 
 % The bidi package swaps the output stream within RTL tables
@@ -2448,7 +2494,7 @@
 \newcommand*\use@localhyphenmins[2][]{%
   \bgroup
   \polyglossia@error@iflangnotloaded:n{#2}
-  \setkeys{#2}{#1}%
+  \exp_args:Nne \setkeys{#2}{#1}%
   % Store BCP-47 id of language
   \tl_if_blank:nTF {#1}{%
     \ifcsundef{#2@gbcp47id}{%

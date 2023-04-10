@@ -7,7 +7,7 @@
 %% tracklang.dtx  (with options: `tracklang.sty,package')
 %% 
 %%  tracklang.dtx
-%%  Copyright 2020 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -38,20 +38,8 @@
 %%   Right bracket \]     Circumflex    \^     Underscore    \_
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% do code now to initialise
-%% Pass all options to tracklang:
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{tracklang}[2020/06/30 v1.5 (NLCT) Track Languages]
+\ProvidesPackage{tracklang}[2022/12/13 v1.6.1 (NLCT) Track Languages]
 \providecommand*{\@tracklang@declareoption}[1]{%
   \DeclareOption{#1}{\TrackPredefinedDialect{#1}}%
 }
@@ -77,27 +65,54 @@
          {%
            \@ifpackageloaded{polyglossia}
            {%
-             \@ifundefined{xpg@loaded}%
+             \@ifundefined{xpg@bcp@loaded}%
              {%
-               \PackageInfo{tracklang}{polyglossia loaded but
-               \string\xpg@loaded\space not defined. Will attempt
-               to track known languages.}%
-                \@for\this@language:=\@tracklang@declaredoptions\do{%
-                  \@ifundefined{\this@language @loaded}%
-                  {}%
-                  {\@nameuse{@tracklang@add@\this@language}}%
-                }%
+               \@ifundefined{xpg@loaded}%
+               {%
+                 \PackageInfo{tracklang}{polyglossia loaded but
+                 \string\xpg@loaded\space not defined. Will attempt
+                 to track known languages.}%
+                  \@for\this@language:=\@tracklang@declaredoptions\do{%
+                    \@ifundefined{\this@language @loaded}%
+                    {}%
+                    {\@nameuse{@tracklang@add@\this@language}}%
+                  }%
+                 }%
+                 {%
+                  \@for\this@language:=\xpg@loaded\do{%
+                    \@ifundefined{@tracklang@add@\this@language}%
+                    {%
+                       \PackageWarning{tracklang}%
+                         {Adding unknown polyglossia language `\this@language'}%
+                       \AddTrackedLanguage{\this@language}%
+                    }%
+                    {\@nameuse{@tracklang@add@\this@language}}%
+                  }%
+               }%
              }%
              {%
-                \@for\this@language:=\xpg@loaded\do{%
-                  \@ifundefined{@tracklang@add@\this@language}%
-                  {%
-                     \PackageWarning{tracklang}%
-                       {Adding unknown polyglossia language `\this@language'}%
-                     \AddTrackedLanguage{\this@language}%
-                  }%
-                  {\@nameuse{@tracklang@add@\this@language}}%
-                }%
+               \@for\this@language:=\xpg@bcp@loaded\do{%
+                  \expandafter\TrackLanguageTag{\this@language}%
+               }%
+             }%
+             \@ifundefined{mainbabelname}{}%
+             {%
+               \let\@org@tracklang@add@latex\@tracklang@add@latex
+               \def\@tracklang@add@latex{%
+                 \PackageWarning{tracklang}%
+                   {Can't detect polyglossia main language. It may
+                     not have been set yet}%
+               }%
+               \@ifundefined{@tracklang@add@\mainbabelname}%
+               {%
+                 \PackageWarning{tracklang}%
+                   {Adding unknown polyglossia main babel name `\mainbabelname'}%
+                 \expandafter\AddTrackedLanguage{\mainbabelname}%
+               }%
+               {%
+                 \@nameuse{@tracklang@add@\mainbabelname}%
+               }%
+               \let\@tracklang@add@latex\@org@tracklang@add@latex
              }%
            }%
            {%

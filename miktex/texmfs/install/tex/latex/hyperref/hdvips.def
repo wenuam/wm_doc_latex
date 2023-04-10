@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hdvips.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref driver for dvips]
 \Hy@VersionCheck{hdvips.def}
 \providecommand*{\XR@ext}{pdf}
@@ -103,6 +103,7 @@
 \AtBeginShipoutFirst{%
   \ifHy@setpagesize
     \begingroup
+     \ifnum\mag=\@m
       \ifdim\stockwidth>\z@
         \ifdim\stockheight>\z@
          \special{papersize=\the\stockwidth,\the\stockheight}%
@@ -122,6 +123,7 @@
           \fi
         \fi
       \fi
+     \fi
     \endgroup
   \fi
   \Hy@DisableOption{setpagesize}%

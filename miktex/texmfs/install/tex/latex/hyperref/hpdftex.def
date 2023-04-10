@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hpdftex.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref driver for pdfTeX]
 \Hy@VersionCheck{hpdftex.def}
 \pdf@ifdraftmode{%
@@ -701,24 +701,26 @@
         \fi
       \fi
     }{%
-      \ifdim\stockwidth>\z@
-        \ifdim\stockheight>\z@
-         \setlength{\pdfpagewidth}{\stockwidth}%
-         \setlength{\pdfpageheight}{\stockheight}%
-        \else
-          \ifdim\paperwidth>\z@
-            \ifdim\paperheight>\z@
-              \setlength{\pdfpagewidth}{\paperwidth}%
-              \setlength{\pdfpageheight}{\paperheight}%
+      \ifnum\mag=\@m
+        \ifdim\stockwidth>\z@
+          \ifdim\stockheight>\z@
+           \setlength{\pdfpagewidth}{\stockwidth}%
+           \setlength{\pdfpageheight}{\stockheight}%
+          \else
+            \ifdim\paperwidth>\z@
+              \ifdim\paperheight>\z@
+                \setlength{\pdfpagewidth}{\paperwidth}%
+                \setlength{\pdfpageheight}{\paperheight}%
+              \fi
             \fi
           \fi
-        \fi
-      \else
-        \ifdim\stockwidth=\z@
-          \ifdim\paperwidth>\z@
-            \ifdim\paperheight>\z@
-              \setlength{\pdfpagewidth}{\paperwidth}%
-              \setlength{\pdfpageheight}{\paperheight}%
+        \else
+          \ifdim\stockwidth=\z@
+            \ifdim\paperwidth>\z@
+              \ifdim\paperheight>\z@
+                \setlength{\pdfpagewidth}{\paperwidth}%
+                \setlength{\pdfpageheight}{\paperheight}%
+              \fi
             \fi
           \fi
         \fi

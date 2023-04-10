@@ -1,4 +1,6 @@
-\ProvidesFile{gloss-portuges.ldf}[polyglossia: module for portuguese]
+% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+%
+\ProvidesFile{gloss-portuges.ldf}[polyglossia: module for Portuguese]
 
 % We only provide this gloss for backwards compatibility. The name
 % 'portuges' was selected in accordance with babel (which probably

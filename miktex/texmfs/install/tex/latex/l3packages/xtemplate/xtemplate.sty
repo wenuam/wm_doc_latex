@@ -6,7 +6,7 @@
 %%
 %% xtemplate.dtx  (with options: `package')
 %% 
-%% Copyright (C) 2011-2022 The LaTeX Project
+%% Copyright (C) 2011-2023 The LaTeX Project
 %% 
 %% It may be distributed and/or modified under the conditions of
 %% the LaTeX Project Public License (LPPL), either version 1.3c of
@@ -32,7 +32,7 @@
       }%
     \endinput
   }
-\ProvidesExplPackage{xtemplate}{2022-06-22}{}
+\ProvidesExplPackage{xtemplate}{2023-01-16}{}
   {L3 Experimental prototype document functions}
 \cs_generate_variant:Nn \keys_define:nn { nx }
 \cs_generate_variant:Nn \tl_trim_spaces:n { e }
@@ -397,11 +397,11 @@
 \cs_new:Npn \__xtemplate_split_keytype_arg_aux:w #1 \s__xtemplate_stop { }
 \cs_new_protected:Npn \__xtemplate_store_value_boolean:n #1
   { \prop_put:Non \l__xtemplate_values_prop \l__xtemplate_key_name_tl {#1} }
-\cs_new_protected:Npn \__xtemplate_store_value_code:n #1
+\cs_new_protected:Npn \__xtemplate_store_value:n #1
   { \prop_put:Non \l__xtemplate_values_prop \l__xtemplate_key_name_tl {#1} }
-\cs_new_eq:NN \__xtemplate_store_value_choice:n    \__xtemplate_store_value_code:n
-\cs_new_eq:NN \__xtemplate_store_value_function:n  \__xtemplate_store_value_code:n
-\cs_new_eq:NN \__xtemplate_store_value_instance:n  \__xtemplate_store_value_code:n
+\cs_new_eq:NN \__xtemplate_store_value_choice:n    \__xtemplate_store_value:n
+\cs_new_eq:NN \__xtemplate_store_value_function:n  \__xtemplate_store_value:n
+\cs_new_eq:NN \__xtemplate_store_value_instance:n  \__xtemplate_store_value:n
 \cs_new_protected:Npn \__xtemplate_store_value_aux:Nn #1#2
   { \prop_put:Non \l__xtemplate_values_prop \l__xtemplate_key_name_tl {#2} }
 \cs_new_protected:Npn \__xtemplate_store_value_integer:n
@@ -498,16 +498,6 @@
     \str_case:VnF \l__xtemplate_keytype_tl
       {
         { choice } { \__xtemplate_implement_choices:nn {#1} {#3} }
-        { code }
-          {
-            \__xtemplate_parse_vars_elt_key:nn {#1}
-              {
-                .cs_ \str_if_eq:nnT {#1} { global } { g }
-                   set_protected:Np = \exp_not:N #3
-              }
-            \prop_put:Non \l__xtemplate_vars_prop
-              \l__xtemplate_key_name_tl {#2#3}
-          }
         { function }
           {
             \cs_if_exist:NF #3
@@ -516,9 +506,12 @@
               {
                 .code:n =
                   {
-                    \exp_not:c
-                      { cs_ \str_if_eq:nnT {#1} { global } { g } seq_eq:NN }
-                      \exp_not:N #3 ####1
+                    \cs_generate_from_arg_count:NNnn
+                      \exp_not:N #3
+                      \exp_not:c
+                        { cs_ \str_if_eq:nnT {#1} { global } { g } set:Npn }
+                      { \exp_not:o \l__xtemplate_keytype_arg_tl }
+                      {####1}
                   }
               }
             \prop_put:Non \l__xtemplate_vars_prop
@@ -668,6 +661,7 @@
         \__xtemplate_set_template_eq:nn { #1 / #3 } { #1 / #2 }
         \bool_set_true:N \l__xtemplate_restrict_bool
         \__xtemplate_edit_defaults_aux:nnn {#1} {#3} {#4}
+        \bool_set_false:N \l__xtemplate_restrict_bool
       }
   }
 \cs_new_protected:Npn \__xtemplate_edit_defaults:nnn
@@ -899,16 +893,6 @@
       { \tl_put_right:No \l__xtemplate_assignments_tl \l__xtemplate_tmp_tl }
   }
 \cs_generate_variant:Nn \__xtemplate_assign_choice_aux:nF { x }
-\cs_new_protected:Npn \__xtemplate_assign_code:
-  {
-    \tl_put_right:Nx \l__xtemplate_assignments_tl
-      {
-        \cs_set_protected:Npn \__xtemplate_assign_code:n \exp_not:n {##1}
-          { \exp_not:o \l__xtemplate_var_tl }
-        \__xtemplate_assign_code:n { \exp_not:o \l__xtemplate_value_tl }
-      }
-  }
-\cs_new_protected:Npn \__xtemplate_assign_code:n #1 { }
 \cs_new_protected:Npn \__xtemplate_assign_function:
   {
     \bool_if:NTF \l__xtemplate_global_bool
@@ -1278,7 +1262,6 @@
     Valid~key-types~are:\\
     -~boolean;\\
     -~choice;\\
-    -~code;\\
     -~commalist;\\
     -~function;\\
     -~instance;\\

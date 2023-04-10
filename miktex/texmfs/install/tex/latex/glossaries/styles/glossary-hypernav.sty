@@ -7,7 +7,7 @@
 %% glossaries.dtx  (with options: `glossary-hypernav.sty,package')
 %% 
 %%  glossaries.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossaries-prefix.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list-2020-03-19.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-accsupp.sty, glossaries-babel.sty, glossaries-polyglossia.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, glossaries-2020-03-19.sty, glossaries.perl.
+%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-babel.sty, glossaries-polyglossia.sty, glossaries-prefix.sty, glossaries-accsupp.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-2020-03-19.sty, glossaries-accsupp-2020-03-19.sty, glossaries-babel-2020-03-19.sty, glossaries-compatible-207-2020-03-19.sty, glossaries-compatible-307-2020-03-19.sty, glossaries-polyglossia-2020-03-19.sty, glossaries-prefix-2020-03-19.sty, glossary-hypernav-2020-03-19.sty, glossary-inline-2020-03-19.sty, glossary-list-2020-03-19.sty, glossary-long-2020-03-19.sty, glossary-longbooktabs-2020-03-19.sty, glossary-longragged-2020-03-19.sty, glossary-mcols-2020-03-19.sty, glossary-super-2020-03-19.sty, glossary-superragged-2020-03-19.sty, glossary-tree-2020-03-19.sty, glossaries-2021-11-01.sty, glossaries-accsupp-2021-11-01.sty, glossaries-babel-2021-11-01.sty, glossaries-compatible-207-2021-11-01.sty, glossaries-compatible-307-2021-11-01.sty, glossaries-polyglossia-2021-11-01.sty, glossaries-prefix-2021-11-01.sty, glossary-hypernav-2021-11-01.sty, glossary-inline-2021-11-01.sty, glossary-list-2021-11-01.sty, glossary-long-2021-11-01.sty, glossary-longbooktabs-2021-11-01.sty, glossary-longragged-2021-11-01.sty, glossary-mcols-2021-11-01.sty, glossary-super-2021-11-01.sty, glossary-superragged-2021-11-01.sty, glossary-tree-2021-11-01.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, example-glossaries-user.tex, glossaries.l2h.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -38,12 +38,18 @@
 %%   Right bracket \]     Circumflex    \^     Underscore    \_
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
-\ProvidesPackage{glossary-hypernav}[2021/11/01 v4.49 (NLCT)]
-\newcommand*{\glsnavhyperlink}[3][\@glo@type]{%
+\NeedsTeXFormat{LaTeX2e}
+\DeclareRelease{v4.46}{2020-03-19}{glossary-hypernav-2020-03-19.sty}
+\DeclareRelease{v4.49}{2021-11-01}{glossary-hypernav-2021-11-01.sty}
+\DeclareCurrentRelease{v4.52}{2022-11-03}
+\ProvidesPackage{glossary-hypernav}[2022/11/03 v4.52 (NLCT)]
+\newcommand*{\glsnavhyperlink}[3][\currentglossary]{%
   \protected@edef\gls@grplabel{#2}\protected@edef\@gls@grptitle{#3}%
-  \@glslink{\glsnavhyperlinkname{#1}{#2}}{#3}}
+  \@glslink{\glsnavhyperlinkname{#1}{#2}}{#3}%
+}
 \newcommand*{\glsnavhyperlinkname}[2]{glsn:#1@#2}
-\newcommand*{\glsnavhypertarget}[3][\@glo@type]{%
+\newcommand*{\glsnavhypertarget}{\protect\@@gls@navhypertarget}
+\newcommand*{\@@gls@navhypertarget}[3][\currentglossary]{%
   \@glsnavhypertarget{#1}{#2}{#3}%
 }
 \newcommand*{\@glsnavhypertarget}[3]{%
@@ -65,29 +71,23 @@
 \let\gls@hypergrouprerun\relax
 \AtEndDocument{\gls@hypergrouprerun}
 \newcommand*{\@gls@hypergroup}[2]{%
-\@ifundefined{@gls@hypergrouplist@#1}{%
-   \expandafter\xdef\csname @gls@hypergrouplist@#1\endcsname{#2}%
-}{%
-   \expandafter\let\expandafter\@gls@tmp
-      \csname @gls@hypergrouplist@#1\endcsname
-   \expandafter\xdef\csname @gls@hypergrouplist@#1\endcsname{%
-      \@gls@tmp,#2}%
-}%
+ \ifcsdef{@gls@hypergrouplist@#1}%
+ {\protected@csxappto{@gls@hypergrouplist@#1}{,#2}}%
+ {\protected@csxdef{@gls@hypergrouplist@#1}{#2}}%
 }
 \newcommand*{\glsnavigation}{%
   \def\@gls@between{}%
-  \ifcsundef{@gls@hypergrouplist@\@glo@type}%
+  \ifcsundef{@gls@hypergrouplist@\currentglossary}%
   {%
     \def\@gls@list{}%
   }%
   {%
-    \expandafter\let\expandafter\@gls@list
-      \csname @gls@hypergrouplist@\@glo@type\endcsname
+    \letcs\@gls@list{@gls@hypergrouplist@\currentglossary}%
   }%
   \@for\@gls@tmp:=\@gls@list\do{%
     \@gls@between
     \@gls@getgrouptitle{\@gls@tmp}{\@gls@grptitle}%
-    \glsnavhyperlink{\@gls@tmp}{\@gls@grptitle}%
+    \expandafter\glsnavhyperlink\expandafter{\@gls@tmp}{\@gls@grptitle}%
     \let\@gls@between\glshypernavsep
   }%
 }

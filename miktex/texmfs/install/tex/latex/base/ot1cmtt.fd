@@ -46,7 +46,7 @@
 %% making successful document exchange impossible.
 %% 
 \ProvidesFile{ot1cmtt.fd}
-        [2019/12/16 v2.5j Standard LaTeX font definitions]
+        [2022/07/10 v2.5l Standard LaTeX font definitions]
 \DeclareFontFamily{OT1}{cmtt}{\hyphenchar \font\m@ne}
 \DeclareFontShape{OT1}{cmtt}{m}{n}
      {%

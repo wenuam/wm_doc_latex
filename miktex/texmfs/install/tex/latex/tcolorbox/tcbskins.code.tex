@@ -1,8 +1,8 @@
-%% The LaTeX package tcolorbox - version 5.1.1 (2022/06/24)
+%% The LaTeX package tcolorbox - version 6.0.3 (2023/03/17)
 %% tcbskins.code.tex: Code for colorboxes with different skins
 %%
 %% -------------------------------------------------------------------------------------------
-%% Copyright (c) 2006-2022 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
+%% Copyright (c) 2006-2023 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
 %% -------------------------------------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -17,9 +17,10 @@
 %%
 %% This work consists of all files listed in README
 %%
-\tcb@set@library@version{5.1.1}
+\tcb@set@library@version{6.0.3}
 
 \RequirePackage{tikz}[2010/10/13]
+\RequirePackage{tikzfill.image}
 
 \newenvironment{tikzpicture@tcb@hooked}{%
   \edef\tcb@tikzpicture@begin{\noexpand\tikzpicture[\expandonce\tcb@tikz@option@hook]}%
@@ -1134,7 +1135,7 @@
       \colorlet{tcbtranscol@back}{tcbcolbacktitle}%
       \let\tcb@trans@skin@current\kvtcb@skin@current%
       \let\tcb@trans@boxedstyle\kvtcb@style@boxedtitle%
-      \setbox\tcb@titlebox\color@hbox\bgroup\color{tcbcoltitle}\kvtcb@fonttitle\kvtcb@before@boxedtitle\kvtcb@haligntitle\kvtcb@before@title\tcbtitletext\kvtcb@after@title\kvtcb@after@boxedtitle\egroup\color@endbox%
+      \setbox\tcb@titlebox\color@hbox\bgroup\color{tcbcoltitle}\kvtcb@fonttitle\kvtcb@before@boxedtitle\kvtcb@haligntitle\tcb@insert@before@title\tcbtitletext\tcb@insert@after@title\kvtcb@after@boxedtitle\egroup\color@endbox%
       \setbox\tcb@titlebox\color@hbox\tcbox[skin=\tcb@trans@skin@current,colframe=tcbtranscol@frame,colback=tcbtranscol@back,%
           code={\pgfkeysalsofrom\tcb@trans@boxedsize\pgfkeysalsofrom\tcb@trans@boxedstyle%
             \ifcase#6
@@ -1210,77 +1211,55 @@
 }
 
 
-\newbox\tcb@waterbox
-
-\def\tcb@setratio#1#2#3{\edef#1{\strip@pt\dimexpr\number\numexpr\number\dimexpr#2\relax*65536/\number\dimexpr#3\relax\relax sp\relax}}
-
-\def\tcb@setratiorobust#1#2#3{\ifdim\dimexpr#3<1pt\relax\tcb@setratio#1{#2}{1pt}\else\tcb@setratio#1{#2}{#3}\fi}
-
-\def\tcb@comp@waterbox@stretch#1#2#3{%
-  \tcb@setratiorobust\tcb@scale@x{#1\dimexpr#2}{\wd\tcb@waterbox}%
-  \tcb@setratiorobust\tcb@scale@y{#1\dimexpr#3}{\ht\tcb@waterbox+\dp\tcb@waterbox}%
-}
-
-\def\tcb@comp@waterbox@zoom#1#2#3{%
-  \tcb@comp@waterbox@stretch{#1}{#2}{#3}%
-  \ifdim\dimexpr\tcb@scale@x pt\relax<\dimexpr\tcb@scale@y pt\relax\let\tcb@scale@y=\tcb@scale@x\else\let\tcb@scale@x=\tcb@scale@y\fi%
-}
-
-\def\tcb@comp@waterbox@overzoom#1#2#3{%
-  \tcb@comp@waterbox@stretch{#1}{#2}{#3}%
-  \ifdim\dimexpr\tcb@scale@x pt\relax>\dimexpr\tcb@scale@y pt\relax\let\tcb@scale@y=\tcb@scale@x\else\let\tcb@scale@x=\tcb@scale@y\fi%
-}
-
-\def\tcb@comp@waterbox@shrink#1#2#3{%
-  \tcb@comp@waterbox@zoom{#1}{#2}{#3}%
-  \ifdim\dimexpr\tcb@scale@x pt\relax>1pt\relax%
-    \edef\tcb@scale@x{1}\edef\tcb@scale@y{1}%
-  \fi%
-}
-
-\def\tcb@box@scaled@waterbox{\scalebox{\tcb@scale@x}[\tcb@scale@y]{\box\tcb@waterbox}}
-
-\def\tcb@drawspec@watermark@@noclip{%
-  \tcb@comp@wm%
-  \node[opacity=\kvtcb@watermark@opacity,anchor=center] at (interior) {\tcb@box@scaled@waterbox};%
-}
-
-\def\tcb@drawspec@watermark@@clip{%
+\def\tcb@drawspec@watermark@@clip#1{%
   \begin{tcbclipinterior}%
-  \tcb@drawspec@watermark@@noclip%
+  \color{\kvtcb@watermark@color}%
+  \path[%
+      fill image opacity=\kvtcb@watermark@opacity,
+      fill image scale=\kvtcb@watermark@scale,
+      #1,
+    ]
+    (interior.south west) rectangle (interior.north east);
   \end{tcbclipinterior}%
 }
 
-\def\tcb@drawspec@watermark@tikz#1{%
-  \setbox\tcb@waterbox=\color@hbox\pgfinterruptpicture{\pgfsetbaseline{0pt}\begin{tikzpicture}[color=\kvtcb@watermark@color]#1\end{tikzpicture}}\endpgfinterruptpicture\color@endbox%
-  \tcb@drawspec@watermark%
+\def\tcb@drawspec@watermark@@noclip#1{%
+  \color{\kvtcb@watermark@color}%
+  \path[%
+      fill image opacity=\kvtcb@watermark@opacity,
+      fill image scale=(\kvtcb@watermark@scale)/4,
+      #1,
+    ]
+    ([xshift=-\tcb@innerwidth*2,yshift=-\tcb@innerheight*2]interior.center)
+    rectangle +(\tcb@innerwidth*4,\tcb@innerheight*4);
 }
-
-\def\tcb@drawspec@watermark@graphics#1{%
-  \setbox\tcb@waterbox=\color@hbox\pgfinterruptpicture{\includegraphics{#1}}\endpgfinterruptpicture\color@endbox%
-  \tcb@drawspec@watermark%
-}
-
-\def\tcb@drawspec@watermark@text#1{%
-  \tcb@drawspec@watermark@tikz{\node[inner sep=0pt,align=flush center]{#1};}%
-}
-
 
 \tcbset{%
   watermark opacity/.store in=\kvtcb@watermark@opacity,%
   watermark color/.store in=\kvtcb@watermark@color,%
 %
-  watermark stretch/.code={\def\tcb@comp@wm{\tcb@comp@waterbox@stretch{#1}{\tcb@innerwidth}{\tcb@innerheight}}},%
-  watermark zoom/.code={\def\tcb@comp@wm{\tcb@comp@waterbox@zoom{#1}{\tcb@innerwidth}{\tcb@innerheight}}},%
-  watermark overzoom/.code={\def\tcb@comp@wm{\tcb@comp@waterbox@overzoom{#1}{\tcb@innerwidth}{\tcb@innerheight}}},%
-  watermark shrink/.code={\def\tcb@comp@wm{\tcb@comp@waterbox@shrink{#1}{\tcb@innerwidth}{\tcb@innerheight}}},%
+  watermark stretch/.code={\def\kvtcb@watermark@scale{#1}%
+    \tikzset{fill@image/.style={fill stretch image={##1}},fill@picture/.style={fill stretch picture={##1}}}},%
+  watermark stretch/.default=1,
+  watermark zoom/.code={\def\kvtcb@watermark@scale{#1}%
+    \tikzset{fill@image/.style={fill zoom image={##1}},fill@picture/.style={fill zoom picture={##1}}}},%
+  watermark zoom/.default=1,
+  watermark overzoom/.code={\def\kvtcb@watermark@scale{#1}%
+    \tikzset{fill@image/.style={fill overzoom image={##1}},fill@picture/.style={fill overzoom picture={##1}}}},%
+  watermark overzoom/.default=1,
+  watermark shrink/.code={\def\kvtcb@watermark@scale{#1}%
+    \tikzset{fill@image/.style={fill shrink image={##1}},fill@picture/.style={fill shrink picture={##1}}}},%
+  watermark shrink/.default=1,
 %
-  watermark tikz/.style={overlay={\tcb@drawspec@watermark@tikz{#1}}},
-  watermark tikz on/.style args={#1 is #2}{overlay #1={\tcb@drawspec@watermark@tikz{#2}}},%
-  watermark graphics/.style={overlay={\tcb@drawspec@watermark@graphics{#1}}},
-  watermark graphics on/.style args={#1 is #2}{overlay #1={\tcb@drawspec@watermark@graphics{#2}}},
-  watermark text/.style={overlay={\tcb@drawspec@watermark@text{#1}}},
-  watermark text on/.style args={#1 is #2}{overlay #1={\tcb@drawspec@watermark@text{#2}}},
+  watermark@overlay/.style={overlay={\tcb@drawspec@watermark{#1}}},
+  watermark@overlay@on/.style n args={2}{overlay #1={\tcb@drawspec@watermark{#2}}},
+%
+  watermark tikz/.style={watermark@overlay={fill@picture={#1}}},
+  watermark tikz on/.style args={#1 is #2}{watermark@overlay@on={#1}{fill@picture={#2}}},
+  watermark graphics/.style={watermark@overlay={fill@image={#1}}},
+  watermark graphics on/.style args={#1 is #2}{watermark@overlay@on={#1}{fill@image={#2}}},
+  watermark text/.style={watermark@overlay={fill@picture={\node[inner sep=0pt,align=flush center]{#1};}}},
+  watermark text on/.style args={#1 is #2}{watermark@overlay@on={#1}{fill@picture={\node[inner sep=0pt,align=flush center]{#2};}}},
   no watermark/.style={no overlay},
   clip watermark/.is choice,
   clip watermark/true/.code={\let\tcb@drawspec@watermark=\tcb@drawspec@watermark@@clip},
@@ -1310,115 +1289,6 @@
   \end{tcbclipinterior}%
 }
 
-
-\def\tcb@process@ppbb{%
-  \pgf@process{\pgfpointanchor{path picture bounding box}{south west}}%
-  \pgf@xa\pgf@x\pgf@ya\pgf@y%
-  \pgf@process{\pgfpointanchor{path picture bounding box}{north east}}%
-  \pgf@xb\pgf@x\pgf@yb\pgf@y%
-  \pgfsetfillopacity{\tcb@tikz@fill@graphics@opacity}%
-  \pgfsetstrokeopacity{\tcb@tikz@fill@graphics@opacity}%
-}
-
-\def\tcb@process@ppbb@wh{%
-  \tcb@process@ppbb%
-  \tcbdimto\tcb@ppbb@width{\pgf@xb-\pgf@xa}%
-  \tcbdimto\tcb@ppbb@height{\pgf@yb-\pgf@ya}%
-}
-
-\def\tcb@ppbb@textbox#1{\pgftext[x=\the\dimexpr\pgf@xa+\tcb@ppbb@width/2\relax,y=\pgf@ya+\tcb@ppbb@height/2]{#1}}
-
-\def\tcb@set@waterbox@to@graphics#1{%
-  \setbox\tcb@waterbox=\color@hbox\pgfinterruptpicture%
-    \begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@tikz@fill@graphics@options]}\x{#1}%
-    \endpgfinterruptpicture\color@endbox%
-}
-
-\def\tcb@set@waterbox@to@picture#1{%
-  \setbox\tcb@waterbox=\color@hbox\pgfinterruptpicture{\pgfsetbaseline{0pt}\begin{tikzpicture}#1\end{tikzpicture}}\endpgfinterruptpicture\color@endbox%
-}
-
-\tikzset{%
-  fill image opacity/.store in=\tcb@tikz@fill@graphics@opacity,%
-  fill image opacity=1,%
-  fill image scale/.store in=\tcb@tikz@fill@graphics@scale,%
-  fill image scale=1,%
-  fill image options/.store in=\tcb@tikz@fill@graphics@options,%
-  fill image options=,%
-  fill plain image/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    \tcb@ppbb@textbox{\begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@tikz@fill@graphics@options]}\x{#1}}%
-  }},
-  fill plain picture/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    \tcb@set@waterbox@to@picture{#1}%
-    \tcb@ppbb@textbox{\box\tcb@waterbox}%
-  }},
-  fill stretch image/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    \tcb@ppbb@textbox{\begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@tikz@fill@graphics@options,%
-      width=\the\dimexpr\tcb@tikz@fill@graphics@scale\dimexpr\tcb@ppbb@width\relax,%
-      height=\the\dimexpr\tcb@tikz@fill@graphics@scale\dimexpr\tcb@ppbb@height\relax]}\x{#1}}%
-  }},
-  fill stretch picture/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    \tcb@set@waterbox@to@picture{#1}%
-    \tcb@comp@waterbox@stretch{\tcb@tikz@fill@graphics@scale}{\tcb@ppbb@width}{\tcb@ppbb@height}%
-    \tcb@ppbb@textbox{\tcb@box@scaled@waterbox}%
-  }},
-  fill@overzoom/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    #1%
-    \tcb@comp@waterbox@overzoom{\tcb@tikz@fill@graphics@scale}{\tcb@ppbb@width}{\tcb@ppbb@height}%
-    \tcb@ppbb@textbox{\tcb@box@scaled@waterbox}%
-  }},
-  fill overzoom image/.style={fill@overzoom={\tcb@set@waterbox@to@graphics{#1}}},%
-  fill overzoom picture/.style={fill@overzoom={\tcb@set@waterbox@to@picture{#1}}},%
-  fill@zoom/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    #1%
-    \tcb@comp@waterbox@zoom{\tcb@tikz@fill@graphics@scale}{\tcb@ppbb@width}{\tcb@ppbb@height}%
-    \tcb@ppbb@textbox{\tcb@box@scaled@waterbox}%
-  }},
-  fill zoom image/.style={fill@zoom={\tcb@set@waterbox@to@graphics{#1}}},%
-  fill zoom picture/.style={fill@zoom={\tcb@set@waterbox@to@picture{#1}}},%
-  fill@shrink/.style={path picture={%
-    \tcb@process@ppbb@wh%
-    #1%
-    \tcb@comp@waterbox@shrink{\tcb@tikz@fill@graphics@scale}{\tcb@ppbb@width}{\tcb@ppbb@height}%
-    \tcb@ppbb@textbox{\tcb@box@scaled@waterbox}%
-  }},
-  fill shrink image/.style={fill@shrink={\tcb@set@waterbox@to@graphics{#1}}},%
-  fill shrink picture/.style={fill@shrink={\tcb@set@waterbox@to@picture{#1}}},%
-  fill@tile/.style={path picture={%
-    \tcb@process@ppbb%
-    #1%
-    \tcbdimto\tcb@ppbb@tilew{\wd\tcb@waterbox}%
-    \tcbdimto\tcb@ppbb@tileh{\ht\tcb@waterbox+\dp\tcb@waterbox}%
-    \pgf@xc\pgf@xa\pgf@yc\pgf@yb%
-    \pgfutil@loop%
-      \pgfutil@loop%
-        \pgftext[x=\pgf@xc,y=\pgf@yc,left,top]{\copy\tcb@waterbox}%
-        \ifdim\pgf@xc<\pgf@xb\relax%
-        \advance\pgf@xc\tcb@ppbb@tilew%
-      \pgfutil@repeat%
-      \ifdim\pgf@yc>\pgf@ya\relax%
-      \advance\pgf@yc-\tcb@ppbb@tileh%
-      \pgf@xc\pgf@xa%
-    \pgfutil@repeat%
-  }},%
-  fill tile image/.style={fill@tile={\tcb@set@waterbox@to@graphics{#1}}},%
-  fill tile picture/.style={fill@tile={\tcb@set@waterbox@to@picture{#1}}},%
-  fill tile picture*/.style 2 args={fill@tile={\tcb@set@waterbox@to@picture{#2}%
-    \setbox\tcb@waterbox=\color@hbox\scalebox{#1}{\box\tcb@waterbox}\color@endbox}},%
-  %
-  fill plain image*/.style 2 args={fill image options={#1},fill plain image={#2}},%
-  fill stretch image*/.style 2 args={fill image options={#1},fill stretch image={#2}},%
-  fill overzoom image*/.style 2 args={fill image options={#1},fill overzoom image={#2}},%
-  fill zoom image*/.style 2 args={fill image options={#1},fill zoom image={#2}},%
-  fill shrink image*/.style 2 args={fill image options={#1},fill shrink image={#2}},%
-  fill tile image*/.style 2 args={fill image options={#1},fill tile image={#2}},%
-}
 
 \tcbset{%
   frame style image/.style={frame style={fill=none,fill stretch image={#1}}},
@@ -1815,104 +1685,6 @@
 }
 
 
-\def\tcb@include@graphics{%
-  \let\tcb@graphics@options\kvtcb@graphics@options%
-  \ifnum\kvtcb@graphics@orientation>-1\relax%
-    \setbox\tcb@waterbox=\color@hbox\begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@graphics@options]}\x{\imagepath}\color@endbox%
-    \ifcase\kvtcb@graphics@orientation\relax%
-      \ifdim\wd\tcb@waterbox<\dimexpr\ht\tcb@waterbox+\dp\tcb@waterbox\relax%
-        \appto\tcb@graphics@options{,angle=90}%
-      \fi%
-    \or%
-      \ifdim\wd\tcb@waterbox<\dimexpr\ht\tcb@waterbox+\dp\tcb@waterbox\relax%
-        \appto\tcb@graphics@options{,angle=-90}%
-      \fi%
-    \or%
-      \ifdim\wd\tcb@waterbox>\dimexpr\ht\tcb@waterbox+\dp\tcb@waterbox\relax%
-        \appto\tcb@graphics@options{,angle=90}%
-      \fi%
-    \or%
-      \ifdim\wd\tcb@waterbox>\dimexpr\ht\tcb@waterbox+\dp\tcb@waterbox\relax%
-        \appto\tcb@graphics@options{,angle=-90}%
-      \fi%
-    \fi%
-  \fi%
-  \ifdefstring{\kvtcb@capture}{hbox}{%
-    \tcbox{%
-      \begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@graphics@options]}%
-      \x{\imagepath}%
-    }%
-  }{%
-    \iftcb@fixedheight%
-      \begin{tcolorbox}%
-        \begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@graphics@options,width=\linewidth,height=\tcbtextheight,keepaspectratio]}%
-        \x{\imagepath}%
-      \end{tcolorbox}%
-    \else%
-      \ifdefempty\tcb@height@adjust{%
-        \begin{tcolorbox}%
-          \begingroup\edef\x{\endgroup\noexpand\includegraphics[\tcb@graphics@options,width=\linewidth]}%
-          \x{\imagepath}%
-        \end{tcolorbox}%
-      }{% height fill
-        \begin{tcolorbox}[underlay={%
-          \begin{tcbclipinterior}%
-          \path[fill zoom image*={\tcb@graphics@options}{\imagepath}]
-            ([xshift=\kvtcb@boxsep+\kvtcb@leftupper,yshift=\kvtcb@boxsep+\kvtcb@bottom]interior.south west) rectangle
-            ([xshift=-\kvtcb@boxsep-\kvtcb@rightupper,yshift=-\kvtcb@boxsep-\kvtcb@top]interior.north east);
-          \end{tcbclipinterior}%
-          }]%
-        \end{tcolorbox}%
-      }%
-    \fi%
-  }%
-}
-
-\def\tcb@scanfilename#1#2{%
-  \begingroup%
-    \everyeof{\noexpand}%
-    \endlinechar -1%
-    \catcode`\_=11%
-    \catcode`\~=11%
-    \edef\x{\scantokens\expandafter{#2}}%
-  \expandafter\endgroup%
-  \expandafter\def\expandafter #1\expandafter{\x}%
-}%
-
-
-\def\tcb@include@graphics@preparefile#1{%
-  \tcb@scanfilename\tcb@temp{#1}%
-  \filename@parse{\tcb@temp}%
-  \ifx\filename@ext\relax%
-    \let\imagename\filename@base%
-  \else%
-    \def\imagename{\filename@base\Gin@sepdefault\filename@ext}%
-  \fi%
-  \ifdefined\grffile@Ginclude@graphics%
-    % grffile package loaded
-    \ifx\kvtcb@graphics@directory\@empty%
-      \def\imagepath{#1}%
-    \else%
-      \def\imagepath{\kvtcb@graphics@directory/#1}%
-    \fi%
-  \else%
-    \ifx\kvtcb@graphics@directory\@empty%
-      \edef\imagepath{#1}%
-    \else%
-      \edef\imagepath{\kvtcb@graphics@directory/#1}%
-    \fi%
-  \fi%
-}
-
-\newcommand{\tcbincludegraphics}[2][]{%
-  \begingroup%
-  \tcb@layer@pushup%
-  \tcb@apply@box@options{enhanced,clip upper=true,valign=center,center upper,#1}%
-  \tcb@include@graphics@preparefile{#2}%
-  \edef\imagepage{1}%
-  \tcb@include@graphics%
-  \endgroup%
-}
 
 \def\tcb@set@pdfpages#1#2{%
   \IfFileExists{#2}{%
@@ -1940,19 +1712,169 @@
   \relax%
 }
 
-\newcommand{\tcbincludepdf}[2][]{%
-  \tcb@include@graphics@preparefile{#2}%
-  \tcb@set@pdfpages\pdfpages{\imagepath}%
-  \foreach \imagepage in \kvtcb@graphics@pages%
-  {%
-    \begingroup%
-    \tcb@layer@pushup%
-    \tcb@apply@box@options{enhanced,clip upper=true,valign=center,center upper,#1}%
-    \appto\kvtcb@graphics@options{,page=\imagepage}%
-    \tcb@include@graphics%
-    \endgroup%
-  }%
+
+\ExplSyntaxOn
+
+\tl_new:N \l__tcobox_graphics_options_tl
+
+
+\cs_new:Npn \__tcobox_include_graphics:nn #1#2
+  {
+    \tl_set:Nn \l_tmpa_tl { \includegraphics }
+    \tl_put_right:Nx \l_tmpa_tl { [#1] }
+    \l_tmpa_tl {#2}
+  }
+
+
+\cs_new:Npn \__tcobox_include_graphics:
+  {
+    \tl_set_eq:NN \l__tcobox_graphics_options_tl \kvtcb@graphics@options
+
+    \int_compare:nNnT \kvtcb@graphics@orientation > {-1}
+      {
+        \hbox_set:Nn \l_tmpa_box
+          {
+            \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl }{ \imagepath }
+          }
+        \if_case:w \kvtcb@graphics@orientation
+          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} < {\box_ht_plus_dp:N \l_tmpa_box}
+            {
+              \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=90}
+            }
+        \or:
+          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} < {\box_ht_plus_dp:N \l_tmpa_box}
+            {
+              \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=-90}
+            }
+        \or:
+          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} > {\box_ht_plus_dp:N \l_tmpa_box}
+            {
+              \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=90}
+            }
+        \or:
+          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} > {\box_ht_plus_dp:N \l_tmpa_box}
+            {
+              \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=-90}
+            }
+        \fi:
+      }
+
+    \tl_if_eq:NnTF \kvtcb@capture {hbox}
+      {
+        \tcbox
+          {
+            \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl }{ \imagepath }
+          }
+      }
+      {
+        \legacy_if:nTF {tcb@fixedheight}
+          {
+            \begin{tcolorbox}
+              \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl,width=\linewidth,height=\tcbtextheight,keepaspectratio }{ \imagepath }
+          \end{tcolorbox}
+          }
+          {
+            \tl_if_empty:NTF \tcb@height@adjust
+            {
+              \begin{tcolorbox}
+                \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl,width=\linewidth }{ \imagepath }
+              \end{tcolorbox}%
+            }{% height fill
+              \begin{tcolorbox}[
+                underlay=
+                {
+                  \begin{tcbclipinterior}
+                  \path[fill~zoom~image*={\l__tcobox_graphics_options_tl}{\imagepath}]
+                    ([xshift=\kvtcb@boxsep+\kvtcb@leftupper,yshift=\kvtcb@boxsep+\kvtcb@bottom]interior.south~west)~rectangle~
+                    ([xshift=-\kvtcb@boxsep-\kvtcb@rightupper,yshift=-\kvtcb@boxsep-\kvtcb@top]interior.north~east);
+                  \end{tcbclipinterior}
+                }]
+              \end{tcolorbox}
+            }
+          }
+      }
+  }
+
+
+\cs_new:Npn \__tcobox_include_graphics_preparefile:n #1
+  {
+    \file_parse_full_name:nNNN {#1} \l_tmpa_tl \imagename \l_tmpb_tl
+    \tl_put_right:NV \imagename \l_tmpb_tl
+    \tl_set_eq:NN \imagepath \imagename
+    \tl_if_empty:NF \l_tmpa_tl
+      {
+        \tl_put_left:Nn \imagepath {/}
+        \tl_if_eq:NnF \l_tmpa_tl {/}
+          {
+            \tl_put_left:NV \imagepath \l_tmpa_tl
+          }
+      }
+    \tl_if_empty:NF \kvtcb@graphics@directory
+      {
+        \tl_put_left:Nn \imagepath {/}
+        \tl_if_eq:NnF \kvtcb@graphics@directory {/}
+          {
+            \tl_put_left:NV \imagepath \kvtcb@graphics@directory
+          }
+      }
+    \tl_set_rescan:Nno \imagename
+      {
+        \char_set_catcode_letter:N \_
+        \char_set_catcode_letter:N \~
+        \char_set_catcode_letter:N \{
+        \char_set_catcode_letter:N \}
+        \char_set_catcode_letter:N \$
+        \char_set_catcode_letter:N \^
+        \char_set_catcode_letter:N \#
+        \char_set_catcode_letter:N \%
+      }
+      {
+        \imagename
+      }
+  }
+
+
+\NewDocumentCommand \tcbincludegraphics { +O{} m }
+  {
+    \group_begin:
+    \tcb@layer@pushup
+    \tcb@apply@box@options{enhanced,clip~upper=true,valign=center,center~upper,#1}
+    \__tcobox_include_graphics_preparefile:n {#2}
+    \cs_set:Npn \imagepage {1}
+    \__tcobox_include_graphics:
+    \group_end:
+  }
+
+
+\NewDocumentCommand \tcbincludepdf { +O{} m }
+  {
+    \__tcobox_include_graphics_preparefile:n {#2}
+    \tcb@set@pdfpages\pdfpages{\imagepath}
+    \foreach~\imagepage~in~\kvtcb@graphics@pages
+    {
+      \group_begin:
+      \tcb@layer@pushup
+      \tcb@apply@box@options{enhanced,clip~upper=true,valign=center,center~upper,#1}
+      \tl_put_right:Nn \kvtcb@graphics@options {,page=\imagepage}
+      \__tcobox_include_graphics:
+      \group_end:
+    }
 }
+
+\sys_if_engine_xetex:TF
+  {
+    \cs_set:Npn \tcb@XeTeXLinkBox
+      {
+        \setlength{\XeTeXLinkMargin}{0pt}
+        \XeTeXLinkBox
+      }
+  }
+  {
+    \cs_set_eq:NN \tcb@XeTeXLinkBox \use:n
+  }
+
+\ExplSyntaxOff
+
 
 \tcbset{%
   graphics options/.store in=\kvtcb@graphics@options,
@@ -1966,12 +1888,13 @@
   graphics orientation/portrait*/.code={\def\kvtcb@graphics@orientation{3}},
 }
 
+
 \newcommand{\tcbhypernode}[2]{\ifdefined\hypersetup\@ifundefined{pgf@sh@ns@#2}{}{%
   \node[inner sep=0pt,outer sep=0pt] at (#2.center){%
     \tcbsetmacrotowidthofnode\tcb@w@hn{#2}%
     \tcbsetmacrotoheightofnode\tcb@h@hn{#2}%
     \hypersetup{pdfborder=0 0 0}%
-    #1{\vtop to \dimexpr\tcb@h@hn-2bp\relax{\hbox to \dimexpr\tcb@w@hn-2bp\relax{}\vfil}}%
+    #1{\tcb@XeTeXLinkBox{\vtop to \dimexpr\tcb@h@hn-2bp\relax{\hbox to \dimexpr\tcb@w@hn-2bp\relax{}\vfil}}}%
   };%
 }\fi}
 

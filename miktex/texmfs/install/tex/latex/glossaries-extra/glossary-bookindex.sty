@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossary-bookindex.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-xr.bib.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossary-bookindex}[2021/11/22 v1.48 (NLCT)]
+\DeclareRelease{v1.48}{2021-11-22}{glossary-bookindex-2021-11-22.sty}
+\DeclareCurrentRelease{v1.50}{2022-11-08}
+\ProvidesPackage{glossary-bookindex}[2022/11/08 v1.50 (NLCT)]
 \RequirePackage{multicol}
 \RequirePackage{glossary-tree}
 \newcommand{\glsxtrbookindexcols}{2}
@@ -66,8 +68,19 @@
 \newcommand{\glsxtrbookindexsubatendgroup}[1]{}
 \newcommand{\glsxtrbookindexsubsubatendgroup}[1]{}
 \newcommand{\glsxtrbookindexgroupskip}{\ifglsnogroupskip\else\indexspace\fi}
+\newcommand{\glsxtrbookindexpregroupskip}[1]{#1}
+\newcommand{\glsxtrbookindexpostgroupskip}{\indexspace}
+\newcommand{\glsxtrbookindexpresubgroupskip}[3]{\par\medskip}
+\newcommand{\glsxtrbookindexpostsubgroupskip}[2]{\par\medskip}
 \newcommand*{\glsxtrbookindexformatheader}[1]{%
   \par{\centering\glstreegroupheaderfmt{#1}\par}%
+}
+\newcommand*{\glsxtrbookindexformatsubheader}[5]{%
+ \ifnum#2>1\relax
+  \glstreesubsubitem\glstreegroupheaderfmt{#5}%
+ \else
+  \glstreesubitem\glstreegroupheaderfmt{#5}%
+ \fi
 }
 \ifdef\pdfbookmark
 {%
@@ -79,6 +92,17 @@
 }
 {%
   \newcommand*{\glsxtrbookindexbookmark}[2]{}
+}
+\ifdef\pdfbookmark
+{%
+  \newcommand*{\glsxtrbookindexsubbookmark}[3]{%
+    \ifdefstring{\@@glossarysec}{chapter}%
+    {\expandafter\pdfbookmark\expandafter[\number\numexpr#1+1]{#3}{#2}}%
+    {\expandafter\pdfbookmark\expandafter[\number\numexpr#1+2]{#3}{#2}}%
+  }
+}
+{%
+  \newcommand*{\glsxtrbookindexsubbookmark}[3]{}
 }
 \newcommand*{\glsxtrbookindexbookmarkprefix}{\currentglossary.}
 \newcommand*{\glsxtrbookindexcolspread}{}
@@ -137,10 +161,10 @@
     \let\@glsxtr@bookindex@subsep\glsxtrbookindexparentsubchildsep
     \let\@glsxtr@bookindex@subbetween\@gobble
     \let\@glsxtr@bookindex@subsubbetween\@gobble
-    \edef\@glsxtr@bookindex@between{%
+    \protected@edef\@glsxtr@bookindex@between{%
        \noexpand\glsxtrbookindexbetween{##1}%
     }%
-    \edef\@glsxtr@bookindex@atendgroup{%
+    \protected@edef\@glsxtr@bookindex@atendgroup{%
       \noexpand\glsxtrbookindexatendgroup{##1}%
     }%
     \let\@glsxtr@bookindex@subatendgroup\relax
@@ -189,7 +213,7 @@
     \@glsxtr@bookindex@subsubatendgroup
     \@glsxtr@bookindex@subatendgroup
     \@glsxtr@bookindex@atendgroup
-    \@glsxtr@bookindexgroupskip
+    \glsxtrbookindexpregroupskip\@glsxtr@bookindexgroupskip
     \let\@glsxtr@bookindexgroupskip\glsxtrbookindexgroupskip
     \let\@glsxtr@bookindex@between\@gobble
     \let\@glsxtr@bookindex@atendgroup\relax
@@ -198,8 +222,23 @@
     \glsxtrgetgrouptitle{##1}{\glsxtrcurrentgrptitle}%
     \glsxtrbookindexbookmark{\glsxtrcurrentgrptitle}{\glsxtrbookindexbookmarkprefix##1}%
     \glsxtrbookindexformatheader{\glsxtrcurrentgrptitle}%
-    \nopagebreak\indexspace\nopagebreak\@afterheading
+    \nopagebreak\glsxtrbookindexpostgroupskip\nopagebreak\@afterheading
   }%
+  \renewcommand*{\glssubgroupheading}[4]{%
+    \@glsxtr@bookindex@subsubatendgroup
+    \@glsxtr@bookindex@subatendgroup
+    \@glsxtr@bookindex@atendgroup
+    \glsxtrbookindexpresubgroupskip\@glsxtr@bookindexgroupskip{##1}{##2}%
+    \let\@glsxtr@bookindexgroupskip\glsxtrbookindexgroupskip
+    \let\@glsxtr@bookindex@between\@gobble
+    \let\@glsxtr@bookindex@atendgroup\relax
+    \let\@glsxtr@bookindex@subatendgroup\relax
+    \let\@glsxtr@bookindex@subsubatendgroup\relax
+    \glsxtrgetgrouptitle{##4}{\glsxtrcurrentgrptitle}%
+    \glsxtrbookindexsubbookmark{##2}{##4}{\glsxtrcurrentgrptitle}%
+    \glsxtrbookindexformatsubheader{##1}{##2}{##3}{##4}{\glsxtrcurrentgrptitle}%
+    \nopagebreak\glsxtrbookindexpostsubgroupskip{##1}{##2}\nopagebreak\@afterheading
+  }
 }
 \newcommand{\glsxtrbookindexthepage}{%
  \ifdef\currentglossary{\currentglossary.\arabic{page}}{\arabic{page}}%

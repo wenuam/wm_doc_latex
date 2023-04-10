@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{puenc.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
       Hyperref: PDF Unicode definition (HO)]
 \DeclareFontEncoding{PU}{}{}
 \DeclareTextCommand{\`}{PU}[1]{#1\83\000}% U+0300

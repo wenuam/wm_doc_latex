@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossaries-extra-bib2gls.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-xr.bib.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossaries-extra-bib2gls}[2021/11/22 v1.48 (NLCT)]
+\DeclareRelease{v1.48}{2021-11-22}{glossaries-extra-bib2gls-2021-11-22.sty}
+\DeclareCurrentRelease{v1.50}{2022-11-08}
+\ProvidesPackage{glossaries-extra-bib2gls}[2022/11/08 v1.50 (NLCT)]
 \ifglsacronym
   \providecommand*{\printunsrtacronyms}[1][]{%
    \printunsrtglossary[type=\acronymtype,#1]}%
@@ -75,8 +77,12 @@
 }
 \robustify\glsdisplaynumberlist
 \renewcommand*{\glsentrynumberlist}[1]{\glsxtrusefield{#1}{location}}
+\providecommand{\IfTeXParserLib}[2]{#2}
 \newcommand*{\glshex}{\string\u}
 \newcommand*{\glscapturedgroup}{\string\$}
+\ifdef\glshashchar
+{}
+{\edef\glshashchar{\expandafter\@gobble\string\#}}
 \newcommand*{\GlsXtrIfHasNonZeroChildCount}{%
   \@ifstar\s@GlsXtrIfHasNonZeroChildCount\@GlsXtrIfHasNonZeroChildCount
 }
@@ -115,7 +121,7 @@
 \newcommand*{\GlsXtrDualBackLink}[2]{%
   \glsxtrifhasfield{\GlsXtrDualField}{#2}%
   {\glshyperlink[#1]{\glscurrentfieldvalue}}%
-  {#2}%
+  {#1}%
 }
 \newcommand*{\GlsXtrBibTeXEntryAliases}{%
   article=bibtexentry,
@@ -172,22 +178,35 @@
 }
 {
   \newcommand*{\glsxtrdisplaylocnameref}[8]{%
+    \def\glsxtrrecentanchor{#6}%
+    \def\glsxtrlocationanchor{#2.#7}%
+    \let\glsxtractualanchor\glsxtrlocationanchor
+    \glsxtrsetactualanchor{#2}%
     \ifcsdef{glsxtr#2locfmt}%
-    {\glsxtrnamereflink{#3}{\csuse{glsxtr#2locfmt}{#4}{#5}}{#2.#7}{#8}}%
+    {\glsxtrnamereflink{#3}{\csuse{glsxtr#2locfmt}{#4}{#5}}{\glsxtractualanchor}{#8}}%
     {%
       \ifstrempty{#5}%
       {%
-        \glsxtrnamereflink{#3}{#4}{#2.#7}{#8}%
+        \glsxtrnamereflink{#3}{#4}{\glsxtractualanchor}{#8}%
       }%
       {%
         \ifstrequal{#2}{page}%
-        {\glsxtrnamereflink{#3}{#4}{#2.#7}{#8}}%
-        {\glsxtrnamereflink{#3}{#5}{#2.#7}{#8}}%
+        {\glsxtrnamereflink{#3}{#4}{\glsxtractualanchor}{#8}}%
+        {\glsxtrtitlednamereflink{#3}{#4}{#5}{#8}}%
       }%
     }%
   }
 }
+\newcommand{\glsxtrsetactualanchor}[1]{}
+\newcommand{\glsxtrtitlednamereflink}[4]{%
+  \glsxtrnamereflink{#1}{#2}{\glsxtrrecentanchor}{#4}%
+}
 \newcommand*{\glsxtrequationlocfmt}[2]{(#1)}
+\newcommand*{\glsxtrwrglossarylocfmt}[2]{%
+  {\@@glsxtrwrglosscountermark{#1}%
+  \let\glsxtr@wrglossarylocation\@secondoftwo
+  #1}%
+}
 \newcommand*{\glsxtrnamereflink}[4]{%
   \begingroup
     \let\glshypernumber\@firstofone
@@ -385,53 +404,298 @@
  \protected@write\@auxout{}{\string\providecommand{\string\@glsxtr@prefixlabellist}[1]{}}%
  \protected@write\@auxout{}{\string\@glsxtr@prefixlabellist{\@glsxtr@labelprefixes}}%
 }
+\def\@glsxtr@dglsnomatch#1#2[#3]{%
+ \begingroup
+  \let\glslabel\@gls@thislabel
+  \let\@glsnumberformat\@glsxtr@defaultnumberformat
+  \def\@glsxtr@thevalue{}%
+  \def\@glsxtr@theHvalue{\@glsxtr@thevalue}%
+  \let\@glsxtr@org@theHvalue\@glsxtr@theHvalue
+  \let\@gls@counter\glscounter
+  \if@glsxtr@equations
+    \@glsxtr@use@equation@counter
+  \fi
+  \@gls@setdefault@glslink@opts
+  \@glsxtr@glslink@prekeys
+  \setkeys{glslink}{#1}%
+  \glsxtr@do@autoadd{glslink}%
+  \ifKV@glslink@noindex
+    \GlossariesExtraWarning{Can't obtain a match for prefix
+     candidates: \@glsxtr@prefixedlist. Check the label spelling or rerun}%
+  \else
+    \ifdefempty{\@glsxtr@thevalue}%
+    {%
+      \ifx\@glsxtr@org@theHvalue\@glsxtr@theHvalue
+      \else
+        \let\theHglsentrycounter\@glsxtr@theHvalue
+      \fi
+    }%
+    {%
+      \let\theglsentrycounter\@glsxtr@thevalue
+      \let\theHglsentrycounter\@glsxtr@theHvalue
+    }%
+    \glsxtr@saveentrycounter
+    \@@glsxtr@dorecord\@glsxtr@prefixedlist
+      \glsxtr@select@entry\glsxtr@do@select@nameref@record
+    \GlossariesExtraWarning{Can't obtain a match for prefix
+     candidates: \@glsxtr@prefixedlist. Check the label spelling, use bib2gls v3.0+ to
+     select entry and rerun LaTeX}%
+  \fi
+  \@glsxtrundeftag#3%
+ \endgroup
+}
+\newcommand*{\glsxtr@select@entry}[5]{}
+\newcommand*{\glsxtr@select@entry@nameref}[8]{}
+\newcommand*{\glsxtr@do@select@nameref@record}[5]{%
+  \gls@ifnotmeasuring
+  {%
+    \protected@write\@auxout{}{\string\glsxtr@select@entry@nameref
+     {#1}{#2}{#3}{#4}{#5}%
+     {\csuse{@currentlabelname}}{\csuse{@currentHref}}%
+     {\theHglsentrycounter}}%
+  }%
+}
+\newif\ifGlsXtrPrefixLabelFallbackLast
+\GlsXtrPrefixLabelFallbackLasttrue
 \newcommand*{\@glsxtr@get@prefixedlabel}[1]{%
  \begingroup
  \protected@edef\@gls@thislabel{#1}%
+ \let\@glsxtr@prefixedfirstlabel\@gls@thislabel
+ \def\@glsxtr@set@prefixedfirstlabel{%
+   \let\@glsxtr@prefixedfirstlabel\@gls@thislabel
+   \let\@glsxtr@set@prefixedfirstlabel\relax
+ }%
+ \let\@glsxtr@prefixedlist\@empty
+ \count@=0\relax
  \@for\@glsxtr@prefix:=\@glsxtr@labelprefixes\do
  {%
+   \advance\count@ by 1\relax
    \protected@edef\@gls@thislabel{\@glsxtr@prefix#1}%
-   \ifglsentryexists{\@gls@thislabel}{\@endfortrue}{}%
+   \@glsxtr@set@prefixedfirstlabel
+   \ifglsentryexists{\@gls@thislabel}%
+   {%
+     \@endfortrue
+     \let\@glsxtr@prefixedlist\@empty
+   }%
+   {%
+     \ifdefempty\@glsxtr@prefixedlist
+     {\let\@glsxtr@prefixedlist\@gls@thislabel}%
+     {%
+       \ifGlsXtrPrefixLabelFallbackLast
+         \epreto\@glsxtr@prefixedlist{\expandonce\@gls@thislabel,}%
+       \else
+         \eappto\@glsxtr@prefixedlist{,\expandonce\@gls@thislabel}%
+       \fi
+     }%
+   }%
  }%
- \edef\@glo@tmp{\endgroup\noexpand\def\noexpand\@gls@thislabel{\@gls@thislabel}}\@glo@tmp
+ \if@endfor
+ \else
+  \ifnum\count@>1\relax
+    \ifGlsXtrPrefixLabelFallbackLast
+    \else
+      \let\@gls@thislabel\@glsxtr@prefixedfirstlabel
+    \fi
+  \else
+     \let\@glsxtr@prefixedlist\@empty
+  \fi
+ \fi
+ \edef\@glo@tmp{\endgroup
+  \noexpand\def\noexpand\@glsxtr@prefixedlist{\expandonce\@glsxtr@prefixedlist}%
+  \noexpand\def\noexpand\@gls@thislabel{\expandonce\@gls@thislabel}}\@glo@tmp
+}
+\newcommand*{\@@dgls@}[3]{%
+  \@glsxtr@get@prefixedlabel{#2}%
+  \ifx\@glsxtr@prefixedlist\@empty
+   \let\@dgls@@next#3%
+  \else
+   \let\@dgls@@next\@glsxtr@dglsnomatch
+  \fi
+  \new@ifnextchar[{\@dgls@@next{#1}{\@gls@thislabel}}%
+   {\@dgls@@next{#1}{\@gls@thislabel}[]}%
 }
 \newrobustcmd*{\dgls}{\@gls@hyp@opt\@dgls}
-\newcommand*{\@dgls}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@gls@{#1}{\@gls@thislabel}}{\@gls@{#1}{\@gls@thislabel}[]}%
-}
+\newcommand*{\@dgls}[2][]{\@@dgls@{#1}{#2}{\@gls@}}
 \newrobustcmd*{\dglspl}{\@gls@hyp@opt\@dglspl}
-\newcommand*{\@dglspl}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@glspl@{#1}{\@gls@thislabel}}{\@glspl@{#1}{\@gls@thislabel}[]}%
-}
+\newcommand*{\@dglspl}[2][]{\@@dgls@{#1}{#2}{\@glspl@}}
 \newrobustcmd*{\dGls}{\@gls@hyp@opt\@dGls}
-\newcommand*{\@dGls}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@Gls@{#1}{\@gls@thislabel}}{\@Gls@{#1}{\@gls@thislabel}[]}%
-}
+\glsmfuaddmap{\dgls}{\dGls}
+\newcommand*{\@dGls}[2][]{\@@dgls@{#1}{#2}{\@Gls@}}
 \newrobustcmd*{\dGlspl}{\@gls@hyp@opt\@dGlspl}
-\newcommand*{\@dGlspl}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@Glspl@{#1}{\@gls@thislabel}}{\@Glspl@{#1}{\@gls@thislabel}[]}%
-}
+\glsmfuaddmap{\dglspl}{\dGlspl}
+\newcommand*{\@dGlspl}[2][]{\@@dgls@{#1}{#2}{\@Glspl@}}
 \newrobustcmd*{\dGLS}{\@gls@hyp@opt\@dGLS}
-\newcommand*{\@dGLS}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@GLS@{#1}{\@gls@thislabel}}{\@GLS@{#1}{\@gls@thislabel}[]}%
-}
+\glsmfublocker{\dGLS}
+\newcommand*{\@dGLS}[2][]{\@@dgls@{#1}{#2}{\@GLS@}}
 \newrobustcmd*{\dGLSpl}{\@gls@hyp@opt\@dGLSpl}
-\newcommand*{\@dGLSpl}[2][]{%
-  \@glsxtr@get@prefixedlabel{#2}%
-  \new@ifnextchar[{\@GLSpl@{#1}{\@gls@thislabel}}{\@GLSpl@{#1}{\@gls@thislabel}[]}%
-}
-\newrobustcmd*{\dglslink}[3][]{%
+\glsmfublocker{\dGLSpl}
+\newcommand*{\@dGLSpl}[2][]{\@@dgls@{#1}{#2}{\@GLSpl@}}
+\newrobustcmd*{\dglslink}{\@gls@hyp@opt\@dglslink}
+\newcommand*{\@dglslink}[3][]{%
   \@glsxtr@get@prefixedlabel{#2}%
   \glslink[#1]{\@gls@thislabel}{#3}%
 }
-\newrobustcmd*{\dglsdisp}[3][]{%
+\newrobustcmd*{\dGlslink}{\@gls@hyp@opt\@dGlslink}
+\glsmfuaddmap{\dglslink}{\dGlslink}
+\newcommand*{\@dGlslink}[3][]{%
+  \dglslink[#1]{#2}{\glssentencecase{#3}}%
+}
+\newrobustcmd*{\dglsdisp}{\@gls@hyp@opt\@dglsdisp}
+\newcommand*{\@dglsdisp}[3][]{%
   \@glsxtr@get@prefixedlabel{#2}%
   \glsdisp[#1]{\@gls@thislabel}{#3}%
+}
+\newrobustcmd*{\dGlsdisp}{\@gls@hyp@opt\@dGlsdisp}
+\glsmfuaddmap{\dglsdisp}{\dGlsdisp}
+\newcommand*{\@dGlsdisp}[3][]{%
+  \dglsdisp[#1]{#2}{\glssentencecase{#3}}%
+}
+\newcommand*{\@glsxtr@get@prefixedlabel@field}[2]{%
+  \protected@edef\dglsfieldcurrentfieldlabel{#2}%
+  \let\dglsfieldactualfieldlabel\dglsfieldcurrentfieldlabel
+ \begingroup
+ \protected@edef\@gls@thislabel{#1}%
+ \let\@glsxtr@prefixedfirstlabel\@gls@thislabel
+ \def\@glsxtr@set@prefixedfirstlabel{%
+   \let\@glsxtr@prefixedfirstlabel\@gls@thislabel
+   \let\@glsxtr@set@prefixedfirstlabel\relax
+ }%
+ \let\@gls@fallbacklabel\relax
+ \let\@glsxtr@prefixedlist\@empty
+ \count@=0\relax
+ \@for\@glsxtr@prefix:=\@glsxtr@labelprefixes\do
+ {%
+   \advance\count@ by 1\relax
+   \protected@edef\@gls@thislabel{\@glsxtr@prefix#1}%
+   \@glsxtr@set@prefixedfirstlabel
+   \ifglsentryexists{\@gls@thislabel}%
+   {%
+     \ifcsvoid{glo@\glsdetoklabel{\@gls@thislabel}@#2}%
+     {%
+       \ifx\@gls@fallbacklabel\relax
+        \ifcsvoid
+        {glo@\glsdetoklabel{\@gls@thislabel}@\dglsfieldfallbackfieldlabel}%
+        {}%
+        {%
+          \let\@gls@fallbacklabel\@gls@thislabel
+        }%
+       \fi
+     }%
+     {%
+       \@endfortrue
+       \let\@glsxtr@prefixedlist\@empty
+     }%
+   }%
+   {%
+     \ifdefempty\@glsxtr@prefixedlist
+     {\let\@glsxtr@prefixedlist\@gls@thislabel}%
+     {%
+       \ifGlsXtrPrefixLabelFallbackLast
+         \epreto\@glsxtr@prefixedlist{\expandonce\@gls@thislabel,}%
+       \else
+         \eappto\@glsxtr@prefixedlist{,\expandonce\@gls@thislabel}%
+       \fi
+     }%
+   }%
+ }%
+ \if@endfor
+ \else
+  \ifx\@gls@fallbacklabel\relax
+    \ifnum\count@>1\relax
+      \ifGlsXtrPrefixLabelFallbackLast
+      \else
+        \let\@gls@thislabel\@glsxtr@prefixedfirstlabel
+      \fi
+    \else
+       \let\@glsxtr@prefixedlist\@empty
+    \fi
+  \else
+    \let\@gls@thislabel\@gls@fallbacklabel
+    \let\dglsfieldactualfieldlabel\dglsfieldfallbackfieldlabel
+  \fi
+ \fi
+ \edef\@glo@tmp{\endgroup
+  \noexpand\def\noexpand\@glsxtr@prefixedlist{\expandonce\@glsxtr@prefixedlist}%
+  \noexpand\def\noexpand\@gls@thislabel{\expandonce\@gls@thislabel}%
+  \noexpand\def\noexpand\dglsfieldactualfieldlabel
+   {\expandonce\dglsfieldactualfieldlabel}%
+ }%
+ \@glo@tmp
+}
+\newcommand*{\@@dgls@@field}[4]{%
+  \@glsxtr@get@prefixedlabel@field{#2}{#3}%
+  \ifx\@glsxtr@prefixedlist\@empty
+   \let\@dgls@@next#4%
+  \else
+   \let\@dgls@@next\@glsxtr@dglsnomatch
+  \fi
+  \new@ifnextchar[{\@dgls@@next{#1}{\@gls@thislabel}}%
+   {\@dgls@@next{#1}{\@gls@thislabel}[]}%
+}
+\newcommand*{\dglsfieldcurrentfieldlabel}{}
+\newcommand*{\dglsfieldfallbackfieldlabel}{text}
+\newcommand*{\dglsfieldactualfieldlabel}{\dglsfieldcurrentfieldlabel}
+\newrobustcmd*{\dglsfield}{\@gls@hyp@opt\@dglsfield}
+\newcommand*{\@dglsfield}[3][]{%
+ \@@dgls@@field{#1}{#2}{#3}{\@dgls@field}}
+\def\@dgls@field#1#2[#3]{%
+  \@gls@field@link{#1}{#2}{\glsxtrusefield{#2}{\dglsfieldactualfieldlabel}#3}%
+}
+\newrobustcmd*{\dGlsfield}{\@gls@hyp@opt\@dGlsfield}
+\glsmfuaddmap{\dglsfield}{\dGlsfield}
+\newcommand*{\@dGlsfield}[3][]{%
+ \@@dgls@@field{#1}{#2}{#3}{\@dGls@field}%
+}
+\def\@dGls@field#1#2[#3]{%
+  \@gls@field@link{#1}{#2}{\Glsxtrusefield{#2}{\dglsfieldactualfieldlabel}#3}%
+}
+\newrobustcmd*{\dGLSfield}{\@gls@hyp@opt\@dGLSfield}
+\glsmfublocker{\dGLSfield}
+\newcommand*{\@dGLSfield}[3][]{%
+ \@@dgls@@field{#1}{#2}{#3}{\@dGLS@field}%
+}
+\def\@dGLS@field#1#2[#3]{%
+  \@gls@field@link{#1}{#2}{\GLSxtrusefield{#2}{\dglsfieldactualfieldlabel}#3}%
+}
+\newrobustcmd*{\d@inner@glsfield}[2]{%
+ \ifstrempty{#1}
+ {\def\@d@inner@glsfield@opts{}}%
+ {\def\@d@inner@glsfield@opts{#1,}}%
+ \def\dglsfieldcurrentfieldlabel{#2}%
+ \@gls@hyp@opt\@d@inner@glsfield
+}
+\newcommand*{\@d@inner@glsfield}[2][]{%
+ \expandafter\@@dgls@@field\expandafter
+  {\@d@inner@glsfield@opts#1}{#2}{\dglsfieldcurrentfieldlabel}{\@dgls@field}}
+\newrobustcmd*{\d@inner@Glsfield}[2]{%
+ \ifstrempty{#1}
+ {\def\@d@inner@glsfield@opts{}}%
+ {\def\@d@inner@glsfield@opts{#1,}}%
+ \def\dglsfieldcurrentfieldlabel{#2}%
+ \@gls@hyp@opt\@d@inner@Glsfield
+}
+\newcommand*{\@d@inner@Glsfield}[2][]{%
+ \expandafter\@@dgls@@field\expandafter
+  {\@d@inner@glsfield@opts#1}{#2}{\dglsfieldcurrentfieldlabel}{\@dGls@field}}
+\newrobustcmd*{\d@inner@GLSfield}[2]{%
+ \ifstrempty{#1}
+ {\def\@d@inner@glsfield@opts{}}%
+ {\def\@d@inner@glsfield@opts{#1,}}%
+ \def\dglsfieldcurrentfieldlabel{#2}%
+ \@gls@hyp@opt\@d@inner@GLSfield
+}
+\newcommand*{\@d@inner@GLSfield}[2][]{%
+ \expandafter\@@dgls@@field\expandafter
+  {\@d@inner@glsfield@opts#1}{#2}{\dglsfieldcurrentfieldlabel}{\@dGLS@field}}
+\newrobustcmd*{\newdglsfield}[3][]{%
+  \newrobustcmd*{#3}{\d@inner@glsfield{#1}{#2}}%
+}
+\newrobustcmd*{\newdglsfieldlike}[5][]{%
+  \newrobustcmd*{#3}{\d@inner@glsfield{#1}{#2}}%
+  \newrobustcmd*{#4}{\d@inner@Glsfield{#1}{#2}}%
+  \newrobustcmd*{#5}{\d@inner@GLSfield{#1}{#2}}%
+  \glsmfuaddmap{#3}{#4}%
+  \glsmfublocker{#5}%
 }
 \newrobustcmd*{\glsxtrmultientryadjustedname}[4]{%
   \bgroup
@@ -457,6 +721,7 @@
     \@glsxtrmultientryadjustedname{#1}{#2}{#3}{#4}%
   \egroup
 }
+\glsmfuaddmap{\glsxtrmultientryadjustedname}{\Glsxtrmultientryadjustedname}
 \newrobustcmd*{\GlsXtrmultientryadjustedname}[4]{%
   \bgroup
     \let\@glsxtrmultientryadjustednamesep\glsxtrmultientryadjustednamesep
@@ -469,6 +734,7 @@
     \@glsxtrmultientryadjustedname{#1}{#2}{#3}{#4}%
   \egroup
 }
+\glsmfublocker{\GlsXtrmultientryadjustedname}
 \newrobustcmd*{\GLSxtrmultientryadjustedname}[4]{%
   \bgroup
     \let\@glsxtrmultientryadjustednamesep\glsxtrmultientryadjustednamesep
@@ -481,6 +747,7 @@
     \@glsxtrmultientryadjustedname{#1}{#2}{#3}{#4}%
   \egroup
 }
+\glsmfublocker{\GLSxtrmultientryadjustedname}
 \newcommand*{\@glsxtrmultientryadjustedname}[4]{%
   \letcs\mglscurrentmainlabel{@gls@combined@#4@main}%
   \letcs\mglscurrentmainlist{@gls@combined@#4@list}%
@@ -522,7 +789,7 @@
 \newcommand*{\glsxtrmultientryadjustednamepostsep}{\glsxtrmultientryadjustednamesep}
 \newcommand*{\glsxtrmultientryadjustednamefmt}[1]{#1}
 \newcommand*{\glsxtrmultientryadjustednameother}[1]{\glsentryname{#1}}
-\newcommand*{\Glsxtrmultientryadjustednamefmt}[1]{\makefirstuc{#1}}
+\newcommand*{\Glsxtrmultientryadjustednamefmt}[1]{\glssentencecase{#1}}
 \newcommand*{\Glsxtrmultientryadjustednameother}[1]{\Glsentryname{#1}}
 \newcommand*{\GlsXtrmultientryadjustednameother}[1]{%
  \glsentrytitlecase{#1}{name}}
@@ -534,8 +801,8 @@
   \newcommand*{\GlsXtrmultientryadjustednamefmt}[1]{\capitalisewords{#1}}
 }
 \newcommand*{\GLSxtrmultientryadjustednameother}[1]{%
- \mfirstucMakeUppercase{\glsentryname{#1}}}
-\newcommand*{\GLSxtrmultientryadjustednamefmt}[1]{\mfirstucMakeUppercase{#1}}
+ \glsuppercase{\glsentryname{#1}}}
+\newcommand*{\GLSxtrmultientryadjustednamefmt}[1]{\glsuppercase{#1}}
 \providecommand*{\Alpha}{\mathrm{A}}
 \providecommand*{\Beta}{\mathrm{B}}
 \providecommand*{\Epsilon}{\mathrm{E}}
@@ -569,6 +836,19 @@
   \providecommand*{\upomicron}{\mathrm{o}}
 }%
 {}% upgreek.sty not loaded
+\newcommand{\glsxtrIgnorableRules}{%
+ \glsxtrcontrolrules
+ \string;\glsxtrspacerules
+ \string;\glsxtrnonprintablerules
+}
+\newcommand{\glsxtrGeneralInitRules}{%
+ \glsxtrIgnorableRules
+ \string;\glsxtrcombiningdiacriticrules
+ \string;\glsxtrhyphenrules
+ \string<\glsxtrgeneralpuncrules
+ \string<\glsxtrdigitrules
+ \string<\glsxtrfractionrules
+}
 \newcommand*{\glsxtrcontrolrules}{%
  \string'\glshex 200B\string'\string=\glshex 200C\string=\glshex 200D
  \string=\glshex 200E\string=\glshex 200F\string=\glshex 0000\string=\glshex 0001
@@ -736,6 +1016,13 @@
   \string<\glsxtrgeneralpuncIIrules
 }
 \newcommand*{\glsxtrgeneralpuncIrules}{%
+ \glsxtrgeneralpuncmarksrules
+ \string<\glsxtrgeneralpuncaccentsrules
+ \string<\glsxtrgeneralpuncquoterules
+ \string<\glsxtrgeneralpuncbracketrules
+ \string<\glsxtrgeneralpuncsignrules
+}
+\newcommand*{\glsxtrgeneralpuncmarksrules}{%
  \string'\glshex 005F\string'% underscore
  \string<\glshex 00AF% macron
  \string<\string'\glshex 002C\string'% comma
@@ -747,18 +1034,24 @@
  \string<\glshex 00BF% inverted question mark
  \string<\string'\glshex 002F\string'% solidus
  \string<\string'\glshex 002E\string'% full stop
- \string<\glshex 00B4% acute accent
+}
+\newcommand*{\glsxtrgeneralpuncaccentsrules}{%
+ \glshex 00B4% acute accent
  \string<\string'\glshex 0060\string'% grave accent
  \string<\string'\glshex 005E\string'% circumflex accent
  \string<\glshex 00A8% diaersis
  \string<\string'\glshex 007E\string'% tilde
  \string<\glshex 00B7% middle dot
  \string<\glshex 00B8% cedilla
- \string<\string'\glshex 0027\string'% straight apostrophe
+}
+\newcommand*{\glsxtrgeneralpuncquoterules}{%
+ \string'\glshex 0027\string'% straight apostrophe
  \string<\string'\glshex 0022\string'% straight double quote
  \string<\glshex 00AB% left guillemet
  \string<\glshex 00BB% right guillemet
- \string<\string'\glshex 0028\string'% left parenthesis
+}
+\newcommand*{\glsxtrgeneralpuncbracketrules}{%
+ \string'\glshex 0028\string'% left parenthesis
   \string=\glshex 207D\string=\glshex 208D% super/subscript left parenthesis
  \string<\string'\glshex 0029\string'% right parenthesis
   \string=\glshex 207E\string=\glshex 208E% super/subscript right parenthesis
@@ -766,7 +1059,9 @@
  \string<\string'\glshex 005D\string'% right square bracket
  \string<\string'\glshex 007B\string'% left curly bracket
  \string<\string'\glshex 007D\string'% right curly bracket
- \string<\glshex 00A7% section sign
+}
+\newcommand*{\glsxtrgeneralpuncsignrules}{%
+ \glshex 00A7% section sign
  \string<\glshex 00B6% pilcrow sign
  \string<\glshex 00A9% copyright sign
  \string<\glshex 00AE% registered sign
@@ -1063,6 +1358,70 @@
  \string<y,Y%
  \string<z,Z%
 }
+\newcommand*{\glsxtrGeneralLatinAtoMrules}{%
+ \glsxtrLatinA
+ \string<b,B%
+ \string<c,C%
+ \string<d,D%
+ \string<\glsxtrLatinE
+ \string<f,F%
+ \string<g,G%
+ \string<\glsxtrLatinH
+ \string<\glsxtrLatinI
+ \string<j,J%
+ \string<\glsxtrLatinK
+ \string<\glsxtrLatinL
+ \string<\glsxtrLatinM
+}
+\newcommand*{\glsxtrGeneralLatinNtoZrules}{%
+ \string<\glsxtrLatinN
+ \string<\glsxtrLatinO
+ \string<\glsxtrLatinP
+ \string<q,Q%
+ \string<r,R%
+ \string<\glsxtrLatinS
+ \string<\glsxtrLatinT
+ \string<u,U%
+ \string<v,V%
+ \string<w,W%
+ \string<\glsxtrLatinX
+ \string<y,Y%
+ \string<z,Z
+}
+\newcommand*{\glsxtrGeneralLatinAtoGrules}{%
+ \glsxtrLatinA
+ \string<b,B%
+ \string<c,C%
+ \string<d,D%
+ \string<\glsxtrLatinE
+ \string<f,F%
+ \string<g,G%
+}
+\newcommand*{\glsxtrGeneralLatinHtoMrules}{%
+ \string<\glsxtrLatinH
+ \string<\glsxtrLatinI
+ \string<j,J%
+ \string<\glsxtrLatinK
+ \string<\glsxtrLatinL
+ \string<\glsxtrLatinM
+}
+\newcommand*{\glsxtrGeneralLatinNtoSrules}{%
+ \string<\glsxtrLatinN
+ \string<\glsxtrLatinO
+ \string<\glsxtrLatinP
+ \string<q,Q%
+ \string<r,R%
+ \string<\glsxtrLatinS
+}
+\newcommand*{\glsxtrGeneralLatinTtoZrules}{%
+ \string<\glsxtrLatinT
+ \string<u,U%
+ \string<v,V%
+ \string<w,W%
+ \string<\glsxtrLatinX
+ \string<y,Y%
+ \string<z,Z
+}
 \newcommand*{\glsxtrLatinA}{%
   a\string=\glshex 00AA\string=\glshex 2090,A
 }
@@ -1107,11 +1466,11 @@
 }
 \newcommand*{\glsxtrLatinEszettSs}{%
  \glshex 00DF% eszett
- \string=\glshex 017Fs % long S s
+ \string=\glshex 017Fs % "long S"s
 }
 \newcommand*{\glsxtrLatinEszettSz}{%
  \glshex 00DF% eszett
- \string= \glshex 017Fz % long S z
+ \string= \glshex 017Fz % "long S"z
 }
 \newcommand*{\glsxtrLatinEth}{%
  \glshex 00F0,\glshex 00D0% eth

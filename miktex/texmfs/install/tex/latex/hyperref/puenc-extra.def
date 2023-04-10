@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{puenc-extra.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref: PDF Unicode extra definition (HO)]
 \DeclareTextCommand{\G}{PU}[1]{#1\83\017}% U+030F
 \DeclareTextCompositeCommand{\G}{PU}{\@empty}{\textdoublegrave}%

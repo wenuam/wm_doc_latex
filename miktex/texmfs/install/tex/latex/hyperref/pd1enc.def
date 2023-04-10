@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{pd1enc.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref: PDFDocEncoding definition (HO)]
 \DeclareFontEncoding{PD1}{}{}
 \DeclareTextAccent{\`}{PD1}{\textasciigrave}

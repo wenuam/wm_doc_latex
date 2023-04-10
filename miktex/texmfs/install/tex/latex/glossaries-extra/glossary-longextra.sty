@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossary-longextra.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-xr.bib.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossary-longextra}[2021/11/22 v1.48 (NLCT)]
+\DeclareRelease{v1.48}{2021-11-22}{glossary-longextra-2021-11-22.sty}
+\DeclareCurrentRelease{v1.50}{2022-11-08}
+\ProvidesPackage{glossary-longextra}[2022/11/08 v1.50 (NLCT)]
 \RequirePackage{glossary-longbooktabs}
 \newcommand{\glslongextraNameFmt}[1]{%
  \glsentryitem{#1}\glstarget{#1}{\glossentryname{#1}}%
@@ -48,7 +50,21 @@
   \glossentrydesc{#1}\glspostdescription
 }
 \newcommand{\glslongextraSymbolFmt}[1]{\glossentrysymbol{#1}}
+\newcommand{\glslongextraSymbolTargetFmt}[1]{%
+ \glsentryitem{#1}\glstarget{#1}{\glslongextraSymbolFmt{#1}}}
+\newcommand{\glslongextraSymbolOrName}[1]{%
+  \ifglshassymbol{#1}%
+  {\glslongextraSymbolTargetFmt{#1}}%
+  {\glslongextraNameFmt{#1}}%
+}
 \newcommand{\glslongextraLocationFmt}[2]{#2}
+\newcommand{\glslongextraShortTargetFmt}[1]{%
+ \glsentryitem{#1}\glstarget{#1}{{\glsxtrshort[noindex,hyper=false]{#1}}}%
+ \glsxtrpostnamehook{#1}%
+}
+\newcommand{\glslongextraLongFmt}[1]{%
+ {\glsxtrlong[noindex,hyper=false]{#1}}\glspostdescription
+}
 \newcommand{\glslongextraSubNameFmt}[2]{%
  \glssubentryitem{#2}\glstarget{#2}{\strut}%
 }
@@ -58,12 +74,27 @@
 \newcommand{\glslongextraSubSymbolFmt}[2]{%
   \glslongextraSymbolFmt{#2}%
 }
+\newcommand{\glslongextraSubSymbolTargetFmt}[2]{%
+ \glssubentryitem{#2}\glstarget{#2}{\glslongextraSymbolFmt{#2}}%
+}
+\newcommand{\glslongextraSubSymbolOrName}[2]{%
+  \ifglshassymbol{#2}%
+  {\glslongextraSubSymbolTargetFmt{#1}{#2}}%
+  {\glslongextraSubNameFmt{#1}{#2}}%
+}
+\newcommand{\glslongextraSubShortTargetFmt}[2]{%
+ \glssubentryitem{#2}\glstarget{#2}{{\glsxtrshort[noindex,hyper=false]{#2}}}%
+ \glsxtrpostnamehook{#2}%
+}
+\newcommand{\glslongextraSubLongFmt}[2]{\glslongextraLongFmt{#2}}
 \newcommand{\glslongextraSubLocationFmt}[3]{#3}
 \newcommand{\glslongextraNameAlign}{l}
 \newcommand{\glslongextraDescAlign}{>{\raggedright}p{\glsdescwidth}}
 \newcommand{\glslongextraSymbolAlign}{c}
+\newcommand{\glslongextraSymbolNameAlign}{l}
 \newcommand{\glslongextraLocationAlign}{>{\raggedright}p{\glspagelistwidth}}
 \newcommand{\glslongextraGroupHeading}[2]{}
+\newcommand*{\glslongextraSubGroupHeading}[5]{}
 \newcommand{\glslongextraHeaderFmt}[1]{\textbf{#1}}
 \newcommand{\glslongextraNameDescHeader}{%
  \glslongextraNameDescTabularHeader\endhead
@@ -86,8 +117,8 @@
   \ifundef\@glslongextrawidestname
   {\def\@glslongextrawidestname{#1}}%
   {%
-    \settowidth{\dimen@}{\@glslongextrawidestname}%
-    \settowidth{\dimen@ii}{#1}%
+    \glsmeasurewidth{\dimen@}{\@glslongextrawidestname}%
+    \glsmeasurewidth{\dimen@ii}{#1}%
     \ifdim\dimen@ii>\dimen@
      \def\@glslongextrawidestname{#1}%
     \fi
@@ -95,8 +126,8 @@
 }
 \newcommand*{\glslongextraUpdateWidestChild}[2]{}
 \newcommand{\glslongextraSetDescWidth}{%
-  \settowidth{\gls@tmplen}{\glslongextraHeaderFmt\entryname}%
-  \settowidth{\dimen@}{\glsnamefont{\@glslongextrawidestname}}%
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\entryname}%
+  \glsmeasurewidth{\dimen@}{\glsnamefont{\@glslongextrawidestname}}%
   \ifdim\dimen@>\gls@tmplen
    \gls@tmplen=\dimen@
   \fi
@@ -104,8 +135,12 @@
 }
 \newcommand{\glslongextraSymSetDescWidth}{%
   \glslongextraSetDescWidth
-  \settowidth{\gls@tmplen}{\glslongextraHeaderFmt\symbolname}%
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\symbolname}%
   \setlength{\glsdescwidth}{\dimexpr\glsdescwidth-2\tabcolsep-\gls@tmplen}%
+}
+\newcommand{\glslongextraSymNoNameSetDescWidth}{%
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\symbolname}%
+  \setlength{\glsdescwidth}{\dimexpr\linewidth-4\tabcolsep-\gls@tmplen}%
 }
 \newcommand{\glslongextraLocSetDescWidth}{%
   \glslongextraSetDescWidth
@@ -114,6 +149,10 @@
 \newcommand{\glslongextraSymLocSetDescWidth}{%
   \glslongextraSymSetDescWidth
   \setlength{\glsdescwidth}{\dimexpr\glsdescwidth-2\tabcolsep-\glspagelistwidth}%
+}
+\newcommand{\glslongextraShortNoNameSetDescWidth}{%
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\glslongextraShortHeader}%
+  \setlength{\glsdescwidth}{\dimexpr\linewidth-4\tabcolsep-\gls@tmplen}%
 }
 \newif\ifGlsLongExtraUseTabular
 \GlsLongExtraUseTabularfalse
@@ -150,6 +189,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraNameDescHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{2}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{2}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraDescFmt{##1}\tabularnewline
@@ -216,6 +256,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraNameDescLocationHeader}%
    \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraDescFmt{##1} &
@@ -278,6 +319,7 @@
     \renewcommand*{\glossaryheader}{\glslongextraDescNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{2}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{2}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraDescFmt{##1} &
     \glslongextraNameFmt{##1}\tabularnewline
@@ -339,6 +381,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraLocationDescNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraLocationFmt{##1}{##2} &
     \glslongextraDescFmt{##1} &
@@ -405,6 +448,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraNameDescSymHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraDescFmt{##1} &
@@ -475,6 +519,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraNameDescSymLocationHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraDescFmt{##1} &
@@ -544,6 +589,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraNameSymDescHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraSymbolFmt{##1} &
@@ -613,6 +659,7 @@
     \renewcommand*{\glossaryheader}{\glslongextraNameSymDescLocationHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraNameFmt{##1} &
     \glslongextraSymbolFmt{##1} &
@@ -681,6 +728,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraSymDescNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraSymbolFmt{##1} &
     \glslongextraDescFmt{##1} &
@@ -750,6 +798,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraLocationSymDescNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraLocationFmt{##1}{##2} &
     \glslongextraSymbolFmt{##1} &
@@ -818,6 +867,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraDescSymNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraDescFmt{##1} &
     \glslongextraSymbolFmt{##1} &
@@ -887,6 +937,7 @@
    \renewcommand*{\glossaryheader}{\glslongextraLocationDescSymNameHeader}%
   \fi
   \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
   \renewcommand{\glossentry}[2]{%
     \glslongextraLocationFmt{##1}{##2} &
     \glslongextraDescFmt{##1} &
@@ -897,6 +948,1114 @@
      \glslongextraSubLocationFmt{##1}{##2}{##3} &
      \glslongextraSubDescFmt{##1}{##2} &
      \glslongextraSubSymbolFmt{##1}{##2} &
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-sym-desc}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraSymNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraSymbolNameAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraSymDescTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraSymDescTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraSymNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraSymbolNameAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraSymDescHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraSymbolOrName{##1} &
+    \glslongextraDescFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubSymbolOrName{##1}{##2} &
+     \glslongextraSubDescFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraSymDescHeader}{%
+ \glslongextraSymDescTabularHeader\endhead
+ \glslongextraSymDescTabularFooter\endfoot
+}
+\newcommand{\glslongextraSymDescTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\symbolname &
+ \glslongextraHeaderFmt\descriptionname\tabularnewline
+ \midrule
+}
+\newcommand{\glslongextraSymDescTabularFooter}{%
+ \bottomrule
+}
+\newglossarystyle{long-desc-sym}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraSymNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraSymbolNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraDescSymTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraDescSymTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraSymNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraSymbolNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraDescSymHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraDescFmt{##1} &
+    \glslongextraSymbolOrName{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubDescFmt{##1}{##2} &
+     \glslongextraSubSymbolOrName{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraDescSymHeader}{%
+ \glslongextraDescSymTabularHeader\endhead
+ \glslongextraDescSymTabularFooter\endfoot
+}
+\newcommand{\glslongextraDescSymTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\descriptionname &
+ \glslongextraHeaderFmt\symbolname\tabularnewline
+ \midrule
+}
+\newcommand{\glslongextraDescSymTabularFooter}{%
+ \bottomrule
+}
+\newglossarystyle{abbr-short-long}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraShortNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraShortLongTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraShortLongTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraShortNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraShortLongHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \ifglshasshort{##1}%
+    {\glslongextraShortTargetFmt{##1}}%
+    {\glslongextraNameFmt{##1}}%
+     &
+    \ifglshaslong{##1}%
+    {\glslongextraLongFmt{##1}}%
+    {\glslongextraDescFmt{##1}}%
+    \tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \ifglshasshort{##2}%
+     {\glslongextraSubShortTargetFmt{##1}{##2}}%
+     {\glslongextraSubNameFmt{##1}{##2}}%
+      &
+     \ifglshaslong{##2}%
+     {\glslongextraSubLongFmt{##1}{##2}}%
+     {\glslongextraSubDescFmt{##1}{##2}}%
+     \tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraShortLongHeader}{%
+ \glslongextraShortLongTabularHeader\endhead
+ \glslongextraShortLongTabularFooter\endfoot
+}
+\newcommand{\glslongextraShortHeader}{\entryname}
+\newcommand{\glslongextraLongHeader}{\descriptionname}
+\newcommand{\glslongextraShortLongTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\glslongextraShortHeader &
+ \glslongextraHeaderFmt\glslongextraLongHeader\tabularnewline
+ \midrule
+}
+\newcommand{\glslongextraShortLongTabularFooter}{%
+ \bottomrule
+}
+\newglossarystyle{abbr-long-short}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraShortNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraLongShortTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraLongShortTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraShortNoNameSetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraLongShortHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \ifglshaslong{##1}%
+    {\glslongextraLongFmt{##1}}%
+    {\glslongextraDescFmt{##1}}%
+    &
+    \ifglshasshort{##1}%
+    {\glslongextraShortTargetFmt{##1}}%
+    {\glslongextraNameFmt{##1}}%
+    \tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \ifglshaslong{##2}%
+     {\glslongextraSubLongFmt{##1}{##2}}%
+     {\glslongextraSubDescFmt{##1}{##2}}%
+      &
+     \ifglshasshort{##2}%
+     {\glslongextraSubShortTargetFmt{##1}{##2}}%
+     {\glslongextraSubNameFmt{##1}{##2}}%
+     \tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraLongShortHeader}{%
+ \glslongextraLongShortTabularHeader\endhead
+ \glslongextraLongShortTabularFooter\endfoot
+}
+\newcommand{\glslongextraLongShortTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\glslongextraLongHeader &
+ \glslongextraHeaderFmt\glslongextraShortHeader\tabularnewline
+ \midrule
+}
+\newcommand{\glslongextraLongShortTabularFooter}{%
+ \bottomrule
+}
+\newcommand{\glslongextraCustomIField}{useri}
+\newcommand{\glslongextraCustomIHeader}{%
+ \MFUsentencecase{\glslongextraCustomIField}}
+\newcommand{\glslongextraCustomIFmt}[1]{%
+  \glsxtrusefield{#1}{\glslongextraCustomIField}%
+}
+\newcommand{\glslongextraSubCustomIFmt}[2]{%
+ \glslongextraCustomIFmt{#2}%
+}
+\newcommand{\glslongextraCustomIIField}{userii}
+\newcommand{\glslongextraCustomIIHeader}{%
+ \MFUsentencecase{\glslongextraCustomIIField}}
+\newcommand{\glslongextraCustomIIFmt}[1]{%
+  \glsxtrusefield{#1}{\glslongextraCustomIIField}%
+}
+\newcommand{\glslongextraSubCustomIIFmt}[2]{%
+ \glslongextraCustomIIFmt{#2}%
+}
+\newcommand{\glslongextraCustomIIIField}{useriii}
+\newcommand{\glslongextraCustomIIIHeader}{%
+ \MFUsentencecase{\glslongextraCustomIIIField}}
+\newcommand{\glslongextraCustomIIIFmt}[1]{%
+  \glsxtrusefield{#1}{\glslongextraCustomIIIField}%
+}
+\newcommand{\glslongextraSubCustomIIIFmt}[2]{%
+ \glslongextraCustomIIIFmt{#2}%
+}
+\newcommand{\glslongextraCustomIAlign}{l}
+\newcommand{\glslongextraCustomIIAlign}{l}
+\newcommand{\glslongextraCustomIIIAlign}{l}
+\newcommand{\glslongextraCustomTabularFooter}{%
+ \bottomrule
+}
+\newcommand{\glslongextraNameCustomIHeader}{%
+ \glslongextraNameCustomITabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomITabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader}%
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraCustomINameHeader}{%
+ \glslongextraCustomINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraCustomINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraNameCustomIIHeader}{%
+ \glslongextraNameCustomIITabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomIITabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader}%
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraCustomIINameHeader}{%
+ \glslongextraCustomIINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraCustomIINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraNameCustomIIIHeader}{%
+ \glslongextraNameCustomIIITabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomIIITabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIIHeader}%
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraCustomIIINameHeader}{%
+ \glslongextraCustomIIINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraCustomIIINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newglossarystyle{long-name-custom1}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomITabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{2}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{2}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-custom1-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{2}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{2}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraCustomIFmt{##1} &
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubCustomIFmt{##1}{##2} &
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-name-custom2}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIITabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2} &
+     \glslongextraSubCustomIIFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-custom2-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomIINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomIINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1} &
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubCustomIFmt{##1}{##2} &
+     \glslongextraSubCustomIIFmt{##1}{##2} &
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-name-custom3}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIITabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIIHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraCustomIIIFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2} &
+     \glslongextraSubCustomIIFmt{##1}{##2} &
+     \glslongextraSubCustomIIIFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-custom3-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomIIINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraCustomIIINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraCustomIIIFmt{##1} &
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubCustomIFmt{##1}{##2} &
+     \glslongextraSubCustomIIFmt{##1}{##2} &
+     \glslongextraSubCustomIIIFmt{##1}{##2} &
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraCustomISetDescWidth}{%
+  \glslongextraSetDescWidth
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\glslongextraCustomIHeader}%
+  \setlength{\glsdescwidth}{\dimexpr\glsdescwidth-2\tabcolsep-\gls@tmplen}%
+}
+\newcommand{\glslongextraCustomIISetDescWidth}{%
+  \glslongextraCustomISetDescWidth
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\glslongextraCustomIIHeader}%
+  \setlength{\glsdescwidth}{\dimexpr\glsdescwidth-2\tabcolsep-\gls@tmplen}%
+}
+\newcommand{\glslongextraCustomIIISetDescWidth}{%
+  \glslongextraCustomIISetDescWidth
+  \glsmeasurewidth{\gls@tmplen}{\glslongextraHeaderFmt\glslongextraCustomIIIHeader}%
+  \setlength{\glsdescwidth}{\dimexpr\glsdescwidth-2\tabcolsep-\gls@tmplen}%
+}
+\newcommand{\glslongextraNameCustomIDescHeader}{%
+ \glslongextraNameCustomIDescTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomIDescTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt\descriptionname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraNameCustomIIDescHeader}{%
+ \glslongextraNameCustomIIDescTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomIIDescTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt\descriptionname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraNameCustomIIIDescHeader}{%
+ \glslongextraNameCustomIIIDescTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraNameCustomIIIDescTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\entryname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIIHeader} &
+ \glslongextraHeaderFmt\descriptionname
+ \tabularnewline\midrule
+}
+\newglossarystyle{long-name-custom1-desc}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIDescTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIDescHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraDescFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubDescFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-name-custom2-desc}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIDescTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIDescHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraDescFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubCustomIIFmt{##1}{##2}&
+     \glslongextraSubDescFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-name-custom3-desc}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomIIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIIDescTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomIIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraNameAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+          \expandonce\glslongextraDescAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraNameCustomIIIDescHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{5}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{5}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraNameFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraCustomIIIFmt{##1}&
+    \glslongextraDescFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubNameFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubCustomIIFmt{##1}{##2}&
+     \glslongextraSubCustomIIIFmt{##1}{##2}&
+     \glslongextraSubDescFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newcommand{\glslongextraDescCustomINameHeader}{%
+ \glslongextraDescCustomINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraDescCustomINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\descriptionname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraDescCustomIINameHeader}{%
+ \glslongextraDescCustomIINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraDescCustomIINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\descriptionname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newcommand{\glslongextraDescCustomIIINameHeader}{%
+ \glslongextraDescCustomIIINameTabularHeader\endhead
+ \glslongextraCustomTabularFooter\endfoot
+}
+\newcommand{\glslongextraDescCustomIIINameTabularHeader}{%
+ \toprule
+ \glslongextraHeaderFmt\descriptionname &
+ \glslongextraHeaderFmt{\glslongextraCustomIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIHeader} &
+ \glslongextraHeaderFmt{\glslongextraCustomIIIHeader} &
+ \glslongextraHeaderFmt\entryname
+ \tabularnewline\midrule
+}
+\newglossarystyle{long-desc-custom1-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{3}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{3}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraDescFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubDescFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-desc-custom2-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomIINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomIINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{4}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{4}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraDescFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubDescFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubCustomIIFmt{##1}{##2}&
+     \glslongextraSubNameFmt{##1}{##2}\tabularnewline
+  }%
+  \ifglsnogroupskip
+    \renewcommand*{\glsgroupskip}{}%
+  \else
+    \renewcommand*{\glsgroupskip}{\glspenaltygroupskip}%
+  \fi
+}
+\newglossarystyle{long-desc-custom3-name}%
+{%
+  \ifGlsLongExtraUseTabular
+   \renewenvironment{theglossary}%
+    {%
+      \glslongextraCustomIIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{tabular}[\glslongextraTabularVAlign]{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {%
+      \glslongextraCustomTabularFooter
+      \end{tabular}%
+    }%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomIIINameTabularHeader}%
+  \else
+   \renewenvironment{theglossary}%
+    {%
+      \glspatchLToutput
+      \glslongextraCustomIIISetDescWidth
+      \edef\@glslongextra@begintab{%
+        \noexpand\begin{longtable}{%
+          \expandonce\glslongextraDescAlign
+          \expandonce\glslongextraCustomIAlign
+          \expandonce\glslongextraCustomIIAlign
+          \expandonce\glslongextraCustomIIIAlign
+          \expandonce\glslongextraNameAlign
+        }}%
+      \@glslongextra@begintab
+    }%
+    {\end{longtable}}%
+   \renewcommand*{\glossaryheader}{\glslongextraDescCustomIIINameHeader}%
+  \fi
+  \renewcommand*{\glsgroupheading}[1]{\glslongextraGroupHeading{5}{##1}}%
+  \renewcommand*{\glssubgroupheading}{\glslongextraSubGroupHeading{5}}%
+  \renewcommand{\glossentry}[2]{%
+    \glslongextraDescFmt{##1} &
+    \glslongextraCustomIFmt{##1}&
+    \glslongextraCustomIIFmt{##1}&
+    \glslongextraCustomIIIFmt{##1}&
+    \glslongextraNameFmt{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{%
+     \glslongextraSubDescFmt{##1}{##2} &
+     \glslongextraSubCustomIFmt{##1}{##2}&
+     \glslongextraSubCustomIIFmt{##1}{##2}&
+     \glslongextraSubCustomIIIFmt{##1}{##2}&
      \glslongextraSubNameFmt{##1}{##2}\tabularnewline
   }%
   \ifglsnogroupskip

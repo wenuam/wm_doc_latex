@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hvtex.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref driver for VTeX in PDF/PS mode]
 \Hy@VersionCheck{hvtex.def}
 \providecommand*{\XR@ext}{pdf}
@@ -140,6 +140,7 @@
 \ifcsname mediaheight\endcsname
   \ifHy@setpagesize
      \providecommand*{\VTeXInitMediaSize}{%
+       \ifnum\mag=\@m
         \ifdim\stockwidth>\z@
           \ifdim\stockheight>\z@
            \setlength\mediaheight\stockheight
@@ -162,6 +163,7 @@
             \fi
           \fi
         \fi
+       \fi
      }%
      \Hy@AtBeginDocument{\VTeXInitMediaSize}%
   \fi

@@ -46,7 +46,7 @@
 %% making successful document exchange impossible.
 %% 
 \ProvidesFile{ts1cmtt.fd}
-        [2019/12/16 v2.5j Standard LaTeX font definitions]
+        [2022/07/10 v2.5l Standard LaTeX font definitions]
 \providecommand{\EC@ttfamily}[5]{%
   \DeclareFontShape{#1}{#2}{#3}{#4}%
   {<5><6><7><8>#50800%

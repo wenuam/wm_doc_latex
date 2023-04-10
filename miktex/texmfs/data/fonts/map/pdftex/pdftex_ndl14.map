@@ -121,12 +121,116 @@ aesharjah ae_Sharjah " ArabeyesArabicEncoding ReEncodeFont " <ararabeyes.enc <ae
 aesindibad ae_Sindibad " ArabeyesArabicEncoding ReEncodeFont " <ararabeyes.enc <ae_sindibad.pfb
 aetarablus ae_Tarablus " ArabeyesArabicEncoding ReEncodeFont " <ararabeyes.enc <ae_tarablus.pfb
 aetholoth ae_Tholoth " ArabeyesArabicEncoding ReEncodeFont " <ararabeyes.enc <ae_tholoth.pfb
+aud1m04 SymbolMyoungjo04-Normal <aud004.pfb
+aud1m05 SymbolMyoungjo05-Normal <aud005.pfb
+aud1m06 SymbolMyoungjo06-Normal <aud006.pfb
+aud1m07 SymbolMyoungjo07-Normal <aud007.pfb
+aud1m10 HanjaMyoungjo10-Normal <aud010.pfb
+aud1m11 HanjaMyoungjo11-Normal <aud011.pfb
+aud1m12 HanjaMyoungjo12-Normal <aud012.pfb
+aud1m13 HanjaMyoungjo13-Normal <aud013.pfb
+aud1m14 HanjaMyoungjo14-Normal <aud014.pfb
+aud1m15 HanjaMyoungjo15-Normal <aud015.pfb
+aud1m16 HanjaMyoungjo16-Normal <aud016.pfb
+aud1m17 HanjaMyoungjo17-Normal <aud017.pfb
+aud1m18 HanjaMyoungjo18-Normal <aud018.pfb
+aud1m19 HanjaMyoungjo19-Normal <aud019.pfb
+aud1m20 HanjaMyoungjo20-Normal <aud020.pfb
+aud1m21 HanjaMyoungjo21-Normal <aud021.pfb
+aud1m22 HanjaMyoungjo22-Normal <aud022.pfb
+aud1m23 HanjaMyoungjo23-Normal <aud023.pfb
+aud1m24 HanjaMyoungjo24-Normal <aud024.pfb
+aud1m25 HanjaMyoungjo25-Normal <aud025.pfb
+aud1m26 HanjaMyoungjo26-Normal <aud026.pfb
+aud1m27 HanjaMyoungjo27-Normal <aud027.pfb
+aud1m28 HanjaMyoungjo28-Normal <aud028.pfb
+aud1m29 HanjaMyoungjo29-Normal <aud029.pfb
+aud1mo04 SymbolMyoungjo04-Normal " .167 SlantFont " <aud004.pfb
+aud1mo05 SymbolMyoungjo05-Normal " .167 SlantFont " <aud005.pfb
+aud1mo06 SymbolMyoungjo06-Normal " .167 SlantFont " <aud006.pfb
+aud1mo07 SymbolMyoungjo07-Normal " .167 SlantFont " <aud007.pfb
+aud1mo10 HanjaMyoungjo10-Normal " .167 SlantFont " <aud010.pfb
+aud1mo11 HanjaMyoungjo11-Normal " .167 SlantFont " <aud011.pfb
+aud1mo12 HanjaMyoungjo12-Normal " .167 SlantFont " <aud012.pfb
+aud1mo13 HanjaMyoungjo13-Normal " .167 SlantFont " <aud013.pfb
+aud1mo14 HanjaMyoungjo14-Normal " .167 SlantFont " <aud014.pfb
+aud1mo15 HanjaMyoungjo15-Normal " .167 SlantFont " <aud015.pfb
+aud1mo16 HanjaMyoungjo16-Normal " .167 SlantFont " <aud016.pfb
+aud1mo17 HanjaMyoungjo17-Normal " .167 SlantFont " <aud017.pfb
+aud1mo18 HanjaMyoungjo18-Normal " .167 SlantFont " <aud018.pfb
+aud1mo19 HanjaMyoungjo19-Normal " .167 SlantFont " <aud019.pfb
+aud1mo20 HanjaMyoungjo20-Normal " .167 SlantFont " <aud020.pfb
+aud1mo21 HanjaMyoungjo21-Normal " .167 SlantFont " <aud021.pfb
+aud1mo22 HanjaMyoungjo22-Normal " .167 SlantFont " <aud022.pfb
+aud1mo23 HanjaMyoungjo23-Normal " .167 SlantFont " <aud023.pfb
+aud1mo24 HanjaMyoungjo24-Normal " .167 SlantFont " <aud024.pfb
+aud1mo25 HanjaMyoungjo25-Normal " .167 SlantFont " <aud025.pfb
+aud1mo26 HanjaMyoungjo26-Normal " .167 SlantFont " <aud026.pfb
+aud1mo27 HanjaMyoungjo27-Normal " .167 SlantFont " <aud027.pfb
+aud1mo28 HanjaMyoungjo28-Normal " .167 SlantFont " <aud028.pfb
+aud1mo29 HanjaMyoungjo29-Normal " .167 SlantFont " <aud029.pfb
 bchb8r CharterBT-Bold " TeXBase1Encoding ReEncodeFont " <8r.enc <bchb8a.pfb
 bchbi8r CharterBT-BoldItalic " TeXBase1Encoding ReEncodeFont " <8r.enc <bchbi8a.pfb
 bchbo8r CharterBT-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <bchb8a.pfb
 bchr8r CharterBT-Roman " TeXBase1Encoding ReEncodeFont " <8r.enc <bchr8a.pfb
 bchri8r CharterBT-Italic " TeXBase1Encoding ReEncodeFont " <8r.enc <bchri8a.pfb
 bchro8r CharterBT-Roman " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <bchr8a.pfb
+bsmilp01 ShanHeiSun-Light-01 <bsmilp01.pfb
+bsmilp02 ShanHeiSun-Light-02 <bsmilp02.pfb
+bsmilp03 ShanHeiSun-Light-03 <bsmilp03.pfb
+bsmilp04 ShanHeiSun-Light-04 <bsmilp04.pfb
+bsmilp05 ShanHeiSun-Light-05 <bsmilp05.pfb
+bsmilp06 ShanHeiSun-Light-06 <bsmilp06.pfb
+bsmilp07 ShanHeiSun-Light-07 <bsmilp07.pfb
+bsmilp08 ShanHeiSun-Light-08 <bsmilp08.pfb
+bsmilp09 ShanHeiSun-Light-09 <bsmilp09.pfb
+bsmilp10 ShanHeiSun-Light-10 <bsmilp10.pfb
+bsmilp11 ShanHeiSun-Light-11 <bsmilp11.pfb
+bsmilp12 ShanHeiSun-Light-12 <bsmilp12.pfb
+bsmilp13 ShanHeiSun-Light-13 <bsmilp13.pfb
+bsmilp14 ShanHeiSun-Light-14 <bsmilp14.pfb
+bsmilp15 ShanHeiSun-Light-15 <bsmilp15.pfb
+bsmilp16 ShanHeiSun-Light-16 <bsmilp16.pfb
+bsmilp17 ShanHeiSun-Light-17 <bsmilp17.pfb
+bsmilp18 ShanHeiSun-Light-18 <bsmilp18.pfb
+bsmilp19 ShanHeiSun-Light-19 <bsmilp19.pfb
+bsmilp20 ShanHeiSun-Light-20 <bsmilp20.pfb
+bsmilp21 ShanHeiSun-Light-21 <bsmilp21.pfb
+bsmilp22 ShanHeiSun-Light-22 <bsmilp22.pfb
+bsmilp23 ShanHeiSun-Light-23 <bsmilp23.pfb
+bsmilp24 ShanHeiSun-Light-24 <bsmilp24.pfb
+bsmilp25 ShanHeiSun-Light-25 <bsmilp25.pfb
+bsmilp26 ShanHeiSun-Light-26 <bsmilp26.pfb
+bsmilp27 ShanHeiSun-Light-27 <bsmilp27.pfb
+bsmilp28 ShanHeiSun-Light-28 <bsmilp28.pfb
+bsmilp29 ShanHeiSun-Light-29 <bsmilp29.pfb
+bsmilp30 ShanHeiSun-Light-30 <bsmilp30.pfb
+bsmilp31 ShanHeiSun-Light-31 <bsmilp31.pfb
+bsmilp32 ShanHeiSun-Light-32 <bsmilp32.pfb
+bsmilp33 ShanHeiSun-Light-33 <bsmilp33.pfb
+bsmilp34 ShanHeiSun-Light-34 <bsmilp34.pfb
+bsmilp35 ShanHeiSun-Light-35 <bsmilp35.pfb
+bsmilp36 ShanHeiSun-Light-36 <bsmilp36.pfb
+bsmilp37 ShanHeiSun-Light-37 <bsmilp37.pfb
+bsmilp38 ShanHeiSun-Light-38 <bsmilp38.pfb
+bsmilp39 ShanHeiSun-Light-39 <bsmilp39.pfb
+bsmilp40 ShanHeiSun-Light-40 <bsmilp40.pfb
+bsmilp41 ShanHeiSun-Light-41 <bsmilp41.pfb
+bsmilp42 ShanHeiSun-Light-42 <bsmilp42.pfb
+bsmilp43 ShanHeiSun-Light-43 <bsmilp43.pfb
+bsmilp44 ShanHeiSun-Light-44 <bsmilp44.pfb
+bsmilp45 ShanHeiSun-Light-45 <bsmilp45.pfb
+bsmilp46 ShanHeiSun-Light-46 <bsmilp46.pfb
+bsmilp47 ShanHeiSun-Light-47 <bsmilp47.pfb
+bsmilp48 ShanHeiSun-Light-48 <bsmilp48.pfb
+bsmilp49 ShanHeiSun-Light-49 <bsmilp49.pfb
+bsmilp50 ShanHeiSun-Light-50 <bsmilp50.pfb
+bsmilp51 ShanHeiSun-Light-51 <bsmilp51.pfb
+bsmilp52 ShanHeiSun-Light-52 <bsmilp52.pfb
+bsmilp53 ShanHeiSun-Light-53 <bsmilp53.pfb
+bsmilp54 ShanHeiSun-Light-54 <bsmilp54.pfb
+bsmilp55 ShanHeiSun-Light-55 <bsmilp55.pfb
+bsmilpv ShanHeiSun-Light-Vert <bsmilpv.pfb
 cmb10 CMB10 <cmb10.pfb
 cmbsy10 CMBSY10 <cmbsy10.pfb
 cmbsy5 CMBSY5 <cmbsy5.pfb
@@ -297,6 +401,39 @@ dbtt DBThaiText <dbtt.pfb
 dbttb DBThaiTextBold <dbttb.pfb
 dbttbi DBThaiTextBoldItalic <dbttbi.pfb
 dbtti DBThaiTextItalic <dbtti.pfb
+dmjgreek dmjgreek <dmjgreek.pfb
+dmjhira dmjhira <dmjhira.pfb
+dmjka dmjka <dmjka.pfb
+dmjkata dmjkata <dmjkata.pfb
+dmjkb dmjkb <dmjkb.pfb
+dmjkc dmjkc <dmjkc.pfb
+dmjkd dmjkd <dmjkd.pfb
+dmjke dmjke <dmjke.pfb
+dmjkeisen dmjkeisen <dmjkeisen.pfb
+dmjkf dmjkf <dmjkf.pfb
+dmjkg dmjkg <dmjkg.pfb
+dmjkh dmjkh <dmjkh.pfb
+dmjki dmjki <dmjki.pfb
+dmjkj dmjkj <dmjkj.pfb
+dmjkk dmjkk <dmjkk.pfb
+dmjkl dmjkl <dmjkl.pfb
+dmjkm dmjkm <dmjkm.pfb
+dmjkn dmjkn <dmjkn.pfb
+dmjko dmjko <dmjko.pfb
+dmjkp dmjkp <dmjkp.pfb
+dmjkq dmjkq <dmjkq.pfb
+dmjkr dmjkr <dmjkr.pfb
+dmjks dmjks <dmjks.pfb
+dmjkt dmjkt <dmjkt.pfb
+dmjku dmjku <dmjku.pfb
+dmjkv dmjkv <dmjkv.pfb
+dmjkw dmjkw <dmjkw.pfb
+dmjkx dmjkx <dmjkx.pfb
+dmjky dmjky <dmjky.pfb
+dmjkz dmjkz <dmjkz.pfb
+dmjroma dmjroma <dmjroma.pfb
+dmjrussian dmjrussian <dmjrussian.pfb
+dmjsy dmjsy <dmjsy.pfb
 dummy-space  <dummy-space.pfb
 ec-lmb10 LMRomanDemi10-Regular " enclmec ReEncodeFont " <lm-ec.enc <lmb10.pfb
 ec-lmbo10 LMRomanDemi10-Oblique " enclmec ReEncodeFont " <lm-ec.enc <lmbo10.pfb
@@ -421,6 +558,42 @@ fplmbb PazoMathBlackboardBold <fplmbb.pfb
 fplmbi PazoMath-BoldItalic <fplmbi.pfb
 fplmr PazoMath <fplmr.pfb
 fplmri PazoMath-Italic <fplmri.pfb
+ftnb8z Norasi-Bold " norasiThaiEncoding ReEncodeFont " <norasi.enc <norasib.pfb
+ftnbo8z Norasi-BoldItalic " norasiThaiEncoding ReEncodeFont " <norasi.enc <norasibi.pfb
+ftno8z Norasi-Italic " norasiThaiEncoding ReEncodeFont " <norasi.enc <norasii.pfb
+ftnr8z Norasi " norasiThaiEncoding ReEncodeFont " <norasi.enc <norasin.pfb
+gbsnlp01 BousungEG-Light-GB-01 <gbsnlp01.pfb
+gbsnlp02 BousungEG-Light-GB-02 <gbsnlp02.pfb
+gbsnlp03 BousungEG-Light-GB-03 <gbsnlp03.pfb
+gbsnlp04 BousungEG-Light-GB-04 <gbsnlp04.pfb
+gbsnlp05 BousungEG-Light-GB-05 <gbsnlp05.pfb
+gbsnlp06 BousungEG-Light-GB-06 <gbsnlp06.pfb
+gbsnlp07 BousungEG-Light-GB-07 <gbsnlp07.pfb
+gbsnlp08 BousungEG-Light-GB-08 <gbsnlp08.pfb
+gbsnlp09 BousungEG-Light-GB-09 <gbsnlp09.pfb
+gbsnlp10 BousungEG-Light-GB-10 <gbsnlp10.pfb
+gbsnlp11 BousungEG-Light-GB-11 <gbsnlp11.pfb
+gbsnlp12 BousungEG-Light-GB-12 <gbsnlp12.pfb
+gbsnlp13 BousungEG-Light-GB-13 <gbsnlp13.pfb
+gbsnlp14 BousungEG-Light-GB-14 <gbsnlp14.pfb
+gbsnlp15 BousungEG-Light-GB-15 <gbsnlp15.pfb
+gbsnlp16 BousungEG-Light-GB-16 <gbsnlp16.pfb
+gbsnlp17 BousungEG-Light-GB-17 <gbsnlp17.pfb
+gbsnlp18 BousungEG-Light-GB-18 <gbsnlp18.pfb
+gbsnlp19 BousungEG-Light-GB-19 <gbsnlp19.pfb
+gbsnlp20 BousungEG-Light-GB-20 <gbsnlp20.pfb
+gbsnlp21 BousungEG-Light-GB-21 <gbsnlp21.pfb
+gbsnlp22 BousungEG-Light-GB-22 <gbsnlp22.pfb
+gbsnlp23 BousungEG-Light-GB-23 <gbsnlp23.pfb
+gbsnlp24 BousungEG-Light-GB-24 <gbsnlp24.pfb
+gbsnlp25 BousungEG-Light-GB-25 <gbsnlp25.pfb
+gbsnlp26 BousungEG-Light-GB-26 <gbsnlp26.pfb
+gbsnlp27 BousungEG-Light-GB-27 <gbsnlp27.pfb
+gbsnlp28 BousungEG-Light-GB-28 <gbsnlp28.pfb
+gbsnlp29 BousungEG-Light-GB-29 <gbsnlp29.pfb
+gbsnlp30 BousungEG-Light-GB-30 <gbsnlp30.pfb
+gbsnlp31 BousungEG-Light-GB-31 <gbsnlp31.pfb
+gbsnlp32 BousungEG-Light-GB-32 <gbsnlp32.pfb
 homa Homa " FarsiWebEncoding ReEncodeFont " <farsiwebencoding.enc <homa.pfb
 hv 32 " TeXnANSIEncoding ReEncodeFont " <texnansi.enc
 hvb 262176 " TeXnANSIEncoding ReEncodeFont " <texnansi.enc
@@ -532,6 +705,29 @@ lmsy6 LMMathSymbols6-Regular " enclmmathsy ReEncodeFont " <lm-mathsy.enc <lmsy6.
 lmsy7 LMMathSymbols7-Regular " enclmmathsy ReEncodeFont " <lm-mathsy.enc <lmsy7.pfb
 lmsy8 LMMathSymbols8-Regular " enclmmathsy ReEncodeFont " <lm-mathsy.enc <lmsy8.pfb
 lmsy9 LMMathSymbols9-Regular " enclmmathsy ReEncodeFont " <lm-mathsy.enc <lmsy9.pfb
+mc2jka mc2jka <mc2jka.pfb
+mc2jkb mc2jkb <mc2jkb.pfb
+mc2jkc mc2jkc <mc2jkc.pfb
+mc2jkd mc2jkd <mc2jkd.pfb
+mc2jke mc2jke <mc2jke.pfb
+mc2jkf mc2jkf <mc2jkf.pfb
+mc2jkg mc2jkg <mc2jkg.pfb
+mc2jkh mc2jkh <mc2jkh.pfb
+mc2jki mc2jki <mc2jki.pfb
+mc2jkj mc2jkj <mc2jkj.pfb
+mc2jkk mc2jkk <mc2jkk.pfb
+mc2jkl mc2jkl <mc2jkl.pfb
+mc2jkm mc2jkm <mc2jkm.pfb
+mc2jkn mc2jkn <mc2jkn.pfb
+mc2jko mc2jko <mc2jko.pfb
+mc2jkp mc2jkp <mc2jkp.pfb
+mc2jkq mc2jkq <mc2jkq.pfb
+mc2jkr mc2jkr <mc2jkr.pfb
+mc2jks mc2jks <mc2jks.pfb
+mc2jkt mc2jkt <mc2jkt.pfb
+mc2jku mc2jku <mc2jku.pfb
+mc2jkv mc2jkv <mc2jkv.pfb
+mc2jkw mc2jkw <mc2jkw.pfb
 msam10 MSAM10 <msam10.pfb
 msam5 MSAM5 <msam5.pfb
 msam6 MSAM6 <msam6.pfb
@@ -631,6 +827,26 @@ phvro8yn NimbusSanL-ReguCondItal " TeXnANSIEncoding ReEncodeFont " <texnansi.enc
 phvro8z 96 " XL2encoding ReEncodeFont " <xl2.enc
 phvron8g NimbusSanL-ReguCondItal " groffencoding ReEncodeFont " <groff.enc <uhvro8ac.pfb
 phvron8z NimbusSanL-ReguCondItal " XL2encoding ReEncodeFont " <xl2.enc <uhvro8ac.pfb
+pkmjm0 HangulMyoungjoA-Regular <pkmjm0.pfb
+pkmjm1 HangulMyoungjoB-Regular <pkmjm1.pfb
+pkmjm2 HangulMyoungjoC-Regular <pkmjm2.pfb
+pkmjm3 HangulMyoungjoD-Regular <pkmjm3.pfb
+pkmjm4 HangulMyoungjoE-Regular <pkmjm4.pfb
+pkmjm5 HangulMyoungjoF-Regular <pkmjm5.pfb
+pkmjm6 HangulMyoungjoG-Regular <pkmjm6.pfb
+pkmjm7 HangulMyoungjoH-Regular <pkmjm7.pfb
+pkmjm8 HangulMyoungjoI-Regular <pkmjm8.pfb
+pkmjm9 HangulMyoungjoJ-Regular <pkmjm9.pfb
+pkmjmo0 HangulMyoungjoA-Regular " .167 SlantFont " <pkmjm0.pfb
+pkmjmo1 HangulMyoungjoB-Regular " .167 SlantFont " <pkmjm1.pfb
+pkmjmo2 HangulMyoungjoC-Regular " .167 SlantFont " <pkmjm2.pfb
+pkmjmo3 HangulMyoungjoD-Regular " .167 SlantFont " <pkmjm3.pfb
+pkmjmo4 HangulMyoungjoE-Regular " .167 SlantFont " <pkmjm4.pfb
+pkmjmo5 HangulMyoungjoF-Regular " .167 SlantFont " <pkmjm5.pfb
+pkmjmo6 HangulMyoungjoG-Regular " .167 SlantFont " <pkmjm6.pfb
+pkmjmo7 HangulMyoungjoH-Regular " .167 SlantFont " <pkmjm7.pfb
+pkmjmo8 HangulMyoungjoI-Regular " .167 SlantFont " <pkmjm8.pfb
+pkmjmo9 HangulMyoungjoJ-Regular " .167 SlantFont " <pkmjm9.pfb
 pncb8g CenturySchL-Bold " groffencoding ReEncodeFont " <groff.enc <uncb8a.pfb
 pncb8r CenturySchL-Bold " TeXBase1Encoding ReEncodeFont " <8r.enc <uncb8a.pfb
 pncb8y CenturySchL-Bold " TeXnANSIEncoding ReEncodeFont " <texnansi.enc <uncb8a.pfb

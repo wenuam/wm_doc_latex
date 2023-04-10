@@ -46,7 +46,7 @@
 %% making successful document exchange impossible.
 %% 
 \ProvidesFile{omxcmex.fd}
-        [2019/12/16 v2.5j Standard LaTeX font definitions]
+        [2022/07/10 v2.5l Standard LaTeX font definitions]
 \DeclareFontFamily{OMX}{cmex}{}
 \DeclareFontShape{OMX}{cmex}{m}{n}{%
    <->sfixed*cmex10%

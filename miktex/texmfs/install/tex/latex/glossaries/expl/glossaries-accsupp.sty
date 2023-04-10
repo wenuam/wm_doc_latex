@@ -7,7 +7,7 @@
 %% glossaries.dtx  (with options: `glossaries-accsupp.sty,package')
 %% 
 %%  glossaries.dtx
-%%  Copyright 2021 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossaries-prefix.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list-2020-03-19.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-accsupp.sty, glossaries-babel.sty, glossaries-polyglossia.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, glossaries-2020-03-19.sty, glossaries.perl.
+%%  This work consists of the files glossaries.dtx and glossaries.ins and the derived files glossaries.sty, glossary-hypernav.sty, glossary-inline.sty, glossary-list.sty, glossary-long.sty, glossary-longbooktabs.sty, glossary-longragged.sty, glossary-mcols.sty, glossary-super.sty, glossary-superragged.sty, glossary-tree.sty, glossaries-babel.sty, glossaries-polyglossia.sty, glossaries-prefix.sty, glossaries-accsupp.sty, glossaries-compatible-207.sty, glossaries-compatible-307.sty, glossaries-2020-03-19.sty, glossaries-accsupp-2020-03-19.sty, glossaries-babel-2020-03-19.sty, glossaries-compatible-207-2020-03-19.sty, glossaries-compatible-307-2020-03-19.sty, glossaries-polyglossia-2020-03-19.sty, glossaries-prefix-2020-03-19.sty, glossary-hypernav-2020-03-19.sty, glossary-inline-2020-03-19.sty, glossary-list-2020-03-19.sty, glossary-long-2020-03-19.sty, glossary-longbooktabs-2020-03-19.sty, glossary-longragged-2020-03-19.sty, glossary-mcols-2020-03-19.sty, glossary-super-2020-03-19.sty, glossary-superragged-2020-03-19.sty, glossary-tree-2020-03-19.sty, glossaries-2021-11-01.sty, glossaries-accsupp-2021-11-01.sty, glossaries-babel-2021-11-01.sty, glossaries-compatible-207-2021-11-01.sty, glossaries-compatible-307-2021-11-01.sty, glossaries-polyglossia-2021-11-01.sty, glossaries-prefix-2021-11-01.sty, glossary-hypernav-2021-11-01.sty, glossary-inline-2021-11-01.sty, glossary-list-2021-11-01.sty, glossary-long-2021-11-01.sty, glossary-longbooktabs-2021-11-01.sty, glossary-longragged-2021-11-01.sty, glossary-mcols-2021-11-01.sty, glossary-super-2021-11-01.sty, glossary-superragged-2021-11-01.sty, glossary-tree-2021-11-01.sty, example-glossaries-acronym-desc.tex, example-glossaries-acronym.tex, example-glossaries-acronyms-lang.tex, example-glossaries-brief.tex, example-glossaries-childmultipar.tex, example-glossaries-childnoname.tex, example-glossaries-cite.tex, example-glossaries-images.tex, example-glossaries-long.tex, example-glossaries-longchild.tex, example-glossaries-multipar.tex, example-glossaries-parent.tex, example-glossaries-symbolnames.tex, example-glossaries-symbols.tex, example-glossaries-url.tex, example-glossaries-user.tex, glossaries.l2h.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -39,7 +39,10 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{glossaries-accsupp}[2021/11/01 v4.49 (NLCT)
+\DeclareRelease{v4.46}{2020-03-19}{glossaries-accsupp-2020-03-19.sty}
+\DeclareRelease{v4.49}{2021-11-01}{glossaries-accsupp-2021-11-01.sty}
+\DeclareCurrentRelease{v4.52}{2022-11-03}
+\ProvidesPackage{glossaries-accsupp}[2022/11/03 v4.52 (NLCT)
   Experimental glossaries accessibility]
 \DeclareOption*{\PassOptionsToPackage{\CurrentOption}{glossaries}}
 \ProcessOptions
@@ -56,31 +59,6 @@
   \fi
 }
 {}
-\def\compatibleglossentry#1#2{%
-  \toks@{#2}%
-  \protected@edef\@do@glossentry{%
-    \noexpand\accsuppglossaryentryfield{#1}%
-    {\noexpand\glsnamefont
-       {\expandafter\expandonce\csname glo@\glsdetoklabel{#1}@name\endcsname}}%
-    {\expandafter\expandonce\csname glo@\glsdetoklabel{#1}@desc\endcsname}%
-    {\expandafter\expandonce\csname glo@\glsdetoklabel{#1}@symbol\endcsname}%
-    {\the\toks@}%
-  }%
-  \@do@glossentry
-}
-\def\compatiblesubglossentry#1#2#3{%
-  \toks@{#3}%
-  \protected@edef\@do@subglossentry{%
-    \noexpand\accsuppglossarysubentryfield{\number#1}%
-    {#2}%
-    {\noexpand\glsnamefont
-      {\expandafter\expandonce\csname glo@\glsdetoklabel{#2}@name\endcsname}}%
-    {\expandafter\expandonce\csname glo@\glsdetoklabel{#2}@desc\endcsname}%
-    {\expandafter\expandonce\csname glo@\glsdetoklabel{#2}@symbol\endcsname}%
-    {\the\toks@}%
-  }%
-  \@do@subglossentry
-}
 \RequirePackage{glossaries}
 \providecommand{\gls@accsupp@engine}{accsupp}
 \providecommand{\gls@accessibility}[4]{#4}
@@ -161,8 +139,8 @@
   {firstpluralaccess}{firstpluralaccess},%
   {symbolaccess}{symbolaccess},%
   {symbolpluralaccess}{symbolpluralaccess},%
-  {descaccess}{descaccess},%
-  {descpluralaccess}{descpluralaccess},%
+  {descriptionaccess}{descaccess},%
+  {descriptionpluralaccess}{descpluralaccess},%
   {shortaccess}{shortaccess},%
   {shortpluralaccess}{shortpluralaccess},%
   {longaccess}{longaccess},%
@@ -467,167 +445,6 @@
     \csname gls#1accessdisplay\endcsname{#2}{#3}%
   }%
 }
-\renewcommand*{\@@gls@default@entryfmt}[2]{%
-  \ifdefempty\glscustomtext
-  {%
-    \glsifplural
-    {%
-      \glscapscase
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glspluralaccessdisplay
-               {\glsentryplural{\glslabel}}{\glslabel}}%
-            {\glsdescriptionpluralaccessdisplay
-               {\glsentrydescplural{\glslabel}}{\glslabel}}%
-            {\glssymbolpluralaccessdisplay
-               {\glsentrysymbolplural{\glslabel}}{\glslabel}}
-            {\glsinsert}%
-        }%
-        {%
-          #1{\glsfirstpluralaccessdisplay
-               {\glsentryfirstplural{\glslabel}}{\glslabel}}%
-            {\glsdescriptionpluralaccessdisplay
-               {\glsentrydescplural{\glslabel}}{\glslabel}}%
-            {\glssymbolpluralaccessdisplay
-               {\glsentrysymbolplural{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glspluralaccessdisplay
-              {\Glsentryplural{\glslabel}}{\glslabel}}%
-            {\glsdescriptionpluralaccessdisplay
-              {\glsentrydescplural{\glslabel}}{\glslabel}}%
-            {\glssymbolpluralaccessdisplay
-              {\glsentrysymbolplural{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-        {%
-          #1{\glsfirstpluralaccessdisplay
-               {\Glsentryfirstplural{\glslabel}}{\glslabel}}%
-            {\glsdescriptionpluralaccessdisplay
-               {\glsentrydescplural{\glslabel}}{\glslabel}}%
-            {\glssymbolpluralaccessdisplay
-               {\glsentrysymbolplural{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \MakeUppercase{%
-            #2{\glspluralaccessdisplay
-                {\glsentryplural{\glslabel}}{\glslabel}}%
-              {\glsdescriptionpluralaccessdisplay
-                {\glsentrydescplural{\glslabel}}{\glslabel}}%
-              {\glssymbolpluralaccessdisplay
-                {\glsentrysymbolplural{\glslabel}}{\glslabel}}%
-              {\glsinsert}}%
-        }%
-        {%
-          \MakeUppercase{%
-            #1{\glsfirstpluralaccessdisplay
-                {\glsentryfirstplural{\glslabel}}{\glslabel}}%
-              {\glsdescriptionpluralaccessdisplay
-                {\glsentrydescplural{\glslabel}}{\glslabel}}%
-              {\glssymbolpluralaccessdisplay
-                {\glsentrysymbolplural{\glslabel}}{\glslabel}}%
-              {\glsinsert}}%
-        }%
-      }%
-    }%
-    {%
-      \glscapscase
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glstextaccessdisplay
-               {\glsentrytext{\glslabel}}{\glslabel}}%
-            {\glsdescriptionaccessdisplay
-               {\glsentrydesc{\glslabel}}{\glslabel}}%
-            {\glssymbolaccessdisplay
-               {\glsentrysymbol{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-        {%
-          #1{\glsfirstaccessdisplay
-              {\glsentryfirst{\glslabel}}{\glslabel}}%
-            {\glsdescriptionaccessdisplay
-              {\glsentrydesc{\glslabel}}{\glslabel}}%
-            {\glssymbolaccessdisplay
-              {\glsentrysymbol{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          #2{\glstextaccessdisplay
-               {\Glsentrytext{\glslabel}}{\glslabel}}%
-            {\glsdescriptionaccessdisplay
-               {\glsentrydesc{\glslabel}}{\glslabel}}%
-            {\glssymbolaccessdisplay
-               {\glsentrysymbol{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-        {%
-          #1{\glsfirstaccessdisplay
-              {\Glsentryfirst{\glslabel}}{\glslabel}}%
-            {\glsdescriptionaccessdisplay
-              {\glsentrydesc{\glslabel}}{\glslabel}}%
-            {\glssymbolaccessdisplay
-              {\glsentrysymbol{\glslabel}}{\glslabel}}%
-            {\glsinsert}%
-        }%
-      }%
-      {%
-        \ifglsused\glslabel
-        {%
-          \MakeUppercase{%
-            #2{\glstextaccessdisplay
-                {\glsentrytext{\glslabel}}{\glslabel}}%
-              {\glsdescriptionaccessdisplay
-                {\glsentrydesc{\glslabel}}{\glslabel}}%
-              {\glssymbolaccessdisplay
-                {\glsentrysymbol{\glslabel}}{\glslabel}}%
-              {\glsinsert}}%
-        }%
-        {%
-          \MakeUppercase{%
-            #1{\glsfirstaccessdisplay
-                {\glsentryfirst{\glslabel}}{\glslabel}}%
-              {\glsdescriptionaccessdisplay
-                {\glsentrydesc{\glslabel}}{\glslabel}}%
-              {\glssymbolaccessdisplay
-                {\glsentrysymbol{\glslabel}}{\glslabel}}%
-              {\glsinsert}}%
-        }%
-      }%
-    }%
-  }%
-  {%
-    \ifglsused{\glslabel}%
-    {%
-      #2{\glscustomtext}%
-        {\glsdescriptionaccessdisplay
-          {\glsentrydesc{\glslabel}}{\glslabel}}%
-        {\glssymbolaccessdisplay
-          {\glsentrysymbol{\glslabel}}{\glslabel}}%
-        {\glsinsert}%
-    }%
-    {%
-      #1{\glscustomtext}%
-        {\glsdescriptionaccessdisplay
-          {\glsentrydesc{\glslabel}}{\glslabel}}%
-        {\glssymbolaccessdisplay
-          {\glsentrysymbol{\glslabel}}{\glslabel}}%
-        {\glsinsert}%
-    }%
-  }%
-}
 \renewcommand*{\glsgenentryfmt}{%
   \ifdefempty\glscustomtext
   {%
@@ -664,15 +481,15 @@
         \ifglsused\glslabel
         {%
            \glspluralaccessdisplay
-              {\mfirstucMakeUppercase{\glsentryplural{\glslabel}}}%
+              {\glsuppercase{\glsentryplural{\glslabel}}}%
               {\glslabel}%
-           \mfirstucMakeUppercase{\glsinsert}%
+           \glsuppercase{\glsinsert}%
         }%
         {%
           \glsfirstpluralacessdisplay
-             {\mfirstucMakeUppercase{\glsentryfirstplural{\glslabel}}}%
+             {\glsuppercase{\glsentryfirstplural{\glslabel}}}%
              {\glslabel}%
-          \mfirstucMakeUppercase{\glsinsert}%
+          \glsuppercase{\glsinsert}%
         }%
       }%
     }%
@@ -704,13 +521,13 @@
         \ifglsused\glslabel
         {%
           \glstextaccessdisplay
-            {\mfirstucMakeUppercase{\glsentrytext{\glslabel}}}{\glslabel}%
-          \mfirstucMakeUppercase{\glsinsert}%
+            {\glsuppercase{\glsentrytext{\glslabel}}}{\glslabel}%
+          \glsuppercase{\glsinsert}%
         }%
         {%
           \glsfirstaccessdisplay
-            {\mfirstucMakeUppercase{\glsentryfirst{\glslabel}}}{\glslabel}%
-          \mfirstucMakeUppercase{\glsinsert}%
+            {\glsuppercase{\glsentryfirst{\glslabel}}}{\glslabel}%
+          \glsuppercase{\glsinsert}%
         }%
       }%
     }%
@@ -740,7 +557,7 @@
           \glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
           {\acronymfont
            {\glsshortpluralaccessdisplay
               {\glsentryshortpl{\glslabel}}{\glslabel}}%
@@ -760,7 +577,7 @@
           \glsinsert
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\acronymfont{%
               \glsshortaccessdisplay{\glsentryshort{\glslabel}}{\glslabel}}%
              \glsinsert}%
@@ -778,7 +595,7 @@
           \Genplacrfullformat{\glslabel}{\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
             {\genplacrfullformat{\glslabel}{\glsinsert}}%
         }%
       }%
@@ -791,7 +608,7 @@
           \Genacrfullformat{\glslabel}{\glsinsert}%
         }%
         {%
-          \mfirstucMakeUppercase
+          \glsuppercase
            {\genacrfullformat{\glslabel}{\glsinsert}}%
         }%
       }%
@@ -856,7 +673,7 @@
     \let\glsinsert\@empty
     \def\glscustomtext{%
       \acronymfont{\glsshortaccessdisplay
-          {\MakeUppercase{\glsentryshort{#2}}}{#2}}#3%
+          {\glsuppercase{\glsentryshort{#2}}}{#2}}#3%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
@@ -899,7 +716,7 @@
     \let\glsinsert\@empty
     \def\glscustomtext{%
       \acronymfont{\glslongaccessdisplay{%
-        \MakeUppercase{\glsentrylong{#2}}}{#2}#3}%
+        \glsuppercase{\glsentrylong{#2}}}{#2}#3}%
     }%
     \@gls@link[#1]{#2}{\csname gls@\glstype @entryfmt\endcsname}%
   }%
@@ -913,8 +730,8 @@
 }
 \def\@GLStext@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glstextaccessdisplay{\mfirstucMakeUppercase{\glsentrytext{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glstextaccessdisplay{\glsuppercase{\glsentrytext{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glsfirst@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsfirstaccessdisplay{\glsentryfirst{#2}}{#2}#3}%
@@ -924,8 +741,8 @@
 }
 \def\@GLSfirst@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glsfirstaccessdisplay{\mfirstucMakeUppercase{\glsentryfirst{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glsfirstaccessdisplay{\glsuppercase{\glsentryfirst{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glsplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glspluralaccessdisplay{\glsentryplural{#2}}{#2}#3}%
@@ -935,8 +752,8 @@
 }
 \def\@GLSplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glspluralaccessdisplay{\mfirstucMakeUppercase{\glsentryplural{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glspluralaccessdisplay{\glsuppercase{\glsentryplural{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glsfirstplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsfirstpluralaccessdisplay{\glsentryfirstplural{#2}}{#2}#3}%
@@ -946,8 +763,8 @@
 }
 \def\@GLSfirstplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glsfirstpluralaccessdisplay{\mfirstucMakeUppercase{\glsentryfirstplural{#2}}}{#2}%
-    \mfirstucMakeUppercase{#3}}%
+  {\glsfirstpluralaccessdisplay{\glsuppercase{\glsentryfirstplural{#2}}}{#2}%
+    \glsuppercase{#3}}%
 }
 \def\@glsname@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsnameaccessdisplay{\glsentryname{#2}}{#2}#3}%
@@ -957,8 +774,8 @@
 }
 \def\@GLSname@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glsnameaccessdisplay{\mfirstucMakeUppercase{\glsentryname{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glsnameaccessdisplay{\glsuppercase{\glsentryname{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glsdesc@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsdescriptionaccessdisplay{\glsentrydesc{#2}}{#2}#3}%
@@ -968,8 +785,8 @@
 }
 \def\@GLSdesc@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glsdescriptionaccessdisplay{\mfirstucMakeUppercase{\glsentrydesc{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glsdescriptionaccessdisplay{\glsuppercase{\glsentrydesc{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glsdescplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsdescriptionpluralaccessdisplay{\glsentrydescplural{#2}}{#2}#3}%
@@ -979,8 +796,8 @@
 }
 \def\@GLSdescplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-  {\glsdescriptionpluralaccessdisplay{\mfirstucMakeUppercase{\glsentrydescplural{#2}}}{#2}%
-   \mfirstucMakeUppercase{#3}}%
+  {\glsdescriptionpluralaccessdisplay{\glsuppercase{\glsentrydescplural{#2}}}{#2}%
+   \glsuppercase{#3}}%
 }
 \def\@glssymbol@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glssymbolaccessdisplay{\glsentrysymbol{#2}}{#2}#3}%
@@ -990,8 +807,8 @@
 }
 \def\@GLSsymbol@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glssymbolaccessdisplay{\mfirstucMakeUppercase{\glsentrysymbol{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glssymbolaccessdisplay{\glsuppercase{\glsentrysymbol{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glssymbolplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glssymbolpluralaccessdisplay{\glsentrysymbolplural{#2}}{#2}#3}%
@@ -1001,8 +818,8 @@
 }
 \def\@GLSsymbolplural@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glssymbolpluralaccessdisplay{\mfirstucMakeUppercase{\glsentrysymbolplural{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glssymbolpluralaccessdisplay{\glsuppercase{\glsentrysymbolplural{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuseri@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuseriaccessdisplay{\glsentryuseri{#2}}{#2}#3}%
@@ -1012,8 +829,8 @@
 }
 \def\@GLSuseri@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuseriaccessdisplay{\mfirstucMakeUppercase{\glsentryuseri{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuseriaccessdisplay{\glsuppercase{\glsentryuseri{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuserii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuseriiaccessdisplay{\glsentryuserii{#2}}{#2}#3}%
@@ -1023,8 +840,8 @@
 }
 \def\@GLSuserii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuseriiaccessdisplay{\mfirstucMakeUppercase{\glsentryuserii{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuseriiaccessdisplay{\glsuppercase{\glsentryuserii{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuseriii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuseriiiaccessdisplay{\glsentryuseriii{#2}}{#2}#3}%
@@ -1034,8 +851,8 @@
 }
 \def\@GLSuseriii@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuseriiiaccessdisplay{\mfirstucMakeUppercase{\glsentryuseriii{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuseriiiaccessdisplay{\glsuppercase{\glsentryuseriii{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuseriv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuserivaccessdisplay{\glsentryuseriv{#2}}{#2}#3}%
@@ -1045,8 +862,8 @@
 }
 \def\@GLSuseriv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuserivaccessdisplay{\mfirstucMakeUppercase{\glsentryuseriv{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuserivaccessdisplay{\glsuppercase{\glsentryuseriv{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuserv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuservaccessdisplay{\glsentryuserv{#2}}{#2}#3}%
@@ -1056,8 +873,8 @@
 }
 \def\@GLSuserv@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuservaccessdisplay{\mfirstucMakeUppercase{\glsentryuserv{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuservaccessdisplay{\glsuppercase{\glsentryuserv{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \def\@glsuservi@#1#2[#3]{%
   \@gls@field@link{#1}{#2}{\glsuserviaccessdisplay{\glsentryuservi{#2}}{#2}#3}%
@@ -1067,8 +884,8 @@
 }
 \def\@GLSuservi@#1#2[#3]{%
   \@gls@field@link{#1}{#2}%
-    {\glsuserviaccessdisplay{\mfirstucMakeUppercase{\glsentryuservi{#2}}}{#2}%
-     \mfirstucMakeUppercase{#3}}%
+    {\glsuserviaccessdisplay{\glsuppercase{\glsentryuservi{#2}}}{#2}%
+     \glsuppercase{#3}}%
 }
 \renewcommand*{\glossentryname}[1]{%
   \glsdoifexists{#1}%
@@ -1276,8 +1093,8 @@
         }%
         {%
           \glslongpluralaccessdisplay
-            {\mfirstucMakeUppercase{\glsentrylongpl{\glslabel}}}{\glslabel}%
-          \mfirstucMakeUppercase{\glsinsert}%
+            {\glsuppercase{\glsentrylongpl{\glslabel}}}{\glslabel}%
+          \glsuppercase{\glsinsert}%
         }%
       }%
       {%
@@ -1290,9 +1107,9 @@
         }%
         {%
           \glslongaccessdisplay
-           {\mfirstucMakeUppercase
+           {\glsuppercase
               {\glsentrylong{\glslabel}\glsinsert}}{\glslabel}%
-          \mfirstucMakeUppercase{\glsinsert}%
+          \glsuppercase{\glsinsert}%
         }%
       }%
     }%
@@ -1315,7 +1132,7 @@
   \renewcommand*{\ACRfullfmt}[3]{%
     \glslink[##1]{##2}{%
       \glslongaccessdisplay
-        {\mfirstucMakeUppercase{\glsentrylong{##2}}{##2}##3\space
+        {\glsuppercase{\glsentrylong{##2}}{##2}##3\space
       (\glsshortaccessdisplay{\acronymfont{\glsentryshort{##2}}}{##2})}}}%
   \renewcommand*{\acrfullplfmt}[3]{%
     \glslink[##1]{##2}{%
@@ -1332,7 +1149,7 @@
   \renewcommand*{\ACRfullplfmt}[3]{%
     \glslink[##1]{##2}{%
       \glslongpluralaccessdisplay
-         {\mfirstucMakeUppercase{\glsentrylongpl{##2}}{##2}##3\space
+         {\glsuppercase{\glsentrylongpl{##2}}{##2}##3\space
       (\glsshortpluralaccessdisplay
          {\acronymfont{\glsentryshortpl{##2}}}{##2})}}}%
   \renewcommand*{\glsentryfull}[1]{%
@@ -1411,7 +1228,7 @@
   \renewcommand*{\ACRfullfmt}[3]{%
     \glslink[##1]{##2}{%
       \glsshortaccessdisplay
-         {\mfirstucMakeUppercase
+         {\glsuppercase
            {\acronymfont{\glsentryshort{##2}}}{##2}##3\space
       (\glslongaccessdisplay{\glsentrylong{##2}}{##2})}}}%
   \renewcommand*{\acrfullplfmt}[3]{%
@@ -1427,7 +1244,7 @@
   \renewcommand*{\ACRfullplfmt}[3]{%
     \glslink[##1]{##2}{%
       \glsshortpluralaccessdisplay
-        {\mfirstucMakeUppercase
+        {\glsuppercase
            {\acronymfont{\glsentryshortpl{##2}}}{##2}##3\space
       (\glslongpluralaccessdisplay{\glsentrylongpl{##2}}{##2})}}}%
   \renewcommand*{\glsentryfull}[1]{%
@@ -1510,225 +1327,6 @@
      shortpluralaccess={\glsdefaultshortaccess{\the\glslongtok}{\the\glsshorttok}},%
      \the\glskeylisttok}%
   \expandafter\glskeylisttok\expandafter{\@gls@keylist}%
-}
-\renewcommand*{\DefaultNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\the\glsshorttok},%
-      description={\the\glslongtok},%
-      descriptionaccess=\relax,
-      text={\the\glsshorttok},%
-      access={\noexpand\@glo@textaccess},%
-      sort={\the\glsshorttok},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      shortaccess={\glsdefaultshortaccess{\the\glslongtok}{\the\glsshorttok}},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      descriptionplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      first={\noexpand\glslongaccessdisplay
-        {\the\glslongtok}{\the\glslabeltok}\space
-        (\noexpand\glsshortaccessdisplay
-          {\the\glsshorttok}{\the\glslabeltok})},%
-      plural={\the\glsshorttok\acrpluralsuffix},%
-      firstplural={\noexpand\glslongpluralaccessdisplay
-        {\noexpand\@glo@longpl}{\the\glslabeltok}\space
-        (\noexpand\glsshortpluralaccessdisplay
-          {\noexpand\@glo@shortpl}{\the\glslabeltok})},%
-      firstaccess=\relax,
-      firstpluralaccess=\relax,
-      textaccess={\noexpand\@glo@shortaccess},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-  \@@gls@noexpand@assign@default@plurals
-}
-\renewcommand*{\DescriptionFootnoteNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      sort={\the\glsshorttok},%
-      text={\the\glsshorttok},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      shortaccess={\glsdefaultshortaccess{\the\glslongtok}{\the\glsshorttok}},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      access={\noexpand\@glo@textaccess},%
-      plural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      symbol={\the\glslongtok},%
-      symbolplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      firstpluralaccess=\relax,
-      textaccess={\noexpand\@glo@shortaccess},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\renewcommand*{\DescriptionNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand
-        \acrnameformat{\the\glsshorttok}{\the\glslongtok}},%
-      access={\noexpand\@glo@textaccess},%
-      sort={\the\glsshorttok},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      shortaccess={\glsdefaultshortaccess{\the\glslongtok}{\the\glsshorttok}},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      first={\the\glslongtok},%
-      firstaccess=\relax,
-      firstplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      text={\the\glsshorttok},%
-      textaccess={\the\glslongtok},%
-      plural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      symbol={\noexpand\@glo@text},%
-      symbolaccess={\noexpand\@glo@textaccess},%
-      symbolplural={\noexpand\@glo@plural},%
-      firstpluralaccess=\relax,
-      textaccess={\noexpand\@glo@shortaccess},%
-      \the\glskeylisttok}%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
-}
-\renewcommand*{\FootnoteNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      sort={\the\glsshorttok},%
-      text={\the\glsshorttok},%
-      textaccess={\the\glslongtok},%
-      access={\noexpand\@glo@textaccess},%
-      plural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\the\glslongtok},%
-      descriptionplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@descplural\@org@gls@assign@descplural
-}
-\renewcommand*{\SmallNewAcronymDef}{%
-  \edef\@do@newglossaryentry{%
-    \noexpand\newglossaryentry{\the\glslabeltok}%
-    {%
-      type=\acronymtype,%
-      name={\noexpand\acronymfont{\the\glsshorttok}},%
-      access={\noexpand\@glo@symbolaccess},%
-      sort={\the\glsshorttok},%
-      short={\the\glsshorttok},%
-      shortplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      shortaccess={\glsdefaultshortaccess{\the\glslongtok}{\the\glsshorttok}},%
-      long={\the\glslongtok},%
-      longplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      text={\noexpand\@glo@short},%
-      textaccess={\noexpand\@glo@shortaccess},%
-      plural={\noexpand\@glo@shortpl},%
-      first={\the\glslongtok},%
-      firstaccess=\relax,
-      firstplural={\the\glslongtok\noexpand\acrpluralsuffix},%
-      description={\noexpand\@glo@first},%
-      descriptionplural={\noexpand\@glo@firstplural},%
-      symbol={\the\glsshorttok},%
-      symbolaccess={\the\glslongtok},%
-      symbolplural={\the\glsshorttok\noexpand\acrpluralsuffix},%
-      \the\glskeylisttok
-    }%
-  }%
-  \let\@org@gls@assign@firstpl\gls@assign@firstpl
-  \let\@org@gls@assign@plural\gls@assign@plural
-  \let\@org@gls@assign@descplural\gls@assign@descplural
-  \let\@org@gls@assign@symbolplural\gls@assign@symbolplural
-  \def\gls@assign@firstpl##1##2{%
-    \@@gls@expand@field{##1}{firstpl}{##2}%
-  }%
-  \def\gls@assign@plural##1##2{%
-    \@@gls@expand@field{##1}{plural}{##2}%
-  }%
-  \def\gls@assign@descplural##1##2{%
-    \@@gls@expand@field{##1}{descplural}{##2}%
-  }%
-  \def\gls@assign@symbolplural##1##2{%
-    \@@gls@expand@field{##1}{symbolplural}{##2}%
-  }%
-  \@do@newglossaryentry
-  \let\gls@assign@firstpl\@org@gls@assign@firstpl
-  \let\gls@assign@plural\@org@gls@assign@plural
-  \let\gls@assign@descplural\@org@gls@assign@descplural
-  \let\gls@assign@symbolplural\@org@gls@assign@symbolplural
 }
   \newcommand*{\glsshortaccesskey}{\glsshortkey access}%
   \newcommand*{\glsshortpluralaccesskey}{\glsshortpluralkey access}%

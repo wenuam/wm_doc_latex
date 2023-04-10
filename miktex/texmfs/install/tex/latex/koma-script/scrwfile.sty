@@ -7,7 +7,7 @@
 %% scrwfile.dtx  (with options: `package,scrwfile,identify,option,body')
 %% scrlogo.dtx  (with options: `logo')
 %% 
-%% Copyright (c) 2010-2021 Markus Kohm [komascript at gmx info]
+%% Copyright (c) 2010-2022 Markus Kohm [komascript at gmx info]
 %% 
 %% This file was generated from file(s) of the KOMA-Script bundle.
 %% ---------------------------------------------------------------
@@ -39,10 +39,10 @@
 %% find a complete unmodified copy of LaTeX2e at
 %% <http://mirror.ctan.org/tex-archive/macros/latex/base/>.
 %% 
-%%% From File: $Id: scrwfile.dtx 3889 2022-06-09 12:11:14Z kohm $
+%%% From File: $Id: scrwfile.dtx 3955 2022-10-06 08:13:32Z kohm $
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
 \ProvidesPackage{scrwfile}
-  [2021/05/30 v0.1.10 KOMA-Script package (write and clone files)]
+  [2022/10/06 v0.1.11 KOMA-Script package (write and clone files)]
 \PackageWarningNoLine{scrwfile}{%
   THIS IS AN EXPERIMENTAL PACKAGE!\MessageBreak
   USAGE OF THIS PACKAGE IS ON YOUR OWN RISK!\MessageBreak
@@ -161,29 +161,37 @@
   \begingroup
     \@ifpackageloaded{hyperref}{%
       \scr@ifundefinedorrelax{Hy@AtBeginDocument}{%
-        \PackageWarning{scrwfile}{%
-          Incompatible `hyperref` package detected!\MessageBreak
-          You are using a `hyperref` version, that\MessageBreak
-          doesn't provide `\string\Hy@AtBeginDocument`.\MessageBreak
-          This may or may not work.\MessageBreak
-          Using immediate redefinition%
+        \PackageInfo{scrwfile}{%
+          Using immediate redefinition of `\string\@starttoc'%
         }%
         \aftergroup\@firstofone
       }{%
-        \def\reserved@a{\AtBeginDocument}%
         \ifx\Hy@AtBeginDocumentHook\@undefined
           \PackageInfo{scrwfile}{%
-            Using immediate redefinition%
+            Using immediate redefinition of `\string\@starttoc'%
           }%
           \aftergroup\@firstofone
         \else
-          \PackageInfo{scrwfile}{%
-            Using `\string\Hy@AtBeginDocument`%
+          \@ifpackagelater{hyperref}{2022/02/22}{% newer than v7.00n
+            \PackageInfo{scrwfile}{%
+              Using immediate redefinition of `\string\@starttoc'%
+            }%
+            \aftergroup\@firstofone
+          }{%
+            \PackageWarning{scrwfile}{%
+              Outdated package `hyperref' detected.\MessageBreak
+              Using `\string\Hy@AtBeginDocument' for redefinition of
+              `\string\@starttoc'.\MessageBreak
+              We recommend to update `hyperref'
+            }%
+            \aftergroup\Hy@AtBeginDocument
           }%
-          \aftergroup\Hy@AtBeginDocument
         \fi
       }%
     }{%
+      \PackageInfo{scrwfile}{%
+        Using immediate redefinition of `\string\@starttoc'%
+      }%
       \aftergroup\@firstofone
     }%
   \endgroup

@@ -36,7 +36,7 @@
 %% File: hyperref.dtx
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \ProvidesPackage{hyperref}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hypertext links for LaTeX]
 \begingroup
   \@makeother\`%
@@ -350,6 +350,21 @@
  {
    \def\MakeUppercaseUnsupportedInPdfStrings#1{\use:e {\text_uppercase:n {#1}}}
    \def\MakeLowercaseUnsupportedInPdfStrings#1{\use:e {\text_lowercase:n {#1}}}
+   \AddToHook{package/babel/after}
+     {
+      \def\MakeUppercaseUnsupportedInPdfStrings#1
+         {\use:e
+           {\exp_args:Ne
+              \text_uppercase:nn{\localeinfo*{tag.bcp47}}{#1}
+           }
+         }
+      \def\MakeLowercaseUnsupportedInPdfStrings#1
+         {\use:e
+           {\exp_args:Ne
+              \text_lowercase:nn{\localeinfo*{tag.bcp47}}{#1}
+           }
+         }
+     }
  }
 \ExplSyntaxOff
 \def\pdfstringdef#1#2{%
@@ -6629,13 +6644,6 @@
 \let\Hy@saved@refstepcounter\refstepcounter
 \@ifpackageloaded{amsmath}{}{\newif\ifmeasuring@\measuring@false}
 \def\hyper@refstepcounter#1{%
-  \edef\This@name{#1}%
-  \ifx\This@name\name@of@eq
-    \@ifundefined{theHequation}{%
-      \make@stripped@name{\theequation}%
-      \let\theHequation\newname
-    }{}%
-  \fi
   \HyCnt@ProvideTheHCounter{#1}%
   \hyper@makecurrent{#1}%
   \ifmeasuring@
@@ -6889,78 +6897,74 @@
 \let\new@refstepcounter\refstepcounter
 \let\H@equation\equation
 \let\H@endequation\endequation
-\@ifpackageloaded{amsmath}{%
-  \long\def\Hy@temp{%
-    \incr@eqnum
-    \mathdisplay@push
-    \st@rredfalse \global\@eqnswtrue
-    \mathdisplay{equation}%
-  }%
-  \ifx\Hy@temp\equation
-    \expandafter\ifx\csname if@fleqn\expandafter\endcsname
-                    \csname iftrue\endcsname
-    \else
-      \long\def\equation{%
-        \mathdisplay@push
-        \st@rredfalse \global\@eqnswtrue
-        \mathdisplay{equation}%
-        \incr@eqnum
-      }%
-    \fi
-  \fi
-}{%
-  \def\equation{%
-    \let\refstepcounter\H@refstepcounter
-    \H@equation
-    \@ifundefined{theHequation}{%
-      \make@stripped@name{\theequation}%
-      \let\theHequation\newname
-    }{}%
-    \hyper@makecurrent{equation}%
-    \mathopen{%
-      \Hy@raisedlink{\hyper@anchorstart{\@currentHref}}%
+\@ifundefined{hyper@nopatch@mathenv}{%
+  \@ifpackageloaded{amsmath}{%
+    \long\def\Hy@temp{%
+      \incr@eqnum
+      \mathdisplay@push
+      \st@rredfalse \global\@eqnswtrue
+      \mathdisplay{equation}%
     }%
-    \let\refstepcounter\new@refstepcounter
-  }%
-  \def\endequation{%
-    \ifx\Hy@raisedlink\ltx@empty
-      \hyper@anchorend
-    \else
-      \mathclose{\Hy@raisedlink{\hyper@anchorend}}%
+    \ifx\Hy@temp\equation
+      \expandafter\ifx\csname if@fleqn\expandafter\endcsname
+                      \csname iftrue\endcsname
+      \else
+        \long\def\equation{%
+          \mathdisplay@push
+          \st@rredfalse \global\@eqnswtrue
+          \mathdisplay{equation}%
+          \incr@eqnum
+        }%
+      \fi
     \fi
-    \H@endequation
-  }%
-}
+  }{%
+    \def\equation{%
+      \let\refstepcounter\H@refstepcounter
+      \H@equation
+      \hyper@makecurrent{equation}%
+      \mathopen{%
+        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}}%
+      }%
+      \let\refstepcounter\new@refstepcounter
+    }%
+    \def\endequation{%
+      \ifx\Hy@raisedlink\ltx@empty
+        \hyper@anchorend
+      \else
+        \mathclose{\Hy@raisedlink{\hyper@anchorend}}%
+      \fi
+      \H@endequation
+    }%
+  }
+}{}
 \newif\if@eqnstar
 \@eqnstarfalse
 \let\H@eqnarray\eqnarray
 \let\H@endeqnarray\endeqnarray
-\def\eqnarray{%
-  \let\Hy@reserved@a\relax
-  \def\@currentHref{}%
-  \H@eqnarray
-  \if@eqnstar
-  \else
-    \ifx\\\@currentHref\\%
+\@ifundefined{hyper@nopatch@mathenv}{%
+  \def\eqnarray{%
+    \let\Hy@reserved@a\relax
+    \def\@currentHref{}%
+    \H@eqnarray
+    \if@eqnstar
     \else
-      \@ifundefined{theHequation}{%
-        \make@stripped@name{\theequation}%
-        \let\theHequation\newname
-      }{}%
-      \hyper@makecurrent{equation}%
-      \mathopen{%
-        \Hy@raisedlink{%
-          \hyper@anchorstart{\@currentHref}\hyper@anchorend
+      \ifx\\\@currentHref\\%
+      \else
+        \hyper@makecurrent{equation}%
+        \mathopen{%
+          \Hy@raisedlink{%
+            \hyper@anchorstart{\@currentHref}\hyper@anchorend
+          }%
         }%
-      }%
+      \fi
     \fi
-  \fi
-}
-\def\endeqnarray{%
-  \H@endeqnarray
-}
+  }
+  \def\endeqnarray{%
+    \H@endeqnarray
+  }
+}{}
 \@namedef{eqnarray*}{%
-  \def\@eqncr{\nonumber\@seqncr}\@eqnstartrue\eqnarray
+  \protected\def\@eqncr{\nonumber\@seqncr}\@eqnstartrue\eqnarray
 }
 \@namedef{endeqnarray*}{%
   \nonumber\endeqnarray\@eqnstarfalse
@@ -6971,10 +6975,6 @@
   \def\subeqnarray{%
     \let\Hy@reserved@a\relax
     \H@subeqnarray
-    \@ifundefined{theHequation}{%
-      \make@stripped@name{\theequation}%
-      \let\theHequation\newname
-    }{}%
     \hyper@makecurrent{equation}%
     \hyper@anchorstart{\@currentHref}{}\hyper@anchorend
   }%
@@ -7001,15 +7001,11 @@
     }%
   \endgroup
 }
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname subequations\endcsname\relax
-\else
+\ifcsname subequations\endcsname
   \let\HyOrg@subequations\subequations
   \def\subequations{%
     \stepcounter{equation}%
-    \protected@edef\theHparentequation{%
-      \@ifundefined{theHequation}\theequation\theHequation
-    }%
+    \protected@edef\theHparentequation{\theHequation}%
     \addtocounter{equation}{-1}%
     \HyOrg@subequations
     \def\theHequation{\theHparentequation\alph{equation}}%
@@ -7723,167 +7719,179 @@
   \Hy@EveryPageAnchor
 }
 \providecommand\protected@file@percent{}
-\def\addcontentsline#1#2#3{% toc extension, type, tag
-  \begingroup
-    \let\label\@gobble
-    \ifx\@currentHref\@empty
-      \Hy@Warning{%
-        No destination for bookmark of \string\addcontentsline,%
-        \MessageBreak destination is added%
-      }%
-      \phantomsection
-    \fi
-    \expandafter\ifx\csname toclevel@#2\endcsname\relax
-      \begingroup
-        \def\Hy@tempa{#1}%
-        \ifx\Hy@tempa\Hy@bookmarkstype
-          \Hy@WarningNoLine{%
-            bookmark level for unknown #2 defaults to 0%
+\@ifundefined{hyper@nopatch@toc}{%
+  \def\addcontentsline#1#2#3{% toc extension, type, tag
+    \begingroup
+      \let\label\@gobble
+      \ifx\@currentHref\@empty
+        \Hy@Warning{%
+          No destination for bookmark of \string\addcontentsline,%
+          \MessageBreak destination is added%
+        }%
+        \phantomsection
+      \fi
+      \expandafter\ifx\csname toclevel@#2\endcsname\relax
+        \begingroup
+          \def\Hy@tempa{#1}%
+          \ifx\Hy@tempa\Hy@bookmarkstype
+            \Hy@WarningNoLine{%
+              bookmark level for unknown #2 defaults to 0%
+            }%
+          \else
+            \Hy@Info{bookmark level for unknown #2 defaults to 0}%
+          \fi
+        \endgroup
+        \expandafter\gdef\csname toclevel@#2\endcsname{0}%
+      \fi
+      \edef\Hy@toclevel{\csname toclevel@#2\endcsname}%
+      \Hy@writebookmark{\csname the#2\endcsname}%
+        {#3}%
+        {\@currentHref}%
+        {\Hy@toclevel}%
+        {#1}%
+      \ifHy@verbose
+        \begingroup
+          \def\Hy@tempa{#3}%
+          \@onelevel@sanitize\Hy@tempa
+          \let\temp@online\on@line
+          \let\on@line\@empty
+          \Hy@Info{%
+            bookmark\temp@online:\MessageBreak
+            thecounter {\csname the#2\endcsname}\MessageBreak
+            text {\Hy@tempa}\MessageBreak
+            reference {\@currentHref}\MessageBreak
+            toclevel {\Hy@toclevel}\MessageBreak
+            type {#1}%
           }%
-        \else
-          \Hy@Info{bookmark level for unknown #2 defaults to 0}%
-        \fi
-      \endgroup
-      \expandafter\gdef\csname toclevel@#2\endcsname{0}%
-    \fi
-    \edef\Hy@toclevel{\csname toclevel@#2\endcsname}%
-    \Hy@writebookmark{\csname the#2\endcsname}%
-      {#3}%
-      {\@currentHref}%
-      {\Hy@toclevel}%
-      {#1}%
-    \ifHy@verbose
-      \begingroup
-        \def\Hy@tempa{#3}%
-        \@onelevel@sanitize\Hy@tempa
-        \let\temp@online\on@line
-        \let\on@line\@empty
-        \Hy@Info{%
-          bookmark\temp@online:\MessageBreak
-          thecounter {\csname the#2\endcsname}\MessageBreak
-          text {\Hy@tempa}\MessageBreak
-          reference {\@currentHref}\MessageBreak
-          toclevel {\Hy@toclevel}\MessageBreak
-          type {#1}%
-        }%
-      \endgroup
-    \fi
-    \addtocontents{#1}{%
-      \protect\contentsline{#2}{#3}{\thepage}{\@currentHref}\protected@file@percent
-    }%
-  \endgroup
-}
-\def\contentsline#1#2#3#4{%
-  \begingroup
-    \Hy@safe@activestrue
-  \edef\x{\endgroup
-    \def\noexpand\Hy@tocdestname{#4}%
-  }\x
-  \ifx\Hy@tocdestname\ltx@empty
-    \csname l@#1\endcsname{#2}{#3}%
-  \else
-    \ifcase\Hy@linktoc % none
+        \endgroup
+      \fi
+      \addtocontents{#1}{%
+        \protect\contentsline{#2}{#3}{\thepage}{\@currentHref}\protected@file@percent
+      }%
+    \endgroup
+  }
+}{}
+\protected\def\Hy@toclinkstart{\hyper@linkstart{link}{\Hy@tocdestname}}
+\protected\def\Hy@toclinkend{\hyper@linkend}
+
+\@ifundefined{hyper@nopatch@toc}{%
+  \def\contentsline#1#2#3#4{%
+    \begingroup
+      \Hy@safe@activestrue
+    \edef\x{\endgroup
+      \def\noexpand\Hy@tocdestname{#4}%
+    }\x
+    \ifx\Hy@tocdestname\ltx@empty
       \csname l@#1\endcsname{#2}{#3}%
-    \or % section
-      \csname l@#1\endcsname{%
-        \hyper@linkstart{link}{\Hy@tocdestname}{#2}\hyper@linkend
-      }{#3}%
-    \or % page
-      \def\Hy@temp{#3}%
-      \ifx\Hy@temp\ltx@empty
+    \else
+      \ifcase\Hy@linktoc % none
         \csname l@#1\endcsname{#2}{#3}%
-      \else
-        \csname l@#1\endcsname{{#2}}{%
-          \hyper@linkstart{link}{\Hy@tocdestname}{#3}\hyper@linkend
-        }%
-      \fi
-    \else % all
-      \def\Hy@temp{#3}%
-      \ifx\Hy@temp\ltx@empty
+      \or % section
         \csname l@#1\endcsname{%
-          \hyper@linkstart{link}{\Hy@tocdestname}{#2}\hyper@linkend
-        }{}%
-      \else
-        \csname l@#1\endcsname{%
-          \hyper@linkstart{link}{\Hy@tocdestname}{#2}\hyper@linkend
-        }{%
-          \hyper@linkstart{link}{\Hy@tocdestname}{#3}\hyper@linkend
-        }%
+          \Hy@toclinkstart{#2}\Hy@toclinkend
+        }{#3}%
+      \or % page
+        \def\Hy@temp{#3}%
+        \ifx\Hy@temp\ltx@empty
+          \csname l@#1\endcsname{#2}{#3}%
+        \else
+          \csname l@#1\endcsname{{#2}}{%
+            \Hy@toclinkstart{#3}\Hy@toclinkend
+          }%
+        \fi
+      \else % all
+        \def\Hy@temp{#3}%
+        \ifx\Hy@temp\ltx@empty
+          \csname l@#1\endcsname{%
+            \Hy@toclinkstart{#2}\Hy@toclinkend
+          }{}%
+        \else
+          \csname l@#1\endcsname{%
+            \Hy@toclinkstart{#2}\Hy@toclinkend
+          }{%
+            \Hy@toclinkstart{#3}\Hy@toclinkend
+          }%
+        \fi
       \fi
     \fi
-  \fi
-}
-\let\H@definecounter\@definecounter
-\def\@definecounter#1{%
-  \H@definecounter{#1}%
-  \expandafter\gdef\csname theH#1\endcsname{\arabic{#1}}%
-}
-\let\H@newctr\@newctr
-\def\@newctr#1[#2]{%
-  \H@newctr#1[{#2}]%
-  \expandafter\gdef\csname theH#1\endcsname{%
-    \csname the\@ifundefined{theH#2}{}{H}#2\endcsname.\arabic{#1}%
-  }%
-}
-\@ifpackageloaded{amsmath}{%
-  \def\Hy@make@anchor{%
-    \Hy@MakeCurrentHrefAuto{AMS}%
-    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-  }%
-  \def\Hy@make@df@tag@@#1{%
-    \gdef\df@tag{%
-      \maketag@@@{\Hy@make@anchor#1}%
-      \def\@currentlabel{#1}%
-    }%
-  }%
-  \def\Hy@make@df@tag@@@#1{%
-    \gdef\df@tag{%
-      \tagform@{\Hy@make@anchor#1}%
-      \toks@\@xp{\p@equation{#1}}%
-      \edef\@currentlabel{\the\toks@}%
-    }%
-  }%
-  \let\HyOrg@make@df@tag@@\make@df@tag@@
-  \let\HyOrg@make@df@tag@@@\make@df@tag@@@
-  \let\make@df@tag@@\Hy@make@df@tag@@
-  \let\make@df@tag@@@\Hy@make@df@tag@@@
+  }
 }{}
-\@ifpackagewith{hyperref}{pdftex}{%
-   \let\H@seteqlabel\@seteqlabel
-   \def\@seteqlabel#1{%
-     \H@seteqlabel{#1}%
-     \xdef\@currentHref{AMS.\the\Hy@linkcounter}%
-     \Hy@raisedlink{%
-       \hyper@anchorstart{\@currentHref}\hyper@anchorend
-     }%
-   }%
-}{}
-\let\HyOrg@addtoreset\@addtoreset
-\def\@addtoreset#1#2{%
-  \HyOrg@addtoreset{#1}{#2}%
-  \expandafter\xdef\csname theH#1\endcsname{%
-    \expandafter\noexpand
-        \csname the\@ifundefined{theH#2}{}H#2\endcsname
-    .\noexpand\the\noexpand\value{#1}%
-  }%
-}
-\@ifpackageloaded{amsmath}{%
-  \renewcommand*{\numberwithin}[3][\arabic]{%
-    \@ifundefined{c@#2}{\@nocounterr{#2}}{%
-      \@ifundefined{c@#3}{\@nocnterr{#3}}{%
-        \HyOrg@addtoreset{#2}{#3}%
-        \@xp\xdef\csname the#2\endcsname{%
-          \@xp\@nx\csname the#3\endcsname .\@nx#1{#2}%
-        }%
-        \@xp\xdef\csname theH#2\endcsname{%
-          \@xp\@nx
-          \csname the\@ifundefined{theH#3}{}H#3\endcsname
-          .\@nx#1{#2}%
+\@ifundefined{hyper@nopatch@counter}
+  {
+   \let\H@definecounter\@definecounter
+   \def\@definecounter#1{%
+     \H@definecounter{#1}%
+     \expandafter\gdef\csname theH#1\endcsname{\arabic{#1}}%
+   }
+  }{}
+\@ifundefined{hyper@nopatch@counter}
+  {
+    \let\H@newctr\@newctr
+    \def\@newctr#1[#2]{%
+      \H@newctr#1[{#2}]%
+      \expandafter\gdef\csname theH#1\endcsname{%
+        \csname the\@ifundefined{theH#2}{}{H}#2\endcsname.\arabic{#1}%
+      }%
+    }
+   }{}
+\@ifundefined{hyper@nopatch@amsmath@tag}
+   {%
+    \@ifpackageloaded{amsmath}{%
+      \def\Hy@make@anchor{%
+        \Hy@MakeCurrentHrefAuto{AMS}%
+        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+      }%
+      \def\Hy@make@df@tag@@#1{%
+        \gdef\df@tag{%
+          \maketag@@@{\Hy@make@anchor#1}%
+          \def\@currentlabel{#1}%
         }%
       }%
-    }%
-  }%
-}{}
+      \def\Hy@make@df@tag@@@#1{%
+        \gdef\df@tag{%
+          \tagform@{\Hy@make@anchor#1}%
+          \toks@\@xp{\p@equation{#1}}%
+          \edef\@currentlabel{\the\toks@}%
+        }%
+      }%
+      \let\HyOrg@make@df@tag@@\make@df@tag@@
+      \let\HyOrg@make@df@tag@@@\make@df@tag@@@
+      \let\make@df@tag@@\Hy@make@df@tag@@
+      \let\make@df@tag@@@\Hy@make@df@tag@@@
+    }{}
+  }{}
+\@ifundefined{hyper@nopatch@counter}
+  {
+   \let\HyOrg@addtoreset\@addtoreset
+   \def\@addtoreset#1#2{%
+     \HyOrg@addtoreset{#1}{#2}%
+     \expandafter\xdef\csname theH#1\endcsname{%
+       \expandafter\noexpand
+           \csname the\@ifundefined{theH#2}{}H#2\endcsname
+       .\noexpand\the\noexpand\value{#1}%
+     }%
+   }
+  }{}
+\@ifundefined{hyper@nopatch@counter}
+  {
+   \@ifpackageloaded{amsmath}{%
+     \renewcommand*{\numberwithin}[3][\arabic]{%
+       \@ifundefined{c@#2}{\@nocounterr{#2}}{%
+         \@ifundefined{c@#3}{\@nocnterr{#3}}{%
+           \HyOrg@addtoreset{#2}{#3}%
+           \@xp\xdef\csname the#2\endcsname{%
+             \@xp\@nx\csname the#3\endcsname .\@nx#1{#2}%
+           }%
+           \@xp\xdef\csname theH#2\endcsname{%
+             \@xp\@nx
+             \csname the\@ifundefined{theH#3}{}H#3\endcsname
+             .\@nx#1{#2}%
+           }%
+         }%
+       }%
+     }%
+   }{}
+  }{}
 \ifHy@hyperfigures
   \let\Hy@Gin@setfile\Gin@setfile
   \def\Gin@setfile#1#2#3{%
@@ -8080,7 +8088,7 @@
       Reference `#3' on page \thepage \space undefined%
     }%
   \else
-    \expandafter\Hy@setref@link#1\@empty\@empty\@nil{#2}%
+    \expandafter\Hy@setref@link#1\@empty\@empty\@empty\@nil{#2}%
   \fi
 }
 \def\Hy@setref@link#1#2#3#4#5#6\@nil#7{%

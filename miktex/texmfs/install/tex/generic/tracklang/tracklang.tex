@@ -7,7 +7,7 @@
 %% tracklang.dtx  (with options: `tracklang.tex,package')
 %% 
 %%  tracklang.dtx
-%%  Copyright 2020 Nicola Talbot
+%%  Copyright 2022 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -38,18 +38,6 @@
 %%   Right bracket \]     Circumflex    \^     Underscore    \_
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% load packages that use tracklang for localisation
-%% do code now to initialise
-%% Pass all options to tracklang:
 \ifnum\catcode`\@=11\relax
   \def\@tracklang@restore@at{}%
 \else
@@ -64,7 +52,7 @@
   \expandafter\endinput
 \fi
 \expandafter\def\csname ver@tracklang.tex\endcsname{%
- 2020/06/30 v1.5 (NLCT) Track Languages Generic Code}
+ 2022/12/13 v1.6.1 (NLCT) Track Languages Generic Code}
 \long\def\@tracklang@ifundef#1#2#3{%
   \ifcsname#1\endcsname
     \expandafter\ifx\csname #1\endcsname\relax
@@ -234,6 +222,11 @@
 \else
   \let\@tracklang@IfFileExists\IfFileExists
 \fi
+\ifx\inputencodingname\undefined
+  \def\TrackLangEncodingName{utf8}
+\else
+  \def\TrackLangEncodingName{\inputencodingname}
+\fi
 \def\@tracklang@checklocale{%
   \ifx\TrackLangEnv\empty
   \else
@@ -320,14 +313,14 @@
      \def\TrackLangQueryEnv{%
        \begingroup\endlinechar=-1\relax
        \everyeof{\noexpand}%
-       \edef\x{\endgroup\def\noexpand\TrackLangEnv{%
-         \@tracklang@input|"kpsewhich --var-value LC_ALL" }}\x
+       \edef\@tracklang@x{\endgroup\def\noexpand\TrackLangEnv{%
+         \@tracklang@input|"kpsewhich --var-value LC_ALL" }}\@tracklang@x
        \@tracklang@checklocale
        \ifx\TrackLangEnv\empty
          \begingroup\endlinechar=-1\relax
          \everyeof{\noexpand}%
-         \edef\x{\endgroup\def\noexpand\TrackLangEnv{%
-           \@tracklang@input|"kpsewhich --var-value LANG" }}\x
+         \edef\@tracklang@x{\endgroup\def\noexpand\TrackLangEnv{%
+           \@tracklang@input|"kpsewhich --var-value LANG" }}\@tracklang@x
          \@tracklang@checklocale
          \ifx\TrackLangEnv\empty
            \ifx\TeXOSQueryLocale\undefined
@@ -348,20 +341,20 @@
      \def\TrackLangQueryOtherEnv#1{%
        \begingroup\endlinechar=-1\relax
        \everyeof{\noexpand}%
-       \edef\x{\endgroup\def\noexpand\TrackLangEnv{%
-         \@tracklang@input|"kpsewhich --var-value LC_ALL" }}\x
+       \edef\@tracklang@x{\endgroup\def\noexpand\TrackLangEnv{%
+         \@tracklang@input|"kpsewhich --var-value LC_ALL" }}\@tracklang@x
        \@tracklang@checklocale
        \ifx\TrackLangEnv\empty
          \begingroup\endlinechar=-1\relax
          \everyeof{\noexpand}%
-         \edef\x{\endgroup\def\noexpand\TrackLangEnv{%
-           \@tracklang@input|"kpsewhich --var-value #1" }}\x
+         \edef\@tracklang@x{\endgroup\def\noexpand\TrackLangEnv{%
+           \@tracklang@input|"kpsewhich --var-value #1" }}\@tracklang@x
          \@tracklang@checklocale
          \ifx\TrackLangEnv\empty
            \begingroup\endlinechar=-1\relax
            \everyeof{\noexpand}%
-           \edef\x{\endgroup\def\noexpand\TrackLangEnv{%
-             \@tracklang@input|"kpsewhich --var-value LANG"}}\x
+           \edef\@tracklang@x{\endgroup\def\noexpand\TrackLangEnv{%
+             \@tracklang@input|"kpsewhich --var-value LANG"}}\@tracklang@x
            \@tracklang@checklocale
            \ifx\TrackLangEnv\empty
              \ifx\TeXOSQueryLocale\undefined

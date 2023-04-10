@@ -4,9 +4,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                    %
 \def\xstringname               {xstring}                             %
-\def\xstringversion              {1.84}                              %
+\def\xstringversion              {1.85}                              %
 %                                                                    %
-\def\xstringdate              {2021/07/21}                           %
+\def\xstringdate              {2023/01/14}                           %
 %                                                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                    %
@@ -15,9 +15,7 @@
 % Maintainer : Christian Tellechea                                   %
 % Email      : unbonpetit@netc.fr                                    %
 % Package URL: https://www.ctan.org/pkg/xstring                      %
-% Bug tracker: https://framagit.org/unbonpetit/xstring/issues        %
-% Repository : https://framagit.org/unbonpetit/xstring/tree/master   %
-% Copyright  : Christian Tellechea 2008-2019                         %
+% Copyright  : Christian Tellechea 2008-2023                         %
 % Licence    : Released under the LaTeX Project Public License v1.3c %
 %              or later, see http://www.latex-project.org/lppl.txt   %
 % Files      : 1) xstring.tex                                        %
@@ -1006,7 +1004,7 @@
 			\xs_StrExpand_i{#1}% Appel de la macro récursive
 			}
 			{\def\xs_reserved_B{#2}%
-			}
+			}% <-- bugfix 1.85
 		\expandafter
 	\endgroup
 	\expandafter\def\expandafter#3\expandafter{\xs_reserved_B}%
@@ -1021,7 +1019,7 @@
 		\def\xs_reserved_A{\xs_exparg\xs_StrExpand_i{\number\numexpr#1-1}}%
 		}
 		{\let\xs_reserved_A\relax
-		}%
+		}% <-- bugfix 1.85
 	\xs_reserved_A
 }
 
@@ -1228,3 +1226,6 @@ v1.83 06/02/2019
 ------------------------------------------------------------------------------
 v1.84 21/07/2021
   - encodage du fichier xstring.tex en UTF-8
+  ------------------------------------------------------------------------------
+v1.85 14/01/2023
+    - 2 espaces parasites corrigés

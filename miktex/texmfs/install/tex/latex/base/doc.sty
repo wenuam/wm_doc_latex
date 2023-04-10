@@ -53,7 +53,7 @@
 \DeclareCurrentRelease{v3}{2022-06-01}
 
 \ProvidesPackage{doc}
-  [2022/06/08 v3.0j
+  [2022/07/03 v3.0k
    Standard LaTeX documentation package V3 (FMi)]
 %%
 %% Package `doc' to use with LaTeX 2e
@@ -67,88 +67,28 @@
 \catcode`\^^A=14
 \catcode`\^^X=14
 \AtBeginDocument{\catcode`\^^A=14\relax\catcode`\^^X=14\relax}
-\ExplSyntaxOn
-\newif \ifdoc@noprint
-\newif \ifdoc@noindex
-\newif \ifdoc@hyperref \doc@hyperreftrue
-\newif \ifdoc@multicol \doc@multicoltrue
-\newif \ifdoc@debugshow
-\newif \ifdoc@reportchangedates
-\keys_define:nn {doc}
+\DeclareKeys
   {
-    noprint  .choice:,
-    noprint / true  .code:n = { \legacy_if_set_true:n  { doc@noprint } },
-    noprint / false .code:n = { \legacy_if_set_false:n { doc@noprint } },
-    noprint  .default:n = { true },
-    noindex  .choice:,
-    noindex / true  .code:n = { \legacy_if_set_true:n  { doc@noindex } },
-    noindex / false .code:n = { \legacy_if_set_false:n { doc@noindex } },
-    noindex  .default:n = { true },
-    hyperref  .choice:,
-    hyperref / true  .code:n = { \legacy_if_set_true:n  { doc@hyperref } },
-    hyperref / false .code:n = { \legacy_if_set_false:n { doc@hyperref } },
-    hyperref  .default:n = { true },
-    nohyperref  .choice:,
-    nohyperref / true  .code:n = { \legacy_if_set_false:n  { doc@hyperref } },
-    nohyperref / false .code:n = { \legacy_if_set_true:n { doc@hyperref } },
-    nohyperref  .default:n = { true },
-    multicol  .choice:,
-    multicol / true  .code:n = { \legacy_if_set_true:n  { doc@multicol } },
-    multicol / false .code:n = { \legacy_if_set_false:n { doc@multicol } },
-    multicol  .default:n = { true },
-    nomulticol  .choice:,
-    nomulticol / true  .code:n = { \legacy_if_set_false:n  { doc@multicol } },
-    nomulticol / false .code:n = { \legacy_if_set_true:n { doc@multicol } },
-    nomulticol  .default:n = { true },
-    debugshow  .choice:,
-    debugshow / true  .code:n = { \legacy_if_set_true:n  { doc@debugshow } },
-    debugshow / false .code:n = { \legacy_if_set_false:n { doc@debugshow } },
-    debugshow  .default:n = { true },
-    reportchangedates  .choice:,
-    reportchangedates / true  .code:n = { \legacy_if_set_true:n  { doc@reportchangedates } },
-    reportchangedates / false .code:n = { \legacy_if_set_false:n { doc@reportchangedates } },
-    reportchangedates  .default:n = { true },
+    noprint           .if    = {doc@noprint},
+    noindex           .if    = {doc@noindex},
+    hyperref          .if    = {doc@hyperref},
+    nohyperref        .ifnot = {doc@hyperref},
+    multicol          .if    = {doc@multicol},
+    nomulticol        .ifnot = {doc@multicol},
+    debugshow         .if    = {doc@debugshow},
+    reportchangedates .if    = {doc@reportchangedates},
+    toplevel          .if    = {doc@toplevel},
+    notoplevel        .ifnot = {doc@toplevel},
+    macrolike         .if    = {doc@macrolike},
+    envlike           .ifnot = {doc@macrolike},
+    idxtype           .store = \doc@idxtype,
+    idxgroup          .store = \doc@idxgroup,
+    printtype         .store = \doc@printtype,
+    outer             .if    = {doc@outer},
   }
-\newif \ifdoc@toplevel \doc@topleveltrue
-\keys_define:nn {doc}
-  {
-    toplevel  .choice:,
-    toplevel / true  .code:n = { \legacy_if_set_true:n  { doc@toplevel } },
-    toplevel / false .code:n = { \legacy_if_set_false:n { doc@toplevel } },
-    toplevel  .default:n = { true },
-    notoplevel  .choice:,
-    notoplevel / true  .code:n = { \legacy_if_set_false:n  { doc@toplevel } },
-    notoplevel / false .code:n = { \legacy_if_set_true:n { doc@toplevel } },
-    notoplevel  .default:n = { true }
-  }
-\newif \ifdoc@macrolike
-\keys_define:nn {doc}
-  {
-    macrolike  .choice:,
-    macrolike / true  .code:n = { \legacy_if_set_true:n  { doc@macrolike } },
-    macrolike / false .code:n = { \legacy_if_set_false:n { doc@macrolike } },
-    macrolike  .default:n = { true },
-    envlike  .choice:,
-    envlike / true  .code:n = { \legacy_if_set_false:n  { doc@macrolike } },
-    envlike / false .code:n = { \legacy_if_set_true:n { doc@macrolike } },
-    envlike  .default:n = { true }
-  }
-
-\keys_define:nn { doc }
-  {
-    idxtype  .tl_set:N = \doc@idxtype,
-    idxgroup .tl_set:N = \doc@idxgroup,
-    printtype .tl_set:N = \doc@printtype
-  }
-\newif\ifdoc@outer
-\keys_define:nn {doc}
-  {
-    outer  .choice:,
-    outer / true  .code:n = { \legacy_if_set_true:n  { doc@outer } },
-    outer / false .code:n = { \legacy_if_set_false:n { doc@outer } },
-    outer  .default:n = { true },
-  }
-\ExplSyntaxOff
+\doc@hyperreftrue
+\doc@multicoltrue
+\doc@topleveltrue
 \ProcessKeyOptions
 \newif\ifscan@allowed    \scan@allowedtrue
 \def\SetupDoc#1{%

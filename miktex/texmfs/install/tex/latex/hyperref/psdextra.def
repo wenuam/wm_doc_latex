@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{psdextra.def}
-  [2022-09-22 v7.00t %
+  [2023-02-07 v7.00v %
   Hyperref: Additions to PDF string support]
 \Hy@VersionCheck{psdextra.def}
 \newcommand*{\psdmapshortnames}{%

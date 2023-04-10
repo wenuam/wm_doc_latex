@@ -12,7 +12,7 @@
 %% l3backend-pdf.dtx  (with options: `package,dvisvgm')
 %% l3backend-opacity.dtx  (with options: `package,dvisvgm')
 %% 
-%% Copyright (C) 2019-2022 The LaTeX Project
+%% Copyright (C) 2019-2023 The LaTeX Project
 %% 
 %% It may be distributed and/or modified under the conditions of
 %% the LaTeX Project Public License (LPPL), either version 1.3c of
@@ -26,7 +26,7 @@
 %% 
 %% File: l3backend-basics.dtx
 \ProvidesExplFile
-  {l3backend-dvisvgm.def}{2022-09-28}{}
+  {l3backend-dvisvgm.def}{2023-03-30}{}
   {L3 backend support: dvisvgm}
 \cs_if_exist:NTF \__kernel_dependency_version_check:nn
   {
@@ -97,21 +97,6 @@
   }
 \cs_generate_variant:Nn \__kernel_backend_scope:n { x }
 %% File: l3backend-color.dtx
-\cs_new_protected:Npn \__color_backend_pickup:N #1
-  {
-    \exp_args:NV \tl_if_head_is_space:nTF \current@color
-      {
-        \tl_set:Nn #1 { { gray } { 0 } }
-        \msg_warning:nnx { color } { unhandled }
-          { \current@color }
-      }
-      {
-        \exp_last_unbraced:Nx \__color_backend_pickup:w
-          { \current@color } \s__color_stop #1
-      }
-  }
-\cs_new_protected:Npn \__color_backend_pickup:w #1 ~ #2 \s__color_stop #3
-  { \tl_set:Nn #3 { {#1} {#2} } }
 \cs_new_protected:Npn \__color_backend_select_cmyk:n #1
   { \__color_backend_select:n { cmyk ~ #1 } }
 \cs_new_protected:Npn \__color_backend_select_gray:n #1
@@ -673,7 +658,7 @@
 \cs_new:Npn \__pdf_backend_version_minor: { -1 }
 \cs_new_protected:Npn \__pdf_backend_bdc:nn #1#2 { }
 \cs_new_protected:Npn \__pdf_backend_emc: { }
-\cs_new_protected:Npn \__pdf_backend_pagesize_set:nn #1#2 { }
+\cs_new_protected:Npn \__pdf_backend_pagesize_gset:nn #1#2 { }
 %% File: l3backend-opacity.dtx
 \cs_new_protected:Npn \__opacity_backend_select:n #1
   { \__opacity_backend:nn {#1} { } }

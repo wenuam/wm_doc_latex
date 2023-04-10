@@ -2,7 +2,7 @@
 %% This is file `fancyvrb.sty',
 %%
 %% COPYRIGHT 1992-1999, by Timothy Van Zandt <tvz@zandtwerk.kellogg.nwu.edu>
-%%           2000-2022 ... , by Herbert Voss <hvoss@tug.org>
+%%           2000-2023 ... , by Herbert Voss <hvoss@tug.org>
 %%
 %% This package may be distributed under the terms of the LaTeX Project Public
 %% License, as described in lppl.txt in the base LaTeX distribution.
@@ -13,8 +13,8 @@
 %%   verbatim environments and commands and extensive documentation.
 %%
 \NeedsTeXFormat{LaTeX2e}
-\def\fileversion{4.5}
-\def\filedate{2022/06/06}
+\def\fileversion{4.5a}
+\def\filedate{2023/01/19}
 \ProvidesPackage{fancyvrb}[\filedate\space \fileversion\space verbatim text (tvz,hv)]
 %\message{Style option: `fancyvrb' v\fileversion \space  <\filedate> (tvz)}
 \csname fancyvrb@loaded\endcsname
@@ -827,7 +827,8 @@
 %% DG/SR modification end
   \penalty\@M
   \FV@SingleFrameSep
-  \penalty\@M}
+  \penalty\@M
+}
 %% DG/SR modification begin - May. 19, 1998
 \define@key{FV}{label}{%
   \def\@tempa{#1}%
@@ -868,7 +869,7 @@
 \def\FV@SingleFrameLine#1{%
   \hbox to\z@{%
     \kern\leftmargin
-    \ifnum#1=\z@
+    \ifnum#1=\z@%   top line?
       \let\FV@Label\FV@LabelBegin
     \else
       \let\FV@Label\FV@LabelEnd
@@ -876,7 +877,7 @@
     \ifx\FV@Label\relax
       \FancyVerbRuleColor{\vrule \@width\linewidth \@height\FV@FrameRule}%
     \else
-      \ifnum#1=\z@
+      \ifnum#1=\z@% top line
         \setbox\z@\hbox{\strut\enspace\FV@LabelBegin\enspace\strut}%
       \else
         \setbox\z@\hbox{\strut\enspace\FV@LabelEnd\enspace\strut}%
