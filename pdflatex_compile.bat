@@ -29,21 +29,22 @@ rem Enforce current working directory (i.e. for Total Commander, if placed into 
 cd /d "%cd%"
 
 rem Set PATH with tools
-set "PATH=%PATH%;%sd%\inkscape\bin"
-set "PATH=%PATH%;%sd%\latex"
-set "PATH=%PATH%;%sd%\miktex\texmfs\install\miktex\bin\x64"
-set "PATH=%PATH%;%sd%\nvm"
-set "PATH=%PATH%;%sd%\nvm\v16.13.0"
-set "PATH=%PATH%;%sd%\pandoc"
-set "PATH=%PATH%;%sd%\perl\perl\bin"
-set "PATH=%PATH%;%sd%\tools\ditaa"
-set "PATH=%PATH%;%sd%\tools\msc-generator"
+set "PATH=!PATH!;%sd%\inkscape\bin"
+set "PATH=!PATH!;%sd%\latex"
+set "PATH=!PATH!;%sd%\miktex\texmfs\install\miktex\bin\x64"
+set "PATH=!PATH!;%sd%\nvm"
+set "PATH=!PATH!;%sd%\nvm\v16.13.0"
+set "PATH=!PATH!;%sd%\pandoc"
+set "PATH=!PATH!;%sd%\perl\perl\bin"
+set "PATH=!PATH!;%sd%\tools\ditaa"
+set "PATH=!PATH!;%sd%\tools\msc-generator"
 
 rem Clean PATH
-set "PATH=%PATH:\\=\%"
-set "PATH=%PATH:;;=;%"
-set "PATH=%PATH: ;=;%"
-set "PATH=%PATH:; =;%"
+set "PATH=!PATH:\\=\!"
+set "PATH=!PATH:;;=;!"
+set "PATH=!PATH: ;=;!"
+set "PATH=!PATH:; =;!"
+if "!PATH:~-1!"==";" set "PATH=!PATH:~0,-1!"
 
 rem Check source file
 if exist "%~1" (
@@ -59,13 +60,13 @@ if exist "%~1" (
 )
 
 rem Parameters
-set "vpar="
-set "vpar=%vpar% -shell-escape"
-set "vpar=%vpar% -synctex=1"
-set "vpar=%vpar% -interaction=nonstopmode"
-set "vpar=%vpar% --extra-mem-top=10000000"
-set "vpar=%vpar% -file-line-error"
-set "vpar=%vpar% -max-print-line=8190"
+set "cpar="
+set "cpar=%cpar% -shell-escape"
+set "cpar=%cpar% -synctex=1"
+set "cpar=%cpar% -interaction=nonstopmode"
+set "cpar=%cpar% --extra-mem-top=10000000"
+set "cpar=%cpar% -file-line-error"
+set "cpar=%cpar% -max-print-line=8190"
 
 :repeat
 if %tries% equ 0 (goto :done)
@@ -73,7 +74,7 @@ set /a tries-=1
 echo;
 echo === COMPILING : %tries% @ %time% ==========================================
 rem Generate PDF file (those arguments allow the magic to happen)
-pdflatex %vpar% "%~1"
+pdflatex %cpar% "%~1"
 if %errorlevel% equ 0 (goto :repeat) else (
 	echo FAILED (%errorlevel%) check the log...
 	pause
