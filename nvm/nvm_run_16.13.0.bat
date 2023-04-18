@@ -43,7 +43,7 @@ if exist "%sd%\v!NVM_VER!" (
 	echo NVM version !NVM_VER! found in "%sd%"
 
 	rem Find path of 'node.exe' (last of list if multiple)
-	for /f %%u in ('dir /b /s node.exe') do set "vexe=%%~dpu"
+	for /f %%u in ('dir /b /s "%sd%\v!NVM_VER!\node.exe"') do set "vexe=%%~dpu"
 	if "!vexe:~-1!"=="\" set "vexe=!vexe:~0,-1!"
 REM	echo Found node.exe at "!vexe!"
 
