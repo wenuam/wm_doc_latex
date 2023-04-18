@@ -66,8 +66,8 @@ REM	set "NVM_SYMLINK=%ProgramW6432%\nodejs"
 	rem Launch the right alternative
 	if not "%~1" == "" (
 		echo Executing parameters...
-		echo "%*"
-REM		start "" /d "%cd%" "%*"
+REM		echo "%*"
+		start "" /d "%cd%" "%*"
 	) else (
 		echo Opening command line windows...
 		start "" /d "%sd%" "cmd"
