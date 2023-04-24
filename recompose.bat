@@ -1,5 +1,7 @@
 @echo off && setlocal enabledelayedexpansion && chcp 65001>nul
 
+set "sd=%cd%"
+
 rem - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 echo Recompose 'miktex' caches...
 start "" /d "%~dp0miktex" "miktex-cleanup-fndb.bat"
@@ -16,7 +18,7 @@ rem	)
 	del "node.exe.001" /q 1>nul 2>nul
 	del "node.exe.002" /q 1>nul 2>nul
 )
-cd "..\.."
+cd /d "%sd%"
 
 cd "nvm\v16.13.0\node_modules\@mermaid-js\mermaid-cli\node_modules\puppeteer-core\.local-chromium\win64-1045629\chrome-win"
 if exist "chrome.dll.001" (
@@ -40,7 +42,7 @@ rem	)
 	del "interactive_ui_tests.exe.003" /q 1>nul 2>nul
 	del "interactive_ui_tests.exe.004" /q 1>nul 2>nul
 )
-cd "..\..\..\..\..\..\..\..\..\.."
+cd /d "%sd%"
 
 cd "nvm\v16.13.0\node_modules\diagrams\node_modules\electron\dist"
 if exist "electron.exe.001" (
@@ -51,7 +53,7 @@ rem	)
 	del "electron.exe.001" /q 1>nul 2>nul
 	del "electron.exe.002" /q 1>nul 2>nul
 )
-cd "..\..\..\..\..\..\.."
+cd /d "%sd%"
 
 rem - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 echo Recompose 'pandoc' dependencies...
@@ -66,4 +68,4 @@ rem	)
 	del "pandoc.exe.002" /q 1>nul 2>nul
 	del "pandoc.exe.003" /q 1>nul 2>nul
 )
-cd ".."
+cd /d "%sd%"

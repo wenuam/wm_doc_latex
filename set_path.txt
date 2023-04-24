@@ -1,0 +1,9 @@
+./inkscape/bin
+./latex
+./miktex/texmfs/install/miktex/bin/x64
+./nvm
+./nvm/v16.13.0
+./pandoc
+./perl/perl/bin
+./tools/ditaa
+./tools/msc-generator

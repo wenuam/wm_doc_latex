@@ -11,8 +11,22 @@ rem Change default helpers
 set "quiet=1>nul 2>nul"
 set "fquiet=/f /q 1>nul 2>nul"
 
-rem Runner loop
-set /a tries=0
+rem Set PATH with tools
+set "cset=set_path.txt"
+if exist "%cset%" (
+	for /f "tokens=1* delims=?" %%i in (%cset%) do (
+		set "vset=%%~fi"
+		set "PATH=!PATH!;!vset!"
+	)
+)
+
+rem Clean PATH
+set "PATH=!PATH:\\=\!"
+set "PATH=!PATH:;;=;!"
+set "PATH=!PATH: ;=;!"
+set "PATH=!PATH:; =;!"
+if "!PATH:~-1!"==";" set "PATH=!PATH:~0,-1!"
+REM	echo path=!PATH!
 
 rem Start directory, always the batch's folder (%~dp0)
 set "sd=%cd%"
@@ -28,23 +42,8 @@ if "%cd:~-1%"=="\" set "cd=%cd:~0,-1%"
 rem Enforce current working directory (i.e. for Total Commander, if placed into a menu bar)
 cd /d "%cd%"
 
-rem Set PATH with tools
-set "PATH=!PATH!;%sd%\inkscape\bin"
-set "PATH=!PATH!;%sd%\latex"
-set "PATH=!PATH!;%sd%\miktex\texmfs\install\miktex\bin\x64"
-set "PATH=!PATH!;%sd%\nvm"
-set "PATH=!PATH!;%sd%\nvm\v16.13.0"
-set "PATH=!PATH!;%sd%\pandoc"
-set "PATH=!PATH!;%sd%\perl\perl\bin"
-set "PATH=!PATH!;%sd%\tools\ditaa"
-set "PATH=!PATH!;%sd%\tools\msc-generator"
-
-rem Clean PATH
-set "PATH=!PATH:\\=\!"
-set "PATH=!PATH:;;=;!"
-set "PATH=!PATH: ;=;!"
-set "PATH=!PATH:; =;!"
-if "!PATH:~-1!"==";" set "PATH=!PATH:~0,-1!"
+rem Runner loop
+set /a tries=0
 
 rem Check source file
 if exist "%~1" (
@@ -57,6 +56,9 @@ if exist "%~1" (
 		rem Recreate PDF from scratch, 3 runs
 		set /a tries+=2
 	)
+) else if "%1" == "cmd" (
+	echo Opening pre-configured "cmd" console...
+	start "" /d "%sd%" "cmd" ""
 )
 
 rem Parameters
