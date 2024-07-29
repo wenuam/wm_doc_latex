@@ -1,6 +1,6 @@
-% beamer.4ht (2021-05-16-09:21), generated from tex4ht-4ht.tex
+% beamer.4ht (2022-10-04-13:07), generated from tex4ht-4ht.tex
 % Copyright 2003-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-05-16-09:21}
+\immediate\write-1{version 2022-10-04-13:07}
 
 \NewConfigure{titlepage}{2}
 \NewConfigure{title}{2}
@@ -54,21 +54,6 @@
 \newtoks\sl:toks
 \NewConfigure{sec@slide}{2}
 
-\def\addtocontents#1#2{%
-   \add:toc{#1}{}{#2}%
-}
-\def\add:toc#1#2#3{{%
-   \csname if:toc\endcsname{
-      \def\protect{\noexpand\noexpand\noexpand}%
-      \edef\:tempa{\the\:tokwrite{\string\doTocEntry
-   \string\toc#1{#2}{%
-      \string\csname\space a:TocLink\string\endcsname
-            {\FileNumber}{\cur:th\@currentlabel}{}{#3}%
-   }{}\relax
-}%
-}\:tempa
-   }%
-}}
 \def\tableofcontents{\futurelet\:temp\:TOC}
 \def\:TOC{\ifx [\:temp \expandafter\:TableOfContents
           \else \:TableOfContents[toc]\fi}
@@ -165,7 +150,7 @@
 
 \NewConfigure{frame}{2}
 \NewConfigure{frametitle}{2}
-\AddToHook{env/beamer@frameslide/before}{\RecallEndP\a:frame}
+\AddToHook{env/beamer@frameslide/before}{\RecallEndP\a:frame\beamer@autobreakfalse}
 \AddToHook{env/beamer@frameslide/after}{\b:frame}
 
 \long\def\:temp[#1]#2{%
@@ -176,9 +161,29 @@
 
 \HLet\beamer@@frametitle\:temp
 % Beamer redefines \emph, it is necessary to insert hooks again
-
+\NewConfigure{emph}{2}
 \pend:defI\emph{\a:emph}%
 \append:defI\emph{\b:emph}%
+
+\HLet\framebreak\relax
+\HLet\beamer@@spacingcover\relax
+\NewConfigure{beamerbiblatex}{3}
+\@ifpackageloaded{biblatex}{
+  \pend:defI\beamer@biblabeltemplate{%
+    \ifdefined\end:itm\end:itm\fi%
+    \gdef\end:itm{\c:beamerbiblatex}%
+    \a:beamerbiblatex%
+  }
+  \append:defI\beamer@biblabeltemplate{\b:beamerbiblatex}
+  \AfterPreamble{%
+    \def\bibConfigure{%
+      \ConfigureList{thebibliography}%
+      {\PushMacro\end:itm\let\end:itm=\empty}%
+      {\end:itm\PopMacro\end:itm\global\let\end:itm\end:itm}{}{}%
+    }
+  }
+}
+{}
 
 
 \Hinput{beamer}

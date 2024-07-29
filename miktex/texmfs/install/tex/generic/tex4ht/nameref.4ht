@@ -1,6 +1,6 @@
-% nameref.4ht (2021-02-03-14:57), generated from tex4ht-4ht.tex
+% nameref.4ht (2022-12-30-15:46), generated from tex4ht-4ht.tex
 % Copyright 2005-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-02-03-14:57}
+\immediate\write-1{version 2022-12-30-15:46}
 
    \let\NR:Type\relax
 \let\ltx@label\label
@@ -86,9 +86,27 @@
 % \NR:Type threw an undefined control sequence error. I think
 % \@currenvir is safe, there is nothing special about \@captype.
 %
+% use of \index and \label inside caption results in a fatal error
+% we need to disable them in \NR:Title
+
+% there can be more problematic commands, so we provide a configuration
+% that can be used multiple times - the default value fixes known commands
+% but a user can add more of them
+
+\def\a:captioncommandsfix{}
+\NewConfigure{CaptionCommandsFix}[1]{\concat:config\a:captioncommandsfix{#1}}
+\Configure{CaptionCommandsFix}{
+  \let\index\:gobble%
+  \let\label\:gobble%
+  \let\\\relax% causes issues when \centering is active
+}
+
 \long\def\@caption#1[#2]{%
     \gdef\NR:Type{\@currenvir}%
-    \gdef\NR:Title{\a:newlabel{#2}}%
+    \begingroup%
+    \a:captioncommandsfix
+    \protected@xdef\NR:Title{\a:newlabel{#2}}%
+    \endgroup%
    \o:NR@@caption{#1}[{#2}]%
 }
 
@@ -132,7 +150,12 @@
 \@ifpackageloaded{caption}{
   \pend:defIII\caption@beginex{%
     \gdef\NR:Type{\@currenvir}%
-    \gdef\NR:Title{\a:newlabel{##2}}%
+    % handle \label and \index in Caption's package
+    % version of \caption
+    \begingroup%
+    \a:captioncommandsfix
+    \protected@xdef\NR:Title{\a:newlabel{##2}}%
+    \endgroup%
   }
 }{}
 
@@ -163,13 +186,13 @@
 }
 
 \let\T:ref=\::ref
-\def\::ref{\protect\T@ref}
+\def\::ref{\@ifstar{\protect\T@ref}{\protect\T@ref}}
 \def\T@ref#1{%
-  \@safe@activestrue
-  \let\::ref \T:ref
+  \@safe@activestrue%
+  \let\::ref\T:ref%
   \expandafter\@setref\csname r@#1\endcsname\@firstoffive{#1}%
-  \def\::ref{\protect\T@ref}%
-  \@safe@activesfalse
+  \def\::ref{\@ifstar{\protect\T@ref}{\protect\T@ref}}%
+  \@safe@activesfalse%
 }
 
 \gdef\defineautorefname#1#2{%

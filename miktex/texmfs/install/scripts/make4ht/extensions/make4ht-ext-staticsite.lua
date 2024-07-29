@@ -67,7 +67,7 @@ local function insert_filter(make, pattern, fn)
   local insert_executed = false
   table.insert(make.matches, 1, {
     pattern=pattern,
-    params = {},
+    params = make.params or {},
     command = function()
       if not insert_executed  then
         fn()
@@ -96,12 +96,17 @@ end
 
 local function copy_files(filename, par)
   local function prepare_path(dir, subdir)
-    local path = dir .. "/" .. subdir .. "/" .. filename
+    local f = filename
+    if par.builddir then
+        f = f:gsub("^" .. par.builddir .. "/", "")
+    end
+    local path = dir .. "/" .. subdir .. "/" .. f
     return path:gsub("//", "/")
   end
   -- get extension settings
   local site_settings = get_filter_settings "staticsite"
-  local site_root = site_settings.site_root or "./"
+  local site_root = site_settings.site_root or par.outdir 
+  if site_root == "" then site_root = "./" end
   local map = site_settings.map or {}
   -- default path without subdir, will be used if the file is not matched
   -- by any pattern in the map
@@ -150,8 +155,10 @@ function M.modify_build(make)
     --   match.params.outdir = outdir
     --   print(match.pattern, match.params.outdir)
     -- end
-    make:match("html?$", process)
-    make:match(".*", copy_files, {slug=slug})
+    local params = make.params
+    params.slug = slug
+    make:match("html?$", process, params)
+    make:match(".*", copy_files, params)
   end)
 
   return make

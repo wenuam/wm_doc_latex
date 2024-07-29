@@ -1,8 +1,8 @@
 \ifnum\the\catcode`\%=14\else\expandafter\edef\csname
   \string:RestoreCatcodes\endcsname{\catcode`\%\the
   \catcode`\%}\catcode`\%14\fi
-% tex4ht.sty (2021-09-14-14:11), generated from tex4ht-sty.tex
-% Copyright 2009-2021 TeX Users Group
+% tex4ht.sty (2023-10-04-13:17), generated from tex4ht-sty.tex
+% Copyright 2009-2023 TeX Users Group
 % Copyright 1996-2009 Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -20,7 +20,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-09-14-14:11}
+\immediate\write-1{version 2023-10-04-13:17}
 
 
 \ifx  \Preamble\UnDef  \else
@@ -32,6 +32,12 @@
    \let\AtBeginDocument\origatbegindocument
 
 \fi
+% disable new LaTeX's tagging support,
+% but save the requested keys for possible latter processing
+\ifdefined\DocumentMetadata
+  \def\DocumentMetadata#1{\def\:DocumentMetadata{#1}}
+\fi
+
 \def\writesixteen#1{\immediate\write99999{#1}}
 \expandafter\edef\csname :RestoreCatcodes\endcsname{%
    \expandafter\ifx \csname :RestoreCatcodes\endcsname\relax\else
@@ -84,6 +90,8 @@
 \catcode`\:11 \catcode`\@11 \catcode`;12 \catcode`\ 10
 \catcode`\<12 \catcode`\>12 \catcode`+12 \catcode`*12
 \catcode`\?12
+\def\SUPOn{}
+\def\SUBOn{}
 \edef\SUPOff{%
    \catcode`\noexpand ^\the\catcode`^\relax
 }
@@ -579,18 +587,25 @@
    \ifx \config:opt\:UnDef \else
   \append:def\:RestoreCatcodes{\early:sub\early:sup}
 \let\:IfFileExists\IfFileExists
-\long\def\IfFileExists#1#2#3{%
-   \csname recall:sub\endcsname
-   \csname recall:sup\endcsname
-   \expandafter\let\csname #1:sub\endcsname=\early:sub
-   \expandafter\let\csname #1:sup\endcsname=\early:sup
-   \let\early:sub=\relax     \let\recall:sub\relax
-   \let\early:sup=\relax     \let\recall:sup\relax
-   \:IfFileExists{#1}{#2}{#3}%
-   \expandafter\let\expandafter\early:sub\csname #1:sub\endcsname
-   \expandafter\let\expandafter\early:sup\csname #1:sup\endcsname
-   \early:sub \early:sup
-}
+
+% I am not sure why we used this declaration. It is from the original
+% TeX4ht sources, so it probably had some reason. The problem is that it
+% inserts extra tokens after \:IfFileExists, and if some package uses
+% something like \IfFileExists{foo.sty}{\@firstoftwo}{\@secondoftwo}{aa}{bb},
+% then it fails. I've found this issue with the Standalone class.
+% See https://tex.stackexchange.com/a/638965/2891 for example where it fails.
+% \long\def\IfFileExists#1#2#3{%
+%    \csname recall:sub\endcsname
+%    \csname recall:sup\endcsname
+%    \expandafter\let\csname #1:sub\endcsname=\early:sub
+%    \expandafter\let\csname #1:sup\endcsname=\early:sup
+%    \let\early:sub=\relax     \let\recall:sub\relax
+%    \let\early:sup=\relax     \let\recall:sup\relax
+%    \:IfFileExists{#1}{#2}{#3}%
+%    \expandafter\let\expandafter\early:sub\csname #1:sub\endcsname
+%    \expandafter\let\expandafter\early:sup\csname #1:sup\endcsname
+%    \early:sub \early:sup
+% }
 \ifx \o:document\:UnDef
    \pend:def\Preamble{%
      \csname recall:sub\endcsname
@@ -3802,7 +3817,7 @@
    \xp:var{#2}fstf:id,#1!*?: %
    \closeout\:refout
 \openout\:refout\jobname.xref     \:clearpage
-\gHAdvance\fstf:id  10000
+\gHAdvance\fstf:id  100000
 %
 \gHAssign\maxfile:id  \fstf:id
 \gHAssign\bs:fileid  \maxfile:id
@@ -3984,6 +3999,7 @@
    \noexpand\csname doTocEntry\string\endcsname\relax
       \string\expandafter\string\endinput
    \string\fi}%
+   \message{(\jobname.4tc)}% enable tracking of the .4tc file by latexmk
 }%
 }
 \:temp

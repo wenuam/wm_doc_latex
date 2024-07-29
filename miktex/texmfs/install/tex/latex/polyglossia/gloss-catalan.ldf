@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-catalan.ldf}[polyglossia: module for Catalan]
 \PolyglossiaSetup{catalan}{
   bcp47=ca,
+  bcp47-language=ca,
+  bcp47-script=Latn,
   hyphennames={catalan},
   hyphenmins={2,2},
   langtag=CAT,
@@ -14,21 +16,21 @@
 % BCP-47 compliant aliases
 \setlanguagealias*{catalan}{ca}
 
-\define@boolkey{catalan}[catalan@]{babelshorthands}[true]{}
+\DeclareKeys[polyglossia/gloss/catalan]
+  {
+    babelshorthands.if = catalan@babelshorthands,
+    babelshorthands.default:n = true,
+  }
 \ifsystem@babelshorthands
-  \setkeys{catalan}{babelshorthands=true}
+  \SetGlossOptions{catalan}{babelshorthands=true}
 \else
-  \setkeys{catalan}{babelshorthands=false}
+  \SetGlossOptions{catalan}{babelshorthands=false}
 \fi
 
 % Register default options
-\xpg@initialize@gloss@options{catalan}{babelshorthands=false}
+\InitializeGlossOptions{catalan}{babelshorthands=false}
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
 %%% adapted from Babel's catalan.ldf
 \newdimen\leftllkern \newdimen\rightllkern \newdimen\raiselldim
@@ -44,7 +46,7 @@
   \else
     \leftllkern=0pt\rightllkern=0pt\raiselldim=0pt%
     \setbox0\hbox{l}%
-    \xpg@if@char@available{00B7}%
+    \IfCharIsAvailableTF{00B7}%
           {\setbox2\hbox{\char"00B7}\setbox1\hbox{l}}%
           {\setbox2\hbox{.}\setbox1\hbox{l\/}}%
     \setbox3\hbox{.}%
@@ -72,7 +74,7 @@
   \else
     \leftllkern=0pt\rightllkern=0pt\raiselldim=0pt%
     \setbox0\hbox{L}%
-    \xpg@if@char@available{00B7}%
+    \IfCharIsAvailableTF{00B7}%
           {\setbox2\hbox{\char"00B7}\setbox1\hbox{L}}%
           {\setbox2\hbox{.}\setbox1\hbox{L\/}}%
     \setbox3\hbox{.}%
@@ -104,14 +106,14 @@
 \def\bbl@L#1#2{\Lgem}
 
 \def\catalan@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{catalan}%
   \declare@shorthand{catalan}{"l}{\lgem{}}
   \declare@shorthand{catalan}{"L}{\Lgem{}}
 }
 
 \def\nocatalan@shorthands{%
-    \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+    \xpg@deactivate@shorthands%
 }
 
 \def\captionscatalan{%

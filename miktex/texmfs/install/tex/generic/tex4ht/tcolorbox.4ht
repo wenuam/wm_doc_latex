@@ -1,5 +1,5 @@
-% tcolorbox.4ht (2022-01-28-15:00), generated from tex4ht-4ht.tex
-% Copyright 2020-2022 TeX Users Group
+% tcolorbox.4ht (2023-02-12-14:24), generated from tex4ht-4ht.tex
+% Copyright 2020-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,7 +16,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-01-28-15:00}
+\immediate\write-1{version 2023-02-12-14:24}
 
 
 % use custom counter that increments for every \tcolorbox
@@ -34,10 +34,11 @@
   \def\:tcbcolid{tcolobox-\arabic{:tcbcolcount}}
   % Open box
   \a:tcolorbox%
-  % save label, if it is set
+  % set label if it exists
   \ifdefined\tcolorbox:label:key%
+    \let\@currentlabel\tcolorbox:currentlabel% at this moment, \@currentlabel has wrong value
+    \o:tcb@set@label:{\tcolorbox:label:key}%
     \AnchorLabel% save cross-ref destination
-    \label{\tcolorbox:label:key}%
     \global\let\tcolorbox:label:key\undefined%
   \fi%
   % open title
@@ -46,6 +47,8 @@
   % close title and open main box
   \c:tcolorbox%
   \box\tcb@upperbox%
+  % the paragraph opened in the upper box can be unclosed
+  \RecallEndP
   % deal with lower box, if it is set
   \iftcb@hasLower%
     \a:tcolorlowerbox%
@@ -58,6 +61,9 @@
 \HLet\tcb@drawcolorbox\:tempa
 % overwrite other versions of box drawing macros
 \HLet\tcb@drawcolorbox@standalone\:tempa
+
+% save the state of paragraph before opening the content box
+\pend:def\tcb@set@@upper@and@lower{\SaveEndP}
 
 % we need to close tcolorbox environment here,
 % in the box. otherwise, last paragraph end
@@ -78,10 +84,10 @@
 \NewConfigure{tcolorbox}{4}
 \NewConfigure{tcolorlowerbox}{2}
 
-% we need to save label for a later use
+% we need to save current label for a later use
 \def\:tempa#1{%
   \xdef\tcolorbox:label:key{#1}%
-  \o:tcb@set@label:{#1}%
+  \global\let\tcolorbox:currentlabel\@currentlabel%
 }
 \HLet\tcb@set@label\:tempa
 
@@ -90,6 +96,15 @@
 \pend:def\tcb@minipage@bottom{\SaveEndP}
 \pend:def\tcb@minipage@center{\SaveEndP}
 
+
+\AfterEndPreamble{%
+  % fix \nameref support
+  \def\:tempa#1{%
+    \gdef\NR:Title{\a:newlabel{#1}}%
+    \o:tcb@gettitle:{#1}%
+  }%
+  \HLet\tcb@gettitle\:tempa
+}
 
 
 \Hinput{tcolorbox}

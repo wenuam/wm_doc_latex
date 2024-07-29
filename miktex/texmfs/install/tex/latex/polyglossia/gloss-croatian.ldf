@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-croatian.ldf}[polyglossia: module for Croatian]
 \PolyglossiaSetup{croatian}{
   bcp47=hr,
+  bcp47-language=hr,
+  bcp47-script=Latn,
   langtag=HRV,
   hyphennames={croatian},
   hyphenmins={2,2}, % aligned with https://ctan.org/pkg/hrhyph patterns and http://lebesgue.math.hr/~nenad/Diplomski/Maja_Ribaric_2011.pdf
@@ -18,44 +20,45 @@
   \RequirePackage{luavlna}
 \fi
 
-\define@boolkey{croatian}[croatian@]{babelshorthands}[true]{}
-
-\define@boolkey{croatian}[croatian@]{disabledigraphs}[true]{}
-
-% Alias kept for backwards compatibility. Please do not remove
-\define@boolkey{croatian}[croatian@]{disableligatures}[true]{%
-   \xpg@warning{The option disableligatures is deprected.\MessageBreak
-                Please use disabledigraphs instead}%
-   \ifcroatian@disableligatures
-      \croatian@disabledigraphstrue
-   \else
-      \croatian@disabledigraphsfalse
-   \fi
-}
-
-\define@boolkey{croatian}[croatian@]{splithyphens}[true]{}
-
-\define@boolkey{croatian}[croatian@]{localalph}[true]{}
+\DeclareKeys[polyglossia/gloss/croatian]
+  {
+    babelshorthands.if = croatian@babelshorthands,
+    babelshorthands.default:n = true,
+    disabledigraphs.if = croatian@disabledigraphs,
+    disabledigraphs.default:n = true,
+    splithyphens.if = croatian@splithyphens,
+    splithyphens.default:n = true,
+    localalph.if = croatian@localalph,
+    localalph.default:n = true,
+    disableligatures.choices:nn = { true, false }
+      {%
+        \xpg@warning{The option disableligatures is deprecated.\MessageBreak
+               Please use disabledigraphs instead}%
+        \ifcase\UseName{l_keys_choice_int}\or
+          \croatian@disabledigraphstrue
+        \or
+          \croatian@disabledigraphsfalse
+        \fi
+      },
+    disableligatures.default:n = true,
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{croatian}{babelshorthands=false,disabledigraphs=false,
+\InitializeGlossOptions{croatian}{babelshorthands=false,disabledigraphs=false,
                                         splithyphens=true,localalph=true}
 
 \ifsystem@babelshorthands
-  \setkeys{croatian}{babelshorthands=true}
+  \SetGlossOptions{croatian}{babelshorthands=true}
 \else
-  \setkeys{croatian}{babelshorthands=false}
+  \SetGlossOptions{croatian}{babelshorthands=false}
 \fi
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
+\let\xpg@hyphen@char-
 \def\croatian@@splhyphen#1{%
   \def\croatian@sh@tmp{%
-       \if\croatian@sh@next-#1%
+       \ifx\croatian@sh@next\xpg@hyphen@char#1%
        \else\expandafter\croatian@@@splhyphen{#1}\fi%
      }%
      \futurelet\croatian@sh@next\croatian@sh@tmp%
@@ -75,7 +78,7 @@
 }
 
 \def\croatian@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{croatian}%
   \declare@shorthand{croatian}{"=}{\penalty\@M-\hskip\z@skip}%
   \declare@shorthand{croatian}{""}{\hskip\z@skip}%
@@ -100,7 +103,7 @@
 }
 
 \def\nocroatian@shorthands{%
-  \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+  \xpg@deactivate@shorthands%
 }
 
 \ifxetex

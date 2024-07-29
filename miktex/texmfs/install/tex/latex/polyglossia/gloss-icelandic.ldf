@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-icelandic.ldf}[polyglossia: module for Icelandic]
 \PolyglossiaSetup{icelandic}{
   bcp47=is,
+  bcp47-language=is,
+  bcp47-script=Latn,
   hyphennames={icelandic},
   hyphenmins={2,2},
   langtag=ISL,

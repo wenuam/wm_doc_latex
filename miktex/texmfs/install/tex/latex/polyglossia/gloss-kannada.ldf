@@ -1,5 +1,5 @@
 %% gloss-kannada.ldf
-%% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+%% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %%
 %% Copyright 2011 Aravinda VK <hallimanearavind AT gmail.com>,
 %%                Shankar Prasad <prasad.mvs AT gmail.com>,
@@ -22,6 +22,9 @@
 
 \PolyglossiaSetup{kannada}{
   bcp47=kn,
+  bcp47-language=kn,
+  bcp47-region=IN,
+  bcp47-script=Knda,
   script=Kannada,
   scripttag=knda,
   langtag=KAN,
@@ -50,12 +53,20 @@
 \def\tmp@western{Western}
 \newif\ifkannada@numerals
 \kannada@numeralstrue
-
-\define@key{kannada}{numerals}[Kannada]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@western
-    \kannada@numeralsfalse
-  \fi}
+  
+\DeclareKeys[polyglossia/gloss/kannada]
+  {
+    numerals.choice:,
+    numerals / kannada.code =
+      {%
+        \kannada@numeralstrue
+      },
+    numerals / western.code =
+      {%     
+        \kannada@numeralsfalse
+      },
+    numerals.default:n = kannada
+  }
 
   
 \def\captionskannada{%

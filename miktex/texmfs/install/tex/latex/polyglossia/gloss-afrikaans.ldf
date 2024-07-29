@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-afrikaans.ldf}[polyglossia: module for Afrikaans]
 
 \PolyglossiaSetup{afrikaans}{
   bcp47=af,
+  bcp47-language=af,
+  bcp47-script=Latn,
   hyphennames={afrikaans,dutch},
   hyphenmins={2,2},
   langtag=AFK,
@@ -14,25 +16,24 @@
 % BCP-47 compliant aliases
 \setlanguagealias*{afrikaans}{af}
 
-\define@boolkey{afrikaans}[afrikaans@]{babelshorthands}[true]{}
-
+\DeclareKeys[polyglossia/gloss/afrikaans]
+  {
+    babelshorthands.if = afrikaans@babelshorthands,
+    babelshorthands.default:n = true,
+  }
 % Register default options
-\xpg@initialize@gloss@options{afrikaans}{babelshorthands=false}
+\InitializeGlossOptions{afrikaans}{babelshorthands=false}
 
 \ifsystem@babelshorthands
-  \setkeys{afrikaans}{babelshorthands=true}
+  \SetGlossOptions{afrikaans}{babelshorthands=true}
 \else
-  \setkeys{afrikaans}{babelshorthands=false}
+  \SetGlossOptions{afrikaans}{babelshorthands=false}
 \fi
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
 \def\afrikaans@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{afrikaans}%
   \declare@shorthand{afrikaans}{"-}{\nobreak-\bbl@allowhyphens}
   \declare@shorthand{afrikaans}{"~}{\textormath{\leavevmode\hbox{-}}{-}}
@@ -45,7 +46,7 @@
 }
 
 \def\noafrikaans@shorthands{%
-  \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+  \xpg@deactivate@shorthands%
 }
 
 \def\captionsafrikaans{%

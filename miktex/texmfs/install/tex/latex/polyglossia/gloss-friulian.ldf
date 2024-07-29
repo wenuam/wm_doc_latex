@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-friulian.ldf}[polyglossia: module for Friulian]
 
 \PolyglossiaSetup{friulian}{%
   bcp47=fur,
+  bcp47-language=fur,
+  bcp47-script=Latn,
   language=Friulian,
   babelname=friulan,
   hyphennames={friulan,furlan},
@@ -50,7 +52,7 @@
       Lui\or Avost\or Setembar\or Otobar\or Novembar\or Dicembar%
       \fi\space dal\space\number\year}}
 
-\AtEndPreamble{% the user or the class might define different values
+\AddToHook{begindocument/before}{% the user or the class might define different values
   \edef\xpgfu@savedvalues{%
     \clubpenalty=\the\clubpenalty\space
     \@clubpenalty=\the\@clubpenalty\space

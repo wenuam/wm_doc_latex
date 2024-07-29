@@ -1,9 +1,9 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>miktex.ini</title><link rel="stylesheet" type="text/css" href="miktexman.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="MiKTeX Manual"><link rel="up" href="files.html" title="Chapter 7. Files"><link rel="prev" href="files.html" title="Chapter 7. Files"><link rel="next" href="pdftex.cfg.html" title="pdftex.cfg"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><nav><ul class="pager"><li><a aria-label="Prev" href="files.html"><span aria-hidden="true">Prev</span></a></li><li><a aria-label="Up" href="files.html"><span aria-hidden="true">Up</span></a></li><li><a aria-label="Next" href="pdftex.cfg.html"><span aria-hidden="true">Next</span></a></li></ul></nav><div class="refentry"><a name="miktex.ini"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>miktex.ini — <span class="application">MiKTeX</span> configuration data store</p></div><div class="refsect1"><a name="id660581"></a><h2>Description</h2><p><span class="application">MiKTeX</span> configurations settings are read from the file
-<code class="filename">miktex.ini</code>.</p></div><div class="refsect1"><a name="id660599"></a><h2>Syntax</h2><p>The syntax follows the informal conventions of a traditional
-<a class="ulink" href="https://en.wikipedia.org/wiki/INI_file" target="_top">INI file</a>.</p></div><div class="refsect1"><a name="id660618"></a><h2>Querying and Modifying</h2><p>It is recommended that you use the <span class="application">MiKTeX</span> Configuration Utility
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>miktex.ini</title><link rel="stylesheet" type="text/css" href="miktexman.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="MiKTeX Manual"><link rel="up" href="files.html" title="Chapter 7. Files"><link rel="prev" href="files.html" title="Chapter 7. Files"><link rel="next" href="pdftex.cfg.html" title="pdftex.cfg"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><nav><ul class="pager"><li><a aria-label="Prev" href="files.html"><span aria-hidden="true">Prev</span></a></li><li><a aria-label="Up" href="files.html"><span aria-hidden="true">Up</span></a></li><li><a aria-label="Next" href="pdftex.cfg.html"><span aria-hidden="true">Next</span></a></li></ul></nav><div class="refentry"><a name="miktex.ini"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>miktex.ini — <span class="application">MiKTeX</span> configuration data store</p></div><div class="refsect1"><a name="id772397"></a><h2>Description</h2><p><span class="application">MiKTeX</span> configurations settings are read from the file
+<code class="filename">miktex.ini</code>.</p></div><div class="refsect1"><a name="id772452"></a><h2>Syntax</h2><p>The syntax follows the informal conventions of a traditional
+<a class="ulink" href="https://en.wikipedia.org/wiki/INI_file" target="_top">INI file</a>.</p></div><div class="refsect1"><a name="id772454"></a><h2>Querying and Modifying</h2><p>It is recommended that you use the <span class="application">MiKTeX</span> Configuration Utility
 (see
 <a class="citerefentry" href="initexmf.html"><span class="citerefentry"><span class="refentrytitle">initexmf</span>(1)</span></a>)
-to query and modify configuration settings.</p></div><div class="refsect1"><a name="id660656"></a><h2>Settings Reference</h2><pre class="programlisting">[General]
+to query and modify configuration settings.</p></div><div class="refsect1"><a name="id772483"></a><h2>Settings Reference</h2><pre class="programlisting">[General]
 
 	;; This variable specifies the external program called for
 	;; TeX's interactive `e' option.  %l is replaced by the line
@@ -45,7 +45,10 @@ to query and modify configuration settings.</p></div><div class="refsect1"><a na
 	AllowedShellCommands[] = findtexmf
 	AllowedShellCommands[] = gregorio
 	AllowedShellCommands[] = kpsewhich
+	AllowedShellCommands[] = l3sys-query
 	AllowedShellCommands[] = makeindex
+	AllowedShellCommands[] = memoize-extract.pl
+	AllowedShellCommands[] = memoize-extract.py
 	AllowedShellCommands[] = texosquery-jre8
 
 	;; Do we allow unrestricted shell command execution when running
@@ -996,4 +999,4 @@ to query and modify configuration settings.</p></div><div class="refsect1"><a na
 
 	;; Indicates whether input file encodings are guessed.
 	GuessInputKanjiEncoding = t
-</pre></div><div class="refsect1"><a name="id660652"></a><h2>See also</h2><span class="simplelist"><a class="citerefentry" href="initexmf.html"><span class="citerefentry"><span class="refentrytitle">initexmf</span>(1)</span></a></span></div></div></body></html>
+</pre></div><div class="refsect1"><a name="id772532"></a><h2>See also</h2><span class="simplelist"><a class="citerefentry" href="initexmf.html"><span class="citerefentry"><span class="refentrytitle">initexmf</span>(1)</span></a></span></div></div></body></html>

@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-polish.ldf}[polyglossia: module for Polish]
 
 \PolyglossiaSetup{polish}{
   bcp47=pl,
+  bcp47-language=pl,
+  bcp47-script=Latn,
   hyphennames={polish},
   hyphenmins={2,2},
   langtag=PLK,
@@ -18,30 +20,31 @@
   \RequirePackage{luavlna}
 \fi
 
-\define@boolkey{polish}[polish@]{babelshorthands}[true]{}
-
-\define@boolkey{polish}[polish@]{splithyphens}[true]{}
-
-\define@boolkey{polish}[polish@]{vlna}[true]{}
+\DeclareKeys[polyglossia/gloss/polish]
+  {
+    babelshorthands.if = polish@babelshorthands,
+    babelshorthands.default:n = true,
+    splithyphens.if = polish@splithyphens,
+    splithyphens.default:n = true,
+    vlna.if = polish@vlna,
+    vlna.default:n = true,
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{polish}{babelshorthands=false,splithyphens=true,vlna=true}
+\InitializeGlossOptions{polish}{babelshorthands=false,splithyphens=true,vlna=true}
 
 \ifsystem@babelshorthands
-  \setkeys{polish}{babelshorthands=true}
+  \SetGlossOptions{polish}{babelshorthands=true}
 \else
-  \setkeys{polish}{babelshorthands=false}
+  \SetGlossOptions{polish}{babelshorthands=false}
 \fi
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
+\let\xpg@hyphen@char-
 \def\polish@@splhyphen#1{%
   \def\polish@sh@tmp{%
-       \if\polish@sh@next-#1%
+       \ifx\polish@sh@next\xpg@hyphen@char#1%
        \else\expandafter\polish@@@splhyphen{#1}\fi%
      }%
      \futurelet\polish@sh@next\polish@sh@tmp%
@@ -61,7 +64,7 @@
 }
 
 \def\polish@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{polish}%
   \declare@shorthand{polish}{"=}{\polish@splhyphen}%
   \declare@shorthand{polish}{""}{\hskip\z@skip}%
@@ -80,7 +83,7 @@
 }
 
 \def\nopolish@shorthands{%
-  \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+  \xpg@deactivate@shorthands%
 }
 
 \ifxetex

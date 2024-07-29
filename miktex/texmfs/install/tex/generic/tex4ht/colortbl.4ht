@@ -1,6 +1,6 @@
-% colortbl.4ht (2021-05-06-14:12), generated from tex4ht-4ht.tex
+% colortbl.4ht (2022-07-03-14:21), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-05-06-14:12}
+\immediate\write-1{version 2022-07-03-14:21}
 
 
    \RequirePackage{xcolor}
@@ -99,7 +99,11 @@
 \def\hline:color{000}
 % save rule color in format usable in CSS
 \newcommand\tmp:arrayrulecolor[2][named]{%
-\noalign{\convertcolorspec{#1}{#2}{HTML}\:tmp\global\let\hline:color\:tmp}%
+\ifvoid\@arstrutbox% test if we are inside a tabular environment
+\convertcolorspec{#1}{#2}{HTML}\:tmp\global\let\hline:color\:tmp% we are not
+\else%
+\noalign{\convertcolorspec{#1}{#2}{HTML}\:tmp\global\let\hline:color\:tmp}% we are
+\fi
 }
 \HLet\arrayrulecolor\tmp:arrayrulecolor
 \def\convert:colorspec#1 #2 #3 #4{%

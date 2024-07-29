@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-esperanto.ldf}[polyglossia: module for Esperanto]
 \PolyglossiaSetup{esperanto}{
   bcp47=eo,
+  bcp47-language=eo,
+  bcp47-script=Latn,
   hyphennames={esperanto},
   hyphenmins={2,2},
   langtag=NTO,
@@ -27,10 +29,10 @@
    \def\figurename{Figuro}%
    \def\tablename{Tabelo}%
    %\def\thepart{}%
-   %\def\partname{}%
+   \def\partname{Parto}%
    \def\pagename{Paĝo}%
    \def\seename{vidu}%
-   \def\alsoname{Parto}%
+   \def\alsoname{vidu ankaŭ}%
    \def\enclname{Aldono(j)}%
    \def\ccname{Kopie al}%
    \def\headtoname{Al}%

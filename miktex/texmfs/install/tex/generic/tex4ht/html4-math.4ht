@@ -1,5 +1,5 @@
-% html4-math.4ht (2022-02-28-13:22), generated from tex4ht-html4.tex
-% Copyright 2009-2021 TeX Users Group
+% html4-math.4ht (2022-10-25-13:59), generated from tex4ht-html4.tex
+% Copyright 2009-2022 TeX Users Group
 % Copyright 1999-2009 Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-02-28-13:22}
+\immediate\write-1{version 2022-10-25-13:59}
 
 \exit:ifnot{accents,% 
 amsfonts,% 
@@ -25,6 +25,7 @@ amsmath,%
 amstex,% 
 amstex1,% 
 array,% 
+cancel,% 
 eplain,% 
 fleqn,% 
 fontmath,% 
@@ -332,6 +333,7 @@ ushort}
 \edef\:RestoreMathjaxCatcodes{\catcode`\noexpand \&=\the\catcode`\&}
 \def\:HandleMathjaxCatcodes{\edef\:RestoreMathjaxCatcodes{\catcode`\noexpand \&=\the\catcode`\&}\catcode`\&=11}
 \Configure{$}{\:HandleMathjaxCatcodes}{\:RestoreMathjaxCatcodes}{\expandafter\AltMathOne}
+\Configure{$$}{\:HandleMathjaxCatcodes}{\:RestoreMathjaxCatcodes}{\expandafter\AltlDisplayDollars}
 % for some reason, it is necessary to specify the catcode change directly in the configuration
 \Configure{()}{\:HandleMathjaxCatcodes\catcode`\&=11\AltlMath}{\:RestoreMathjaxCatcodes}
 \Configure{[]}{\:HandleMathjaxCatcodes\catcode`\&=11\AltlDisplay}{\:RestoreMathjaxCatcodes}
@@ -420,6 +422,7 @@ ushort}
 \Configure{underbrace} {}{\Picture+{}}{\EndPicture}
 
 \Configure{Longrightarrow}        {\pic:sym{Longrightarrow}}
+\Configure{Longleftarrow}         {\pic:sym{Longleftarrow}}
 \Configure{bowtie}                {\pic:sym{bowtie}}
 \Configure{cong}                  {\pic:sym{cong}}
 \Configure{ddots}                 {\pic:sym{ddots}}
@@ -447,8 +450,6 @@ ushort}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 
 
@@ -939,6 +940,7 @@ ushort}
 \Css{table.pmatrix {width:100\%;}}
 
 \Configure{Longrightarrow}        {\pic:sym{Longrightarrow}}
+\Configure{Longleftarrow}         {\pic:sym{Longleftarrow}}
 \Configure{bowtie}                {\pic:sym{bowtie}}
 \Configure{cong}                  {\pic:sym{cong}}
 \Configure{ddots}                 {\pic:sym{ddots}}
@@ -1006,7 +1008,6 @@ ushort}
 
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{array}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1025,6 +1026,8 @@ ushort}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 
@@ -1147,6 +1150,7 @@ ushort}
 
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{gauss}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1160,8 +1164,6 @@ ushort}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 
 
@@ -1189,6 +1191,15 @@ ushort}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1430,6 +1441,22 @@ ushort}
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                \ConfigureHinput{cancel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \Configure{cancel-math}{\HCode{<span class="cancel">}}{\HCode{</span>}}
+\Configure{bcancel-math}{\HCode{<span class="bcancel">}}{\HCode{</span>}}
+\Configure{xcancel-math}{\HCode{<span class="xcancel">}}{\HCode{</span>}}
+% It doesn't produce arrow unfortunatelly, maybe we could use SVG
+\Configure{cancelto}{\HCode{<span class="cancel">}}{\HCode{</span><sup>}}{\HCode{</sup>}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+\endinput\empty\empty\empty\empty\empty\empty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 
 
@@ -1474,6 +1501,11 @@ ushort}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
 
 
 

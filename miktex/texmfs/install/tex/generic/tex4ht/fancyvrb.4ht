@@ -1,6 +1,6 @@
-% fancyvrb.4ht (2021-06-06-09:18), generated from tex4ht-4ht.tex
+% fancyvrb.4ht (2022-12-02-14:48), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-06-06-09:18}
+\immediate\write-1{version 2022-12-02-14:48}
 
 
    \pend:def\FV@FormattingPrep{\let\fv:color\empty
@@ -68,7 +68,9 @@
   \setbox\@tempboxa=\FV@ListProcessLine{#1}%
   \let\FV@ProcessLine\FV@ListProcessLine@iv}
 \def\FV@ListProcessLine@iv#1{%
-  \box\@tempboxa
+  % we use \nobreak to really prevent unwanted line breaks
+  % see https://github.com/michal-h21/make4ht/issues/104
+  \box\@tempboxa\nobreak%
   \setbox\@tempboxa=\FV@ListProcessLine{#1}}%
 \def\FV@ListProcessLastLine{%
   \ifx\FV@ProcessLine\FV@ListProcessLine@iv

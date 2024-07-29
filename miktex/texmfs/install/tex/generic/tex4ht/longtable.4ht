@@ -1,6 +1,6 @@
-% longtable.4ht (2021-09-26-14:15), generated from tex4ht-4ht.tex
+% longtable.4ht (2023-04-10-13:46), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-09-26-14:15}
+\immediate\write-1{version 2023-04-10-13:46}
 
    \def\:tempc[#1]#2{%
   \gHAdvance\float:cnt  1
@@ -226,10 +226,11 @@
   \o:noalign:\bgroup  \gHAdvance\TitleCount  1
     \@ifnextchar[{\egroup\LT@c@ption\@firstofone}\LT@capti@n}
 \HLet\LT@caption\:tempc
+\NewConfigure{longtablecaption}{4}
 \def\:tempc#1#2#3{%
-  \LT@mcol\LT@cols c{\hbox{\parbox[t]\LTcapwidth{%
-    \cptA: #1{\cap:ref{#2}}\if\relax\detokenize{#1}\relax\else\cptB:\fi\cptC:#3\cptD:
-    \endgraf\vskip\baselineskip}}}}
+    \a:longtablecaption #1{\cap:ref{#2}}\if\relax\detokenize{#1}\relax\else\b:longtablecaption\fi\c:longtablecaption#3\d:longtablecaption
+    \endgraf%\vskip\baselineskip <- this caused error in https://tex.stackexchange.com/q/682383/2891
+ }
 \HLet\LT@makecaption\:tempc
 \def\:tempc#1[#2]#3{%
   \LT@makecaption#1\fnum@table{#3}%

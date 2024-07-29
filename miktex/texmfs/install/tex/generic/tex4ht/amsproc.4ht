@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amsproc.4ht (2021-05-09-08:03), generated from tex4ht-4ht.tex
+% amsproc.4ht (2023-03-21-10:02), generated from tex4ht-4ht.tex
 % Copyright (C) 1997-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -18,7 +18,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-05-09-08:03}
+\immediate\write-1{version 2023-03-21-10:02}
 
 
 \append:def\quote{\par\@totalleftmargin\z@}
@@ -31,8 +31,8 @@
 
 \pend:def\caption{\SkipRefstepAnchor}
 \long\def\c:theindex:#1#2#3#4#5#6#7#8#9{%
-   \def\theindex{%
-      \def\idx:item{\SaveEverypar\ht:everypar{}#1}%
+   \def\theindex{\SaveEverypar\ht:everypar{}#1%
+      \def\idx:item{}%
       \def\endtheindex{\idx:item#2\RecallEverypar}%
       \def\item{\idx:item\def\idx:item{#4}\let\index\@gobble #3}%
       \def\subitem{\idx:item\def\idx:item{#6}\let\index\@gobble #5}%
@@ -365,8 +365,8 @@ UnDFexyz
          \ifx \au:StartSec\:UnDef
             \let\au:StartSec\:StartSec
             \def\:StartSec{\:tableofcontents
-               \global\let\auto:toc\:UnDef \:StartSec}%
-            \pend:def\:tableofcontents{\gdef\:StartSec{\au:StartSec}}%
+               \global\let\auto:toc\:UnDef \global\let\:StartSec\au:StartSec\:StartSec}%
+            \append:def\tableofcontents{\gdef\:StartSec{\au:StartSec}}%
    \fi  \fi
 }
      

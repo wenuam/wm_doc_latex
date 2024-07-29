@@ -35,19 +35,21 @@
 %% Sourcefile `supertabular.dtx'.
 %%
 %% Copyright (C) 1988 by Theo Jurriens
-%% Copyright (C) 1990-2020 by Johannes Braams texniek at braams.xs4all.nl
-%%                            Kersengaarde 33
-%%                            2723 BP Zoetermeer NL
+%% Copyright (C) 1990-2024 by Johannes Braams texniek at texniek.nl
+%%                            The Netherlands
 %%                       all rights reserved.
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{supertabular}
-              [2020/02/02 v4.1g the supertabular environment]
+              [2024/07/20 v4.2c the supertabular environment]
 \newcount\c@tracingst
 \DeclareOption{errorshow}{\c@tracingst\z@}
 \DeclareOption{pageshow}{\c@tracingst\thr@@}
 \DeclareOption{debugshow}{\c@tracingst5\relax}
+\DeclareOption{calculate}{\def\ST@calculate@rowht{\ST@compute@rowht}}
+\DeclareOption{estimate}{\def\ST@calculate@rowht{\ST@estimate@rowht}}
+\ExecuteOptions{errorshow,estimate}
 \ProcessOptions
 \newif\if@topcaption \@topcaptiontrue
 \def\topcaption{\@topcaptiontrue\tablecaption}
@@ -76,41 +78,53 @@
     \if@topcaption \vskip 10\p@ \gdef\ST@captionroom{20\p@}\fi
   \endgroup}
 \newcommand\tablehead[1]{%
-  \gdef\@tablehead{%
-  \noalign{%
-      \global\let\@savcr=\\
-      \global\let\\=\org@tabularcr}%
-    #1%
-    \noalign{\global\let\\=\@savcr}}}
+  \def\@ST@arg{#1}%
+  \ifx\@ST@arg\@empty\gdef\@tablehead{}\else
+    \gdef\@tablehead{%
+    \noalign{%
+        \global\let\@savcr=\\
+        \global\let\\=\org@tabularcr}%
+      #1%
+      \noalign{\global\let\\=\@savcr}}%
+  \fi}
 \tablehead{}
 \newcommand\tablefirsthead[1]{%
-  \gdef\@table@first@head{%
-    \noalign{%
-      \global\let\@savcr=\\
-      \global\let\\=\org@tabularcr}%
-    #1%
-    \noalign{%
-      \global\let\\=\@savcr
-      \global\let\@table@first@head\undefined
-    }}}
+  \def\@ST@arg{#1}%
+  \ifx\@ST@arg\@empty\gdef\@table@first@head{}\else
+    \gdef\@table@first@head{%
+      \noalign{%
+        \global\let\@savcr=\\
+        \global\let\\=\org@tabularcr}%
+      #1%
+      \noalign{%
+        \global\let\\=\@savcr
+        \global\let\@table@first@head\undefined
+      }}%
+  \fi}
 \newcommand\tabletail[1]{%
-  \gdef\@tabletail{%
-    \noalign{%
-      \global\let\@savcr=\\
-      \global\let\\=\org@tabularcr}%
-    #1%
-    \noalign{\global\let\\=\@savcr}}}
+  \def\@ST@arg{#1}%
+  \ifx\@ST@arg\@empty\gdef\@tabletail{}\else
+    \gdef\@tabletail{%
+      \noalign{%
+        \global\let\@savcr=\\
+        \global\let\\=\org@tabularcr}%
+      #1%
+      \noalign{\global\let\\=\@savcr}}%
+  \fi}
 \tabletail{}
 \newcommand\tablelasttail[1]{%
-  \gdef\@table@last@tail{%
-    \noalign{%
-      \global\let\@savcr=\\
-      \global\let\\=\org@tabularcr}%
-    #1%
-    \noalign{%
-      \global\let\\=\@savcr
-      \global\let\@table@last@tail\undefined
-    }}}
+  \def\@ST@arg{#1}%
+  \ifx\@ST@arg\@empty\gdef\@table@last@tail{}\else
+    \gdef\@table@last@tail{%
+      \noalign{%
+        \global\let\@savcr=\\
+        \global\let\\=\org@tabularcr}%
+      #1%
+      \noalign{%
+        \global\let\\=\@savcr
+        \global\let\@table@last@tail\undefined
+      }}%
+  \fi}
 \newcommand\sttraceon{\c@tracingst5\relax}
 \newcommand\sttraceoff{\c@tracingst\z@}
 \newcommand\ST@trace[2]{%
@@ -142,7 +156,7 @@
 \newdimen\ST@tailht
 \newdimen\ST@pagesofar
 \newdimen\ST@pboxht
-\newdimen\ST@lineht
+\newdimen\ST@rowht
 \newdimen\ST@prevht
 \newdimen\ST@toadd
 \newdimen\ST@dimen
@@ -191,22 +205,28 @@
   \fi
   \ST@dimen=\z@
   \unvbox\ST@pbox\egroup\hfil}
-\def\ST@compute@lineht{%
-  \ST@lineht=\ht\strutbox
-  \ifx\extrarowheight\undefined\else
-    \advance \ST@lineht by \extrarowheight
+\def\ST@compute@rowht{%
+  \setbox\@tempboxa=\vbox{\@arrayparboxrestore $5^5_5$}
+  \ifnum\ht\@tempboxa>\ht\strutbox
+    \ST@rowht=\ht\@tempboxa
+  \else
+    \ST@rowht=\ht\strutbox
   \fi
-  \ST@lineht = \arraystretch\ST@lineht
-  \advance\ST@lineht \arraystretch\dp\strutbox
-  \ST@trace\tw@{Normal Line height: \the\ST@lineht}%
+  \ifx\extrarowheight\undefined\else
+    \advance \ST@rowht by \extrarowheight
+  \fi
+  \ifnum\dp\@tempboxa>\dp\strutbox
+    \advance\ST@rowht \dp\@tempboxa
+  \else
+    \advance\ST@rowht \dp\strutbox
+  \fi
+  \ST@rowht = \arraystretch\ST@rowht
+  \ST@trace\tw@{Normal Row height: \the\ST@rowht}%
   }
-\def\estimate@lineht{%
-  \ST@lineht=\arraystretch \baslineskp
-  \global\advance\ST@lineht by 1\p@
-  \ST@stretchht\ST@lineht\advance\ST@stretchht-\baslineskp
-  \ifdim\ST@stretchht<\z@\ST@stretchht\z@\fi
-  \ST@trace\tw@{Average line height: \the\ST@lineht}%
-  \ST@trace\tw@{Stretched line height: \the\ST@stretchht}%
+\def\ST@estimate@rowht{%
+  \ST@rowht=\arraystretch \baslineskp
+  \global\advance\ST@rowht by 1\p@
+  \ST@trace\tw@{Average Row height: \the\ST@rowht}%
 }
 \def\@calfirstpageht{%
   \ST@trace\tw@{Calculating height of tabular on first page}%
@@ -273,11 +293,11 @@
         \@tabletail\endtabular}
     \ST@tailht=\ht\@tempboxa\advance\ST@tailht\dp\@tempboxa
   \fi
-  \advance\ST@tailht by \ST@lineht
+  \advance\ST@tailht by \ST@rowht
   \ST@trace\tw@{Height of tail: \the\ST@tailht}%
   \ST@trace\tw@{Maximum height of tabular: \the\ST@pageleft}%
   \@tempdima\ST@headht
-  \advance\@tempdima\ST@lineht
+  \advance\@tempdima\ST@rowht
   \advance\@tempdima\ST@tailht
   \ST@trace\tw@{Minimum height of tabular: \the\@tempdima}%
   \ifnum\@tempdima>\ST@pageleft
@@ -325,7 +345,7 @@
     \let\@@tablehead=\@table@first@head
   \fi
   \let\ST@skippage\ST@skipfirstpart
-  \ST@compute@lineht
+  \ST@calculate@rowht
   \@calfirstpageht
   \noindent
   }
@@ -453,9 +473,9 @@
   \csname org@tabular*\endcsname}
 \def\ST@cr{%
   \noalign{%
-    \ifnum\ST@pboxht<\ST@lineht
-      \global\advance\ST@pageleft -\ST@lineht
-      \global\ST@prevht\ST@lineht
+    \ifnum\ST@pboxht<\ST@rowht
+      \global\advance\ST@pageleft -\ST@rowht
+      \global\ST@prevht\ST@rowht
     \else
      \ST@trace@cr\thr@@{Added par box with height \the\ST@pboxht}%
       \global\advance\ST@pageleft -\ST@pboxht
@@ -489,7 +509,7 @@
     \ST@trace\tw@{Tabular too high, moving to next page}%
     \global\advance\ST@pageleft\pagetotal
     \global\ST@pagesofar\z@
-    \newpage
+    \penalty -\@M
     \global\let\ST@skippage\ST@newpage
     }}
 \def\ST@newpage{%

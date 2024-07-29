@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 % UTF-8 strings kindly provided by 
 % Arvinder Singh Kang, <17-11-2022>
@@ -9,6 +9,8 @@
 \RequirePackage{gurmukhidigits}
 \PolyglossiaSetup{punjabi}{
   bcp47=pa,
+  bcp47-language=pa,
+  bcp47-script=Guru,
   script=Gurmukhi,
   scripttag=gur,
   langtag=pan,
@@ -23,24 +25,31 @@
 
 \def\punjabi@language{%
   % patterns are spelled panjabi
-  \polyglossia@setup@language@patterns{panjabi}%
+  \SetupPolyglossiaLangPatterns{panjabi}%
 }
 
 \newif\ifpunjabi@gurmukhi@numerals
 \punjabi@gurmukhi@numeralstrue
-\define@choicekey*+{punjabi}{numerals}[\xpg@val\xpg@nr]{Gurmukhi,Western}[Gurmukhi]{%
-   \ifcase\xpg@nr\relax
-      % Gurmukhi:
-      \punjabi@gurmukhi@numeralstrue%
-   \or
-      % Western:
-      \punjabi@gurmukhi@numeralsfalse%
-   \fi
-   \xpg@info{Option: Punjabi, numerals=\xpg@val}%
-}{\xpg@warning{Unknown Punjabi numeral `#1'}}
+
+\DeclareKeys[polyglossia/gloss/punjabi]
+  {
+    numerals.choice:,
+    numerals / gurmukhi.code =
+      {%
+        \punjabi@gurmukhi@numeralstrue
+        \SetLanguageKeys{punjabi}{bcp47-extension-u=nu-guru}%
+      },
+    numerals / western.code =
+      {%
+        \punjabi@gurmukhi@numeralsfalse
+        \SetLanguageKeys{punjabi}{bcp47-extension-u=nu-latn}%
+      },
+    numerals.default:n = gurmukhi,
+    numerals/unknown.code = \xpg@warning{Unknown Punjabi numeral `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{punjabi}{numerals=gurmukhi}
+\InitializeGlossOptions{punjabi}{numerals=gurmukhi}
 
 \newcommand{\punjabinumerals}[2]{\punjabinumber{#2}}
 
@@ -91,18 +100,6 @@
     ਨਵੰਬਰ\or
     ਦਸੰਬਰ\fi
     \space\punjabinumber\year}%
-}
-
-% Save original \MakeUppercase definition
-\let\xpg@save@MakeUppercase\MakeUppercase
-
-\def\blockextras@punjabi{%
-  \def\MakeUppercase##1{##1}%
-}
-
-\def\noextras@punjabi{%
-   % restore original \MakeUppercase definition
-   \let\MakeUppercase\xpg@save@MakeUppercase%
 }
 
 \endinput

@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-gaelic.ldf}[polyglossia: module for Gaelic]
 
 \PolyglossiaSetup{gaelic}{
   bcp47=ga,
+  bcp47-language=ga,
+  bcp47-script=Latn,
   language=Irish,
   babelname=irish,
   hyphennames={irish},
@@ -20,23 +22,28 @@
 \setlanguagealias[variant=scottish]{gaelic}{scottish}
 
 \def\gaelic@variant{irish}
-\define@choicekey*+{gaelic}{variant}[\xpg@val\xpg@nr]{irish,scottish}[irish]{%
-   \ifcase\xpg@nr\relax
-      % irish:
-      \gdef\gaelic@variant{irish}%
-      \SetLanguageKeys{gaelic}{language=Irish,langtag=IRI,babelname=irish,bcp47=ga}%
-      \xpg@fontsetup@latin{gaelic}%
-   \or
-      % scottish:
-      \gdef\gaelic@variant{scottish}%
-      \SetLanguageKeys{gaelic}{language=Gaelic,langtag=GAE,babelname=scottish,bcp47=gd}%
-      \xpg@fontsetup@latin{gaelic}%
-   \fi
-   \xpg@info{Option: gaelic, variant=\xpg@val}%
-}{\xpg@warning{Unknown gaelic variant `#1'}}
+
+\DeclareKeys[polyglossia/gloss/gaelic]
+  {
+    variant.choice:,
+    variant / irish.code = 
+      {%
+        \gdef\gaelic@variant{irish}%
+        \SetLanguageKeys{gaelic}{language=Irish,langtag=IRI,babelname=irish,bcp47=ga,bcp47-language=ga}%
+        \SetupLatinPolyglossiaFont{gaelic}%
+      },
+    variant / scottish.code =
+      {%
+        \gdef\gaelic@variant{scottish}%
+        \SetLanguageKeys{gaelic}{language=Gaelic,langtag=GAE,babelname=scottish,bcp47=gd,bcp47-language=gd}%
+        \SetupLatinPolyglossiaFont{gaelic}%
+      },
+    variant.default:n = irish,
+    variant/unknown.code = \xpg@warning{Unknown gaelic variant `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{gaelic}{variant=irish}
+\InitializeGlossOptions{gaelic}{variant=irish}
 
 \def\captionsgaelic@irish{%
    \def\refname{Tagairtí}%

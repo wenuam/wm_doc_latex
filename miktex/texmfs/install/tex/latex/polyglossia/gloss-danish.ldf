@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-danish.ldf}[polyglossia: module for Danish]
 \PolyglossiaSetup{danish}{
   bcp47=da,
+  bcp47-language=da,
+  bcp47-script=Latn,
   hyphennames={danish},
   hyphenmins={2,3},
   langtag=DAN,

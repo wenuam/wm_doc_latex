@@ -1,8 +1,8 @@
-%% The LaTeX package tcolorbox - version 6.0.3 (2023/03/17)
+%% The LaTeX package tcolorbox - version 6.3.0 (2024/07/10)
 %% tcbbreakable.code.tex: Code for breakable colorboxes
 %%
 %% -------------------------------------------------------------------------------------------
-%% Copyright (c) 2006-2023 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
+%% Copyright (c) 2006-2024 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
 %% -------------------------------------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -17,7 +17,7 @@
 %%
 %% This work consists of all files listed in README
 %%
-\tcb@set@library@version{6.0.3}
+\tcb@set@library@version{6.3.0}
 
 \RequirePackage{pdfcol}
 \pdfcolInitStack{tcb@breakable}
@@ -81,6 +81,8 @@
       \def\noexpand\@currenvline{\on@line}}%
   \reserved@a%
   \@endpefalse%
+  \global\@newlistfalse%
+  \tcb@set@savebox@construction@true%
   \let\tcbbreak\tcb@@break%
   \iftcb@usecolorstack%
     \pdfcolSwitchStack{tcb@breakable}%
@@ -550,7 +552,7 @@
     \let\tcb@before@middle=\@empty%
     \let\tcb@before@last=\@empty%
     \iftcb@multicol%
-      \long\def\tcb@after@first{\par}% using \columnbreak here kills multicols' algortihm sometimes
+      \long\def\tcb@after@first{\par}% using \columnbreak here kills multicols' algorithm sometimes
       \long\def\tcb@after@middle{\par\vfill}%
     \else%
       \long\def\tcb@after@first{\par\pagebreak\tcb@enlbreak@next}%
@@ -826,7 +828,7 @@
   \csname tcb@break@ch@\tcb@split@state\endcsname%
   \tcbdimto\tcb@innerheight{\tcb@height-\kvtcb@top@rule-\kvtcb@bottom@rule-\tcb@h@padtitle}%
   \tcbdimto\tcbtextheight{\tcb@innerheight-\kvtcb@boxsep*2-\kvtcb@top-\kvtcb@bottom}%
-  \tcb@drawing@env@begin%
+  \begin{tcb@drawing}%
     \tcb@extensions@preframe%
      % draw frame and interior
     \tcb@adraw@frame%
@@ -841,7 +843,7 @@
     \tcb@tdraw@upper%
     \tcb@tdraw@lower%
     \tcb@extensions@final%
-  \tcb@drawing@env@end%
+  \end{tcb@drawing}%
   \endgroup%
 }
 
@@ -856,7 +858,7 @@
   \csname tcb@break@ch@\tcb@split@state\endcsname%
   \tcbdimto\tcb@innerheight{\tcb@height-\kvtcb@top@rule-\kvtcb@bottom@rule-\tcb@h@padtitle}%
   \tcbdimto\tcbtextheight{\tcb@innerheight-\kvtcb@boxsep*2-\kvtcb@top-\kvtcb@bottom}%
-  \tcb@drawing@env@begin%
+  \begin{tcb@drawing}%
     \tcb@extensions@preframe%
     % draw frame and interior
     \tcb@adraw@frame%
@@ -867,7 +869,7 @@
     \tcb@tdraw@title%
     \tcb@tdraw@upper%
     \tcb@extensions@final%
-  \tcb@drawing@env@end%
+  \end{tcb@drawing}%
   \endgroup%
 }
 
@@ -882,7 +884,7 @@
   \csname tcb@break@ch@\tcb@split@state\endcsname%
   \tcbdimto\tcb@innerheight{\tcb@height-\kvtcb@top@rule-\kvtcb@bottom@rule-\tcb@h@padtitle}%
   \tcbdimto\tcbtextheight{\tcb@innerheight-\kvtcb@boxsep*2-\kvtcb@top-\kvtcb@bottom}%
-  \tcb@drawing@env@begin%
+  \begin{tcb@drawing}%
     \tcb@extensions@preframe%
     % draw frame and interior
     \tcb@adraw@frame%
@@ -896,7 +898,7 @@
     \tcb@tdraw@title%
     \tcb@tdraw@lower%
     \tcb@extensions@final%
-  \tcb@drawing@env@end%
+  \end{tcb@drawing}%
   \endgroup%
 }
 
@@ -911,7 +913,7 @@
   \csname tcb@break@ch@\tcb@split@state\endcsname%
   \tcbdimto\tcb@innerheight{\tcb@height-\kvtcb@top@rule-\kvtcb@bottom@rule-\tcb@h@padtitle}%
   \tcbdimto\tcbtextheight{\tcb@innerheight-\kvtcb@boxsep*2-\kvtcb@top-\kvtcb@bottom}%
-  \tcb@drawing@env@begin%
+  \begin{tcb@drawing}%
     \tcb@extensions@preframe%
     % draw frame and interior
     \tcb@adraw@frame%
@@ -922,7 +924,7 @@
     \tcb@tdraw@title%
     \tcb@tdraw@lower%
     \tcb@extensions@final%
-  \tcb@drawing@env@end%
+  \end{tcb@drawing}%
   \endgroup%
 }
 

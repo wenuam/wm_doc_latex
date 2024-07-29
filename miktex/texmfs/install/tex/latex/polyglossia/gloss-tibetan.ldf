@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-tibetan.ldf}[polyglossia: module for Tibetan]
 %% Copyright 2013 Elie Roux
@@ -9,6 +9,8 @@
 
 \PolyglossiaSetup{tibetan}{
   bcp47=bo,
+  bcp47-language=bo,
+  bcp47-script=Tibt,
   script=Tibetan,
   scripttag=tibt,
   langtag=TIB,
@@ -22,17 +24,18 @@
 \setlanguagealias*{tibetan}{bo}
 
 \newif\if@tibetan@numerals
-\def\tmp@tibetan{tibetan}
-\define@key{tibetan}{numerals}[tibetan]{%
-	\def\@tmpa{#1}%
-	\ifx\@tmpa\tmp@tibetan\@tibetan@numeralstrue%
-	\else
-	  \@tibetan@numeralsfalse%
-	\fi%
-}
+\DeclareKeys[polyglossia/gloss/tibetan]
+  {
+    numerals.choice:,
+    numerals/tibetan.code = \@tibetan@numeralstrue
+    	   \SetLanguageKeys{tibetan}{bcp47-extension-u=nu-tibt},
+    numerals/arabic.code = \@tibetan@numeralsfalse
+           \SetLanguageKeys{tibetan}{bcp47-extension-u=nu-latn},
+    numerals.default:n = tibetan
+  }
 
 \ifluatex
-  \newluatexattribute\xpg@tibteol %
+  \newattribute\xpg@tibteol %
   \directlua{polyglossia.load_tibt_eol()}%
 \fi
 
@@ -57,7 +60,7 @@
 }
 
 % Register default options
-\xpg@initialize@gloss@options{tibetan}{numerals=tibetan}
+\InitializeGlossOptions{tibetan}{numerals=tibetan}
 
 % some are known, but very few
 % a few come from "Standardizing Tibetan Terms of Information Technology"

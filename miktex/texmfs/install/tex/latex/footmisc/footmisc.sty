@@ -9,7 +9,7 @@
 %% This is a generated file.
 %% 
 %% Copyright (c) 1995-2011 Robin Fairbairns
-%% Copyright (c) 2018-2022 Robin Fairbairns, Frank Mittelbach
+%% Copyright (c) 2018-2023 Robin Fairbairns, Frank Mittelbach
 %% 
 %% This file was generated from file(s) of the LaTeX `footmisc Bundle'.
 %% --------------------------------------------------------------------
@@ -35,7 +35,7 @@
 %% where one can also log issues in case there are any.
 %% 
 %% File: footmisc.dtx (C) Copyright 1995-2011 Robin Fairbairns
-%%                    (C) Copyright 2018-2022 Frank Mittelbach
+%%                    (C) Copyright 2018-2023 Frank Mittelbach
 \NeedsTeXFormat{LaTeX2e}
 \providecommand\DeclareRelease[3]{}
 \providecommand\DeclareCurrentRelease[2]{}
@@ -43,7 +43,7 @@
 \DeclareRelease{v5}{2011-06-06}{footmisc-2011-06-06.sty}
 \DeclareCurrentRelease{}{2022-02-14}
 \ProvidesPackage{footmisc}%
-        [2022/03/08 v6.0d
+        [2023/07/05 v6.0f
      a miscellany of footnote facilities%
                    ]
 
@@ -242,7 +242,7 @@
       }%
   \fi
 }
-\let \@outputbox@attachfloats \@combinefloats
+\def \@outputbox@attachfloats {\@combinefloats}
 \def \@outputbox@attachtopfloats {%
   \ifx \@toplist\@empty \else \@cflt \fi
 }
@@ -502,6 +502,7 @@
       \linewidth \columnwidth
       \advance \linewidth -\leftmargin
       \parshape \@ne \leftmargin \linewidth
+      \@totalleftmargin \leftmargin
       \footnotesize
       \@setpar{{\@@par}}%
       \leavevmode

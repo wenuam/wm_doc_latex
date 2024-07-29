@@ -90,7 +90,7 @@ EBGaramond-Regular-lf-sc-ly1 1 255
 'Y' '' Y 89
 'Z' '' Z 90
 '[' '' bracketleft.sc 91
-'\' '' backslash.sc 92
+'&#x005C;' '' backslash.sc 92
 ']' '' bracketright.sc 93
 '&#x02C6;' '' circumflex 94
 '&#xde;' '' underscore.sc 95

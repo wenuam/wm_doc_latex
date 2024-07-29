@@ -90,7 +90,7 @@ EBGaramond-Regular-inf-ly1 1 255
 'Y' '' Y.sinf 89
 'Z' '' Z.sinf 90
 '[' '' bracketleft.sinf 91
-'\' '' backslash.sinf 92
+'&#x005C;' '' backslash.sinf 92
 ']' '' bracketright.sinf 93
 '&#x02C6;' '' circumflex 94
 '&#xde;' '' underscore.sinf 95

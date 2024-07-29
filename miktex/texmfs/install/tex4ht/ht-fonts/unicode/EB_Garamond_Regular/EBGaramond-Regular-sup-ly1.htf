@@ -90,7 +90,7 @@ EBGaramond-Regular-sup-ly1 1 255
 'Y' '' Y.sups 89
 'Z' '' Z.sups 90
 '[' '' bracketleft.sups 91
-'\' '' backslash.sups 92
+'&#x005C;' '' backslash.sups 92
 ']' '' bracketright.sups 93
 '&#x02C6;' '' circumflex 94
 '&#xde;' '' underscore.sups 95

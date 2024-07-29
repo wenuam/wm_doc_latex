@@ -14,7 +14,7 @@
 %% modifications. See the file LICENSE for information.
 %% 
 \ifx\ProvidesFile\undefined\else
-\ProvidesFile{utf8x.def}[2022/08/07 UCS: Input encoding UTF-8]%
+\ProvidesFile{utf8x.def}[2023/11/09 UCS: Input encoding UTF-8]%
 
 \ifx\uc@char@notloaded\@undefined
 

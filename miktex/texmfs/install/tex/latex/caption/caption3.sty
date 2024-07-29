@@ -45,7 +45,7 @@
 \DeclareRelease{v1.13}{2019-11-24}{caption3_2020-07-29.sty} % for caption v3.4
 \DeclareRelease{v2.0} {2020-08-30}{caption3_2020-10-26.sty} % for caption v3.5
 \DeclareCurrentRelease{v2.3}{2022-02-20}                    % for caption v3.6
-\ProvidesPackage{caption3}[2023/03/12 v2.4 caption3 kernel (AR)]
+\ProvidesPackage{caption3}[2023/07/31 v2.4d caption3 kernel (AR)]
 \@ifundefined{kernel@ifnextchar}{\let\kernel@ifnextchar\@ifnextchar}{}
 \providecommand*\@nameundef[1]{%
   \expandafter\let\csname #1\endcsname\@undefined}
@@ -167,6 +167,12 @@
   \expandafter\caption@tempb\expandafter{\caption@tempa}}
 \DeclareRobustCommand*\caption@gobble{%
   \caption@withoptargs\@gobbletwo}
+\newcommand\caption@iftokens[1]{%
+  \if\relax\detokenize{#1}\relax
+    \expandafter\@secondoftwo
+  \else
+    \expandafter\@firstoftwo
+  \fi}
 \let\caption@begindocumenthook\@empty
 \let\caption@@begindocumenthook\@empty
 \def\caption@AtBeginDocument{%
@@ -399,6 +405,11 @@
 \@onlypreamble\caption@SetupOptions
 \newcommand*\caption@SetupOptions@list{}
 \@onlypreamble\caption@SetupOptions@list
+%% Unfortunately we have to patch internal \LaTeX\ code here
+%% to get rid of unnecessary ``Option clash'' error messages.
+%% I have asked Frank Mittelbach and David Carlisle in 2018
+%% and have asked Frank again in 2020 for a proper interface instead of
+%% this dirty hack, but my requests got declined.
 \let\caption@onefilewithoptions\@onefilewithoptions
 \def\@onefilewithoptions#1[#2]{%
   \begingroup
@@ -540,18 +551,12 @@
   #1{\caption@width\z@}%
   \caption@@@@setmargin#2,#2,\@nil}
 \def\caption@@@@setmargin#1,#2,#3\@nil{%
-  \def\caption@tempa{#1#2}%
-  \ifx\caption@tempa\@empty
-    \caption@Error{Missing number}%
-  \else
-    \caption@@@@@setmargin{left}{#1}%
-    \caption@@@@@setmargin{right}{#2}%
-  \fi}
+  \caption@iftokens{#1#2}%
+    {\caption@@@@@setmargin{left}{#1}%
+     \caption@@@@@setmargin{right}{#2}}%
+    {\caption@Error{Missing number}}}
 \newcommand*\caption@@@@@setmargin[2]{%
-  \def\caption@tempa{#2}%
-  \ifx\caption@tempa\@empty \else
-    \caption@setlength{#1margin}{#2}%
-  \fi}
+  \caption@iftokens{#2}{\caption@setlength{#1margin}{#2}}{}}
 \newcommand*\caption@setwidth{%
   \caption@resetcalcmargin
   \caption@@setwidth}
@@ -591,7 +596,7 @@
 \newcommand*\caption@pageref[1]{%
   \expandafter\ifx\csname caption@r@#1\endcsname\relax
     \G@refundefinedtrue % => 'There are undefined references.'
-    \@latex@warning{Reference `caption@#1' on page \thepage \space undefined}%
+    \@latex@warning{Reference `caption #1' on page \thepage \space undefined}%
   \else
     \expandafter\let\expandafter\caption@thepage\csname caption@r@#1\endcsname
   \fi}
@@ -788,12 +793,7 @@
   \caption@get@label#1\caption@makeanchor{}\@nil
   \caption@thelabel\caption@clrlabel}
 \long\def\caption@get@label#1\caption@makeanchor#2#3\@nil{%
-  \def\caption@tempa{#2}%
-  \ifx\caption@tempa\@empty
-    \caption@getlabel{#1}%
-  \else
-    \caption@getlabel{#2}%
-  \fi}
+  \caption@iftokens{#2}{\caption@getlabel{#2}}{\caption@getlabel{#1}}}
 \DeclareCaptionTextFormat{simple}{#1}
 \DeclareCaptionTextFormat{period}{#1.}
 \SetCaptionDefault{textformat}{simple}
@@ -1122,7 +1122,6 @@
     \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
   \fi}
 \@onlypreamble\@makecaption@latvian
-\caption@setbool{documentclass}{1}
 \caption@ifundefined\caption@documentclass{%
   \@ifclassloaded{beamer}{%
     \caption@InfoNoLine{beamer document class detected}%
@@ -1150,6 +1149,7 @@
     \caption@InfoNoLine{thesis document class detected}%
     \def\caption@documentclass{thesis}%
   }{%
+    \def\caption@documentclass{standard}%
     \ifx\@makecaption\@undefined
       \caption@InfoNoLine{Document class w/o caption stuff detected}%
     \else
@@ -1166,14 +1166,22 @@
               Unknown document class (or package),\MessageBreak
               standard defaults will be used}%
             \caption@InfoNoLine{\string\@makecaption\space=\space\meaning\@makecaption\@gobble}%
-            \caption@setbool{documentclass}{0}% unknown document class
+            \def\caption@documentclass{unknown}%
           \fi
         \fi
       \fi
     \fi
-    \let\caption@documentclass\@empty % don't load adaption code later on
   }}}}}}}%
 }{}
+\newcommand*\caption@ifdocumentclass[1]{%
+  \begingroup
+    \edef\caption@tempa{\caption@documentclass}%
+    \edef\caption@tempb{#1}%
+    \ifx\caption@tempa\caption@tempb
+      \endgroup\expandafter\@firstoftwo
+    \else
+      \endgroup\expandafter\@secondoftwo
+    \fi}
 \newcommand*\AtCaptionPackage{%
   \g@addto@macro\caption@documentclass@code}
 \@onlypreamble\AtCaptionPackage
@@ -1586,7 +1594,11 @@
   \g@addto@macro\caption@prepareslc}
 \providecommand*\caption@prepareslc{}
 \AtCaptionSingleLineCheck{%
+  \let\caption@protect\protect
+  \caption@ifdefined\GTS@DisablePredefinedCmds\GTS@DisablePredefinedCmds\relax
   \let\label\caption@gobble
+  \let\index\caption@gobble
+  \let\glossary\caption@gobble
   \let\hypertarget\@gobbletwo
   \let\footnote\caption@footnote
   \let\footnotemark\caption@footnotemark
@@ -1605,6 +1617,8 @@
   \let\acused\@gobble
   \let\AC@placelabel\@gobble
   \let\glsunset\@gobble
+  \caption@ifdefined\GTS@DisableHook\GTS@DisableHook\relax
+  \let\protect\caption@protect
 }
 \newcommand*\caption@footnote{%
   \kernel@ifnextchar[%]
@@ -1804,12 +1818,9 @@
   \fi}
 \@onlypreamble\caption@@declaresublistentry
 \long\def\caption@@@declaresublistentry#1\@dottedtocline#2\caption@nil#3{%
-  \def\@tempa{#1}%
-  \ifx\@tempa\@empty
-    \caption@@@@declaresublistentry{#3}#2\caption@nil
-  \else
-    \caption@@@@declaresublistentry{#3}@{3.8em}{3.2em}\caption@nil
-  \fi}
+  \caption@iftokens{#1}%
+    {\caption@@@@declaresublistentry{#3}@{3.8em}{3.2em}\caption@nil}%
+    {\caption@@@@declaresublistentry{#3}#2\caption@nil}}
 \@onlypreamble\caption@@@declaresublistentry
 \def\caption@@@@declaresublistentry#1#2#3#4#5\caption@nil{%
   \expandafter\caption@@@@@declaresublistentry\expandafter
@@ -1859,16 +1870,16 @@
    \renewcommand*\@memresetsubcounter[1]{%
      \caption@ifdefined@subtype{sub#1}\@gobble\caption@memresetsubcounter{#1}}}%
   {}
-\ifx\caption@documentclass\@empty\else
-  \@pushfilename
-  \edef\@currname{caption-\caption@documentclass}
-  \edef\@currext{sto}
-  \InputIfFileExists
-    {\@currname.\@currext}%
-    {}%
-    {\@missingfileerror\@currname\@currext}%
-  \@popfilename
-\fi
+\caption@ifdocumentclass{unknown}{}{%
+  \caption@ifdocumentclass{standard}{}{%
+    \@pushfilename
+    \edef\@currname{caption-\caption@documentclass}
+    \edef\@currext{sto}
+    \InputIfFileExists
+      {\@currname.\@currext}%
+      {}%
+      {\@missingfileerror\@currname\@currext}%
+    \@popfilename}}
 \captionsetup{style=default,position=default,listformat=default}
 \ProcessOptions*
 \endinput

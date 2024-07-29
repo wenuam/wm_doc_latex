@@ -16,17 +16,17 @@
 %% Send comments and ideas on the package, error reports and additional
 %% programming languages to Jobst Hoffmann at <j.hoffmann@fh-aachen.de>.
 %%
-\def\filedate{2023/02/27}
-\def\fileversion{1.9}
+\def\filedate{2024/05/25}
+\def\fileversion{1.10b}
 \ProvidesFile{lstmisc.sty}
              [\filedate\space\fileversion\space(Carsten Heinz)]
-\lst@CheckVersion\fileversion
+\lst@CheckVersion\fileversion%
     {\typeout{^^J%
      ***^^J%
      *** This file requires `listings.sty' version \fileversion.^^J%
-     *** You have a serious problem, so I'm exiting ...^^J%
+     *** You have a serious problem, so I'm exiting...^^J%
      ***^^J}%
-     \batchmode \@@end}
+     \batchmode\@@end}
 \lst@BeginAspect{writefile}
 \newtoks\lst@WFtoken % global
 \lst@AddToHook{InitVarsBOL}{\global\lst@WFtoken{}}
@@ -304,7 +304,7 @@
      \fi \fi \fi}
 \lst@NewMode\lst@TeXLmode
 \gdef\lst@ActiveCDefX#1{\lst@ActiveCDefX@#1}
-\gdef\lst@ActiveCDefX@#1#2#3{
+\gdef\lst@ActiveCDefX@#1#2#3{%
     \catcode`#1\active\lccode`\~=`#1%
     \lowercase{\lst@CDefIt~}{#2}{#3}{}}
 \gdef\lst@Escape#1#2#3#4{%

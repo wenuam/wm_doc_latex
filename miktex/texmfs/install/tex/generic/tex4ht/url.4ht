@@ -1,6 +1,6 @@
-% url.4ht (2022-01-02-14:32), generated from tex4ht-4ht.tex
-% Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2022 TeX Users Group
+% url.4ht (2023-02-19-10:11), generated from tex4ht-4ht.tex
+% Copyright 1997-2023 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,12 +17,12 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-01-02-14:32}
+\immediate\write-1{version 2023-02-19-10:11}
 
-   \protected\def\:temp{\leavevmode \begingroup
+   \protected\def\:temp{\leavevmode \begingroup\ht:special{t4ht@(}%
   \def\UrlLeft##1\UrlRight{\ifmmode \else \UrlFont\fi \Url:use{##1}}%
   \def\Url@use##1 ##2{\ifmmode \else \UrlFont\fi
-                      \Url:use{##1}}\let\,\empty \Configure{$}{}{}{}\Url}
+  \Url:use{##1}}\let\,\empty \Configure{$}{}{}{}\ht:special{t4ht@)}\Url}
 \HLet\url\:temp
 
 \expandafter\ifx\csname Url@OT1encSpecials\endcsname\relax

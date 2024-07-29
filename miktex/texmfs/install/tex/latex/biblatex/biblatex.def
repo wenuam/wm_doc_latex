@@ -1445,6 +1445,17 @@
 }
 
 % ------------------------------------------------------------------
+% NAMEHASH TEMPLATE
+% ------------------------------------------------------------------
+
+\DeclareNamehashTemplate{
+  \namepart[hashscope=full]{family}
+  \namepart[hashscope=full]{given}
+  \namepart[hashscope=full]{prefix}
+  \namepart[hashscope=full]{suffix}
+}
+
+% ------------------------------------------------------------------
 % SORTING
 % ------------------------------------------------------------------
 
@@ -1519,6 +1530,50 @@
   }
 }
 
+\DeclareSortingTemplate{ntd}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
+  }
+  \sort{
+    \field{volume}
+    \literal{0}
+  }
+}
+
 \DeclareSortingTemplate{nyt}{
   \sort{
     \field{presort}
@@ -1548,6 +1603,50 @@
   }
 }
 
+\DeclareSortingTemplate{ndt}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{volume}
+    \literal{0}
+  }
+}
+
 \DeclareSortingTemplate{nyvt}{
   \sort{
     \field{presort}
@@ -1566,6 +1665,50 @@
   \sort{
     \field{sortyear}
     \field{year}
+  }
+  \sort{
+    \field{volume}
+    \literal{0}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+}
+
+\DeclareSortingTemplate{ndvt}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
   }
   \sort{
     \field{volume}
@@ -1609,6 +1752,53 @@
   }
 }
 
+\DeclareSortingTemplate{andt}{
+  \sort{
+    \field{presort}
+  }
+  \sort{
+    \field{labelalpha}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{volume}
+    \literal{0}
+  }
+}
+
 \DeclareSortingTemplate{anyvt}{
   \sort{
     \field{presort}
@@ -1630,6 +1820,53 @@
   \sort{
     \field{sortyear}
     \field{year}
+  }
+  \sort{
+    \field{volume}
+    \literal{0}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+}
+
+\DeclareSortingTemplate{andvt}{
+  \sort{
+    \field{presort}
+  }
+  \sort{
+    \field{labelalpha}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
   }
   \sort{
     \field{volume}
@@ -1667,6 +1904,47 @@
   }
 }
 
+\DeclareSortingTemplate{dnt}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+    \literal{9999}
+  }
+  \sort{
+    \field{month}
+  }
+  \sort{
+    \field{day}
+  }
+  \sort{
+    \field{hour}
+  }
+  \sort{
+    \field{minute}
+  }
+  \sort{
+    \field{second}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+}
+
 \DeclareSortingTemplate{ydnt}{
   \sort{
     \field{presort}
@@ -1678,6 +1956,47 @@
     \field{sortyear}
     \field{year}
     \literal{9999}
+  }
+  \sort{
+    \field{sortname}
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+}
+
+\DeclareSortingTemplate{ddnt}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort[direction=descending]{
+    \field{sortyear}
+    \field{year}
+    \literal{9999}
+  }
+  \sort[direction=descending]{
+    \field{month}
+  }
+  \sort[direction=descending]{
+    \field{day}
+  }
+  \sort[direction=descending]{
+    \field{hour}
+  }
+  \sort[direction=descending]{
+    \field{minute}
+  }
+  \sort[direction=descending]{
+    \field{second}
   }
   \sort{
     \field{sortname}

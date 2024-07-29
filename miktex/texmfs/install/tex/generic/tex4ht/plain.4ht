@@ -1,6 +1,6 @@
-% plain.4ht (2021-04-25-09:48), generated from tex4ht-4ht.tex
+% plain.4ht (2022-10-25-13:59), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-04-25-09:48}
+\immediate\write-1{version 2022-10-25-13:59}
 
 \ifx\SaveMkHalignConf:g\:UnDef \else \expandafter\endinput\fi
 
@@ -73,6 +73,7 @@
 \MathSymbol\mathop{ldots}
 \MathSymbol\mathrel{Longleftrightarrow}
 \MathSymbol\mathrel{Longrightarrow}
+\MathSymbol\mathrel{Longleftarrow}
 \MathSymbol\mathrel{bowtie}
 \MathSymbol\mathrel{cdots}
 \MathSymbol\mathrel{ddots}

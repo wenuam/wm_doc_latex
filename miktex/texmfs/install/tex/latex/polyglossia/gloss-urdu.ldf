@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 %%% Adapted from a file contributed by Kamal Abdali
 \ProvidesFile{gloss-urdu.ldf}[polyglossia: module for Urdu]
@@ -9,6 +9,8 @@
 
 \PolyglossiaSetup{urdu}{
   bcp47=ur,
+  bcp47-language=ur,
+  bcp47-script=Arab,
   script=Arabic,
   direction=RL,
   scripttag=arab,
@@ -23,36 +25,46 @@
 \setlanguagealias*{urdu}{ur}
 
 \newif\if@western@numerals
-\def\tmp@western{western}
-\define@key{urdu}{numerals}[eastern]{%
-	\def\@tmpa{#1}%
-	\ifx\@tmpa\tmp@western\@western@numeralstrue%
-	  \else\@western@numeralsfalse%
-	\fi}
-
-%% TODO USE boolkey instead !!!
-%this is needed for \abjad in arabicnumbers.sty
-\def\tmp@true{true}
-\define@key{urdu}{abjadjimnotail}[true]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@true\abjad@jim@notailtrue%
-  \else
-    \abjad@jim@notailfalse
-  \fi}
-
+\newif\ifurdu@customsep\urdu@customsepfalse
+\def\xpg@sepmark{}
 \newif\if@hijrical
-\def\tmp@hijri{hijri}
-\define@key{urdu}{calendar}[gregorian]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@hijri\@hijricaltrue%
-    \else\@hijricalfalse%
-  \fi}
 
-\define@key{urdu}{hijricorrection}[0]{%
-  \gdef\@hijri@correction{#1}}%
+\DeclareKeys[polyglossia/gloss/urdu]
+  {
+    abjadjimnotail.if = abjad@jim@notail,
+    abjadjimnotail.default:n = true,
+    sectionsep.code = \gdef\xpg@sepmark{#1}\urdu@customseptrue,
+    sectionsep.default:n = .,
+    hijricorrection.code = \gdef\urdu@hijri@correction{#1},
+    hijricorrection.default:n = 0,
+    calendar.choice:,
+    calendar / gregorian.code =
+      {%
+        \@hijricalfalse
+      },
+    calendar / hijri.code =
+      {%
+        \@hijricaltrue
+      },
+    calendar.default:n = gregorian,
+    calendar/unknown.code = \xpg@warning{Unknown Urdu calendar option `#1'},
+    numerals.choice:,
+    numerals / eastern.code =
+      {%
+        \@western@numeralsfalse
+        \SetLanguageKeys{urdu}{bcp47-extension-u=nu-arab}%
+      },
+    numerals / western.code =
+      {%
+        \@western@numeralstrue
+        \SetLanguageKeys{urdu}{bcp47-extension-u=nu-latn}%
+      },
+    numerals.default:n = eastern,
+    numerals/unknown.code = \xpg@warning{Unknown Urdu numerals option `#1'}
+  }
 
 % This should set the defaults
-\setkeys{urdu}{calendar,numerals,hijricorrection}
+\SetGlossOptions{urdu}{calendar,numerals,hijricorrection}
 
 \def\urdugregmonth#1{\ifcase#1%
   \or جنوری\or فروری\or مارچ\or اپریل\or مئی\or جون\or جولائی\or اگست\or  ستمبر\or اکتوبر\or نومبر\or دسمبر\fi}
@@ -93,7 +105,7 @@
 \def\dateurdu{%
   \def\today{%
     \if@hijrical
-     \Hijritoday[\@hijri@correction]%
+     \Hijritoday[\urdu@hijri@correction]%
     \else
       \@ensure@RTL{\urdunumber\day؍\space\urdugregmonth{\month}%
          \space\urdunumber\year}%
@@ -105,7 +117,7 @@
     \number#1%
   \else
     %%FIXME use farsidigits instead???
-    \protect\arabicdigits{\number#1}%
+    \@ensure@LTR{\protect\arabicdigits{\number#1}}%
   \fi}
 
 \def\urdu@numbers{%
@@ -133,16 +145,92 @@
   \let\@arabic\xpg@save@arabic%
 }
 
-% Save original \MakeUppercase definition
-\let\xpg@save@MakeUppercase\MakeUppercase
-
-\def\blockextras@urdu{%
-  \def\MakeUppercase##1{##1}%
+\def\urdu@xetex@capsformat{%
+  \let\xpg@save@sepmark\@SepMark%
+  \SepMark{\xpg@sepmark}
 }
 
+\def\nourdu@xetex@capsformat{%
+   \ifcsname xpg@save@sepmark\endcsname%
+     \SepMark{\xpg@save@sepmark}
+   \fi%
+}
+
+\def\urdu@luatex@capsformat{%
+  %
+  % change chapter and part headings
+  \ifurdu@customsep
+     \ifcsname chapter\endcsname%
+        \let\xpg@save@thesection\thesection%
+        \renewcommand*\thesection{\thechapter\xpg@sepmark\@arabic\c@section}
+        \let\xpg@save@theequation\theequation%
+        \renewcommand*\theequation{%
+	    \ifnum \c@chapter>\z@ \thechapter\xpg@sepmark\fi\@arabic\c@equation}
+        \let\xpg@save@thefigure\thefigure%
+	\renewcommand*\thefigure{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@figure}
+        \let\xpg@save@thetable\thetable%
+	\renewcommand*\thetable{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@table}
+     \fi%
+     \let\xpg@save@thesubsection\thesubsection%
+     \renewcommand\thesubsection
+	{\thesection\xpg@sepmark\@arabic\c@subsection}
+     \let\xpg@save@thesubsubsection\thesubsubsection%
+     \renewcommand\thesubsubsection{\thesubsection\xpg@sepmark\@arabic\c@subsubsection}
+     \let\xpg@save@theparagraph\theparagraph%
+     \renewcommand\theparagraph
+         {\thesubsubsection\xpg@sepmark\@arabic\c@paragraph}
+     \let\xpg@save@thesubparagraph\thesubparagraph%
+     \renewcommand\thesubparagraph{\theparagraph\xpg@sepmark\@arabic\c@subparagraph}
+  \fi% (end \ifurdu@customsep)
+}
+
+\def\nourdu@luatex@capsformat{%
+   \ifcsname xpg@save@thesection\endcsname%
+        \let\thesection\xpg@save@thesection%
+   \fi%
+   \ifcsname xpg@save@theequation\endcsname%
+        \let\theequation\xpg@save@theequation%
+   \fi%
+   \ifcsname xpg@save@thefigure\endcsname%
+        \let\thefigure\xpg@save@thefigure%
+   \fi%
+   \ifcsname xpg@save@thetable\endcsname%
+        \let\thetable\xpg@save@thetable%
+   \fi%
+   \ifcsname xpg@save@thesubsection\endcsname%
+        \let\thesubsection\xpg@save@thesubsection%
+      \ifcsname xpg@save@thesubsubsection\endcsname%
+        \let\thesubsubsection\xpg@save@thesubsubsection%
+      \fi%
+   \fi%
+   \ifcsname xpg@save@theparagraph\endcsname%
+        \let\theparagraph\xpg@save@theparagraph%
+   \fi%
+   \ifcsname xpg@save@thesubparagraph\endcsname%
+        \let\thesubparagraph\xpg@save@thesubparagraph%
+   \fi%
+}
+
+\def\blockextras@urdu{%
+   \ifurdu@customsep
+      \ifxetex
+        \urdu@xetex@capsformat
+      \else
+        \urdu@luatex@capsformat
+      \fi   
+   \fi
+}
+%
 \def\noextras@urdu{%
-   % restore original \MakeUppercase definition
-   \let\MakeUppercase\xpg@save@MakeUppercase%
+    \ifurdu@customsep
+      \ifxetex
+        \nourdu@xetex@capsformat
+      \else
+        \nourdu@luatex@capsformat
+      \fi   
+   \fi
 }
 
 \endinput

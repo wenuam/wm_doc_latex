@@ -12,7 +12,7 @@
 %% reports for it can be opened at https://latex-project.org/bugs/
 %% (but please observe conditions on bug reports sent to that address!)
 %% 
-%% Copyright (C) 1993-2022
+%% Copyright (C) 1993-2024
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 %% 
@@ -35,7 +35,7 @@
 %% given in the file `manifest.txt'.
 %% 
 %% Package `multicol' to use with LaTeX2e
-%% Copyright 1989-2019 Frank Mittelbach
+%% Copyright 1989-2023 Frank Mittelbach
 %%
 %%  In addition to the terms of LPPL any distributed version
 %%  (unchanged or modified) of multicol has to keep the statement
@@ -98,18 +98,14 @@
 %%
 %%     Frank.Mittelbach@latex-project.org
 %%
-\NeedsTeXFormat{LaTeX2e}[2018-04-01]
 
-\providecommand\DeclareRelease[3]{}
-\providecommand\DeclareCurrentRelease[2]{}
-
+\DeclareRelease{}{1994-06-01}{multicol-2017-04-11.sty}
 \DeclareRelease{}{2017-04-11}{multicol-2017-04-11.sty}
 \DeclareRelease{v1.8}{2019-10-01}{multicol-2019-10-01.sty}
 \DeclareCurrentRelease{}{2021-11-15}
 
 \ProvidesPackage{multicol}
-          [2021/11/30 v1.9d  multicolumn formatting (FMi)]
-%%
+          [2024/05/23 v1.9h  multicolumn formatting (FMi)]
 \DeclareOption{twocolumn}
    {\PackageWarning{multicol}{May not work
              with the twocolumn option}}
@@ -319,11 +315,13 @@
                  \kept@firstmark
     \return@nonemptymark{bot}%
                   \kept@botmark
-    \page@sofar
-    \global\let\kept@firstmark
-               \l@kept@firstmark
-    \global\let\kept@botmark
-            \l@kept@botmark
+    \global\setbox\mc@boxedresult\vbox{%
+      \page@sofar
+      \global\let\kept@firstmark
+                 \l@kept@firstmark
+      \global\let\kept@botmark
+                 \l@kept@botmark
+    }%
     \mult@info\tw@
       {Restore kept marks to\MessageBreak
        first: \meaning\kept@firstmark
@@ -349,6 +347,7 @@
   \endgroup
   \global\c@unbalance\z@
   \if@boxedmulticols
+    \unvbox\mc@boxedresult
     \mc@col@status@write
   \else
     \reinsert@footnotes
@@ -378,6 +377,7 @@
 \newskip\multicolbaselineskip
 \newbox\partial@page
 \newbox\last@line
+\newbox\mc@boxedresult
 \c@unbalance   = 0
 \c@collectmore = 0
 \multicoltolerance = 9999
@@ -411,11 +411,11 @@
      }%
 \ifvmode\else\errmessage{Multicol Error}\fi
    \nointerlineskip
-   \setbox\z@\hbox{p}\global\dimen\tw@\dp\z@
+   \setbox\z@\hbox{\multicolmindepthstring}\global\dimen\tw@\dp\z@
    \moveright\multicol@leftmargin
     \hbox to\full@width{%
        \mc@align@columns
-       \rlap{\phantom p}%
+       \rlap{\phantom \multicolmindepthstring}%
     }%
    \prevdepth\z@
  \kern-\dimen\tw@
@@ -425,6 +425,7 @@
       Grid alignment might be broken}%
  \fi
 }
+\def\multicolmindepthstring{p}
 \def\columnseprulecolor{\normalcolor}
 \def\reinsert@footnotes{\ifvoid\footins\else
          \insert\footins{}\fi}
@@ -899,9 +900,16 @@
   \begingroup
    \vbadness\@M
    \setbox#1\copy#1%
-   \setbox#1\vsplit#1to\maxdimen
+   \mc@get@all@box@marks #1%
    \set@keptmarks
  \endgroup
+}
+\def\mc@get@all@box@marks #1{%
+  \setbox\@tempboxa\vsplit#1to\maxdimen
+  \ifvoid#1\else
+    \setbox#1\vbox{\unvbox\@tempboxa \unvbox#1}%
+    \mc@get@all@box@marks #1%
+  \fi
 }
 \def\set@keptmarks{%
    \ifx\kept@firstmark\@empty

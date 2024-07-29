@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossaries-extra.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2022 Nicola Talbot
+%%  Copyright 2023 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-utf8.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -40,8 +40,8 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \DeclareRelease{v1.48}{2021-11-22}{glossaries-extra-2021-11-22.sty}
-\DeclareCurrentRelease{v1.50}{2022-11-08}
-\ProvidesPackage{glossaries-extra}[2022/11/08 v1.50 (NLCT)]
+\DeclareCurrentRelease{v1.53}{2023-09-29}
+\ProvidesPackage{glossaries-extra}[2023/09/29 v1.53 (NLCT)]
 \RequirePackage{xkeyval}
 \RequirePackage{etoolbox}
 \@ifpackageloaded{glossaries}
@@ -524,6 +524,7 @@
   \fi
 }
 \@glsxtr@floatsfalse
+\newcommand*{\GlossariesExtraInfo}[1]{\PackageInfo{glossaries-extra}{#1}}
 \newcommand*{\GlossariesExtraWarning}[1]{\PackageWarning{glossaries-extra}{#1}}
 \newcommand*{\GlossariesExtraWarningNoLine}[1]{%
  \PackageWarningNoLine{glossaries-extra}{#1}}
@@ -1716,7 +1717,7 @@
     \GlossariesExtraWarning{Glossary `#1' is not defined}%
   }%
 }
-\newcommand{\preglossarypreamble}[2][\glsdefaulttype]{%
+\newcommand{\pretoglossarypreamble}[2][\glsdefaulttype]{%
   \ifcsdef{glolist@#1}%
   {%
    \ifcsundef{@glossarypreamble@#1}%
@@ -1728,6 +1729,7 @@
     \GlossariesExtraWarning{Glossary `#1' is not defined}%
   }%
 }
+\newcommand{\preglossarypreamble}{\pretoglossarypreamble}
 \renewcommand*{\@p@glossarysection}[2]{%
   \glsclearpage
   \ifdefempty\@@glossarysecstar
@@ -4959,16 +4961,31 @@
    \@glsnavhypertarget{#1}{#2}{#3}%
  }
 }%
-\ifdef\@glsnavhypertarget
-{%
-  \renewcommand*{\@glsnavhypertarget}[3]{%
-    \protected@write\@auxout{}{\string\@gls@hypergroup{#1}{#2}}%
+\ifdef\glsnavhypergroupdotarget
+{
+  \renewcommand\glsnavhypergroupdotarget[3]{%
     \@glsxtr@do@org@target{\glsnavhyperlinkname{#1}{#2}}{#3}%
-    \ifcsdef{@gls@hypergrouplist@#1}%
-    {%
-      \letcs\@gls@list{@gls@hypergrouplist@#1}%
-      \protected@edef\@gls@thishypernavlabel{#2}%
-      \expandafter\DTLifinlist\expandafter{\@gls@thishypernavlabel}\@gls@list{}%
+  }
+}
+{
+  \ifdef\@glsnavhypertarget
+  {%
+    \renewcommand*{\@glsnavhypertarget}[3]{%
+      \protected@write\@auxout{}{\string\@gls@hypergroup{#1}{#2}}%
+      \@glsxtr@do@org@target{\glsnavhyperlinkname{#1}{#2}}{#3}%
+      \ifcsdef{@gls@hypergrouplist@#1}%
+      {%
+        \letcs\@gls@list{@gls@hypergrouplist@#1}%
+        \protected@edef\@gls@thishypernavlabel{#2}%
+        \expandafter\DTLifinlist\expandafter{\@gls@thishypernavlabel}\@gls@list{}%
+        {%
+          \GlossariesWarningNoLine{Navigation panel
+             for glossary type `#1'^^Jmissing group `#2'}%
+          \gdef\gls@hypergrouprerun{%
+            \GlossariesWarningNoLine{Navigation panel
+            has changed. Rerun LaTeX}}%
+        }%
+      }%
       {%
         \GlossariesWarningNoLine{Navigation panel
            for glossary type `#1'^^Jmissing group `#2'}%
@@ -4977,16 +4994,9 @@
           has changed. Rerun LaTeX}}%
       }%
     }%
-    {%
-      \GlossariesWarningNoLine{Navigation panel
-         for glossary type `#1'^^Jmissing group `#2'}%
-      \gdef\gls@hypergrouprerun{%
-        \GlossariesWarningNoLine{Navigation panel
-        has changed. Rerun LaTeX}}%
-    }%
-  }%
+  }
+  {}
 }
-{}
 \newcommand*{\glsxtrdohyperlink}[2]{%
  \glshasattribute{\glslabel}{targeturl}%
  {%
@@ -5166,9 +5176,10 @@
 \newcommand*{\glossxtrsetpopts}{%
   \glsxtrsetpopts{noindex}%
 }
+\newcommand{\glsxtrpInit}[2]{\let\glspostlinkhook\relax}
 \newrobustcmd*{\@@glsxtrp}[2]{%
   {%
-    \let\glspostlinkhook\relax
+    \glsxtrpInit{#1}{#2}%
     \csname#1\expandafter\endcsname\expandafter[\@glsxtrp@opt]{#2}[]%
   }%
 }
@@ -5312,6 +5323,14 @@
   }%
 }
 \glsmfublocker{\GLSxtrp}
+\newcommand*{\Glsps}{\Glsxtrp{short}}
+\glsmfuaddmap{\glsps}{\Glsps}
+\newcommand*{\GLSps}{\GLSxtrp{short}}
+\glsmfublocker{\GLSps}
+\newcommand*{\Glspt}{\Glsxtrp{text}}
+\glsmfuaddmap{\glspt}{\Glspt}
+\newcommand*{\GLSpt}{\GLSxtrp{text}}
+\glsmfublocker{\GLSpt}
 \newcommand*{\@glsxtr@unset}[1]{%
   \@@glsunset{#1}%
   \glsxtrpostunset{#1}%
@@ -6546,22 +6565,31 @@
   \@onelevel@sanitize\@glsxtr@titlelabel
   \protected@csedef{\@glsxtr@titlelabel}{#2}%
 }
-\renewcommand*{\glsnavigation}{%
-  \def\@gls@between{}%
-  \ifcsundef{@gls@hypergrouplist@\@glo@type}%
-  {%
-    \def\@gls@list{}%
-  }%
-  {%
-    \expandafter\let\expandafter\@gls@list
-      \csname @gls@hypergrouplist@\@glo@type\endcsname
-  }%
-  \@for\@gls@tmp:=\@gls@list\do{%
-    \@gls@between
-    \glsxtrgetgrouptitle{\@gls@tmp}{\@gls@grptitle}%
-    \glsnavhyperlink{\@gls@tmp}{\@gls@grptitle}%
-    \let\@gls@between\glshypernavsep
-  }%
+\ifdef\glsnavigationitem
+{
+  \renewcommand\glsnavigationitem[1]{%
+    \glsxtrgetgrouptitle{#1}{\@gls@grptitle}%
+    \glsnavhyperlink{#1}{\@gls@grptitle}%
+  }
+}
+{
+  \renewcommand*{\glsnavigation}{%
+    \def\@gls@between{}%
+    \ifcsundef{@gls@hypergrouplist@\@glo@type}%
+    {%
+      \def\@gls@list{}%
+    }%
+    {%
+      \expandafter\let\expandafter\@gls@list
+        \csname @gls@hypergrouplist@\@glo@type\endcsname
+    }%
+    \@for\@gls@tmp:=\@gls@list\do{%
+      \@gls@between
+      \glsxtrgetgrouptitle{\@gls@tmp}{\@gls@grptitle}%
+      \glsnavhyperlink{\@gls@tmp}{\@gls@grptitle}%
+      \let\@gls@between\glshypernavsep
+    }%
+  }
 }
 \renewcommand*{\@print@noidx@glossary}{%
   \ifcsdef{@glsref@\@glo@type}%
@@ -6960,6 +6988,7 @@
 }
 \newcommand*{\glsxtr@fields}[1]{}
 \newcommand*{\glsxtr@texencoding}[1]{}
+\newcommand*{\glsxtr@locale}[1]{}
 \newcommand*{\glsxtr@langtag}[1]{}
 \newcommand*{\glsxtr@pluralsuffixes}[4]{}
 \newcommand*{\glsxtr@shortcutsval}[1]{}
@@ -6984,6 +7013,10 @@
   \fi
   \ifdef\CurrentTrackedLanguageTag
   {%
+     \ForEachTrackedDialect{\@glsxtr@currentdialect}{%
+       \protected@write\@auxout{}{%
+         \string\glsxtr@locale{\GetTrackedLanguageTag\@glsxtr@currentdialect}}%
+     }%
      \protected@write\@auxout{}{%
        \string\glsxtr@langtag{\CurrentTrackedLanguageTag}}%
   }%
@@ -7129,6 +7162,14 @@
 \newcommand*{\GlsXtrStandaloneEntryOther}[2]{%
   \glstarget{#1}{\glossentrynameother{#1}{#2}}%
 }
+\newcommand{\glsxtrtarget}[2]{%
+ \GlsXtrIfFieldUndef{\glsxtrtargetfield}{#1}%
+ {%
+   \@glstarget{\glolinkprefix #1}{#2}%
+   \xGlsXtrSetField{#1}{\glsxtrtargetfield}{\glolinkprefix #1}%
+ }{#2}%
+}
+\newcommand{\glsxtrtargetfield}{target}
 \ifdef\@printgloss@checkexists
 {
   \newcommand*{\printunsrtglossary}{%
@@ -11660,6 +11701,7 @@ defined}{}%
   \let\@glsxtr@org@GLSxtrtitleshortpl\GLSxtrtitleshortpl
   \let\@glsxtr@org@glsxtrtitlename\glsxtrtitlename
   \let\@glsxtr@org@Glsxtrtitlename\Glsxtrtitlename
+  \let\@glsxtr@org@GLSxtrtitlename\GLSxtrtitlename
   \let\@glsxtr@org@glsxtrtitletext\glsxtrtitletext
   \let\@glsxtr@org@Glsxtrtitletext\Glsxtrtitletext
   \let\@glsxtr@org@GLSxtrtitletext\GLSxtrtitletext
@@ -11668,6 +11710,7 @@ defined}{}%
   \let\@glsxtr@org@GLSxtrtitleplural\GLSxtrtitleplural
   \let\@glsxtr@org@glsxtrtitlefirst\glsxtrtitlefirst
   \let\@glsxtr@org@Glsxtrtitlefirst\Glsxtrtitlefirst
+  \let\@glsxtr@org@GLSxtrtitlefirst\GLSxtrtitlefirst
   \let\@glsxtr@org@glsxtrtitlefirstplural\glsxtrtitlefirstplural
   \let\@glsxtr@org@Glsxtrtitlefirstplural\Glsxtrtitlefirstplural
   \let\@glsxtr@org@GLSxtrtitlefirstplural\GLSxtrtitlefirstplural
@@ -13958,8 +14001,8 @@ defined}{}%
     \if@mgls@writeseparaterefs
       \protected@write\@auxout{}{\string\@glsxtr@mglsrefs{#1}}%
     \else
-      \AtEndDocument{\immediate\protected@write\@auxout{}%
-        {\string\@glsxtr@mglsrefs{\@glsxtr@mglsreflist}}}%
+      \AtEndDocument{\immediate\write\@auxout
+        {\string\@glsxtr@mglsrefs{\expandonce{\@glsxtr@mglsreflist}}}}%
     \fi
     \@mgls@disable@writeseparateref@cond
   }%

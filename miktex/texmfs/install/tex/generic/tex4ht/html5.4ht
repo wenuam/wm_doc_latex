@@ -1,5 +1,5 @@
-% html5.4ht (2022-01-23-07:51), generated from tex4ht-html5.tex
-% Copyright 2016-2022 TeX Users Group
+% html5.4ht (2023-10-09-13:31), generated from tex4ht-html5.tex
+% Copyright 2016-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,7 +16,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-01-23-07:51}
+\immediate\write-1{version 2023-10-09-13:31}
 
 \exit:ifnot{amsart,% 
 amsbook,% 
@@ -67,6 +67,35 @@ tex4ht}
                  content="\:today"\xml:empty>\Hnewline}}
 \else
   \Log:Note{To print a timestamp, use the command line option timestamp}
+\fi
+\:CheckOption{nostyle}\if:Option
+\else
+\Log:Note{We use a default CSS style. Use the `nostyle' option if you want to use custom a CSS design}
+\Css{body{
+    margin:1em auto;
+    max-width:80ch;
+    padding:0 .62em;
+}}
+
+\Css{h1,h2,h3,h4,h5 {
+    line-height:1.2;
+}}
+\Css{@media print{
+    body{
+      max-width:none
+    }
+}}
+\Css{.partHead, .likepartHead  { font-size: 2em; }}
+\Css{.chapterHead, .likechapterHead  { font-size: 1.7411em; }}
+\Css{.sectionHead, .likesectionHead  { font-size: 1.5157em; }}
+\Css{.subsectionHead, .likesubsectionHead  { font-size: 1.3195em; }}
+\Css{.subsubsectionHead, .likesubsubsectionHead  { font-size: 1.1487em; }}
+
+\Css{
+  @media (prefers-color-scheme: dark) {
+    img[src^="\jobname"]{filter: invert(1); }
+  }
+}
 \fi
 \def\Declare:Language#1#2{%
 \expandafter\gdef\csname rfclang#1\endcsname{#2}%
@@ -218,6 +247,15 @@ tex4ht}
 \par}
    {}{}
 
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
 \Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
 \Css{figure.figure {text-align:center;}}
 
@@ -248,6 +286,15 @@ tex4ht}
      \HCode{</figure>}\csname par\endcsname\ShowPar}
 
 \ConfigureEnv{figure}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
+\ConfigureEnv{figure*}
 {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
     \bgroup \Configure{float}{\ShowPar}{}{}%
    }
@@ -301,6 +348,15 @@ tex4ht}
 \par}
    {}{}
 
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
 \Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
 \Css{figure.figure {text-align:center;}}
 
@@ -342,6 +398,7 @@ tex4ht}
 
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{amsart}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -352,6 +409,15 @@ tex4ht}
      \HCode{</figure>}\csname par\endcsname\ShowPar}
 
 \ConfigureEnv{figure}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
+\ConfigureEnv{figure*}
 {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
     \bgroup \Configure{float}{\ShowPar}{}{}%
    }
@@ -398,6 +464,15 @@ tex4ht}
 \par}
    {}{}
 
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
 \Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
 \Css{figure.figure {text-align:center;}}
 
@@ -436,6 +511,15 @@ tex4ht}
 \par}
    {}{}
 
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
 \Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
 \Css{figure.figure {text-align:center;}}
 
@@ -455,6 +539,11 @@ tex4ht}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
 
 
 
@@ -582,6 +671,15 @@ tex4ht}
 \par}
    {}{}
 
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
 \Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
 \Css{figure.figure {text-align:center;}}
 
@@ -674,6 +772,14 @@ tex4ht}
 
 
 
+
+
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{scrbook}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -684,6 +790,15 @@ tex4ht}
      \HCode{</figure>}\csname par\endcsname\ShowPar}
 
 \ConfigureEnv{figure}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
+\ConfigureEnv{figure*}
 {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
     \bgroup \Configure{float}{\ShowPar}{}{}%
    }
@@ -711,7 +826,6 @@ tex4ht}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{scrartcl}
@@ -731,36 +845,7 @@ tex4ht}
 \par}
    {}{}
 
-\Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
-\Css{figure.figure {text-align:center;}}
-
-\Configure{caption}{\:xhtml{\IgnorePar\EndP}\HCode{<figcaption class="caption" ><span class="id">}}
-   {: } {\HCode{</span><span \Hnewline class="content">}}
-   {\HCode{</span></figcaption>}\HCode{<!--tex4ht:label?:
-   \cur:th\:currentlabel\space-->}%
-}
-\Css{figcaption.caption {text-indent:-2em; margin-left:3em; margin-right:1em;
-                  text-align:center;}}
-\Css{figcaption.caption span.id{font-weight: bold; white-space: nowrap; }}
-\Css{p + figcaption, img + figcaption{margin-top: 1em;}}
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-\endinput\empty\empty\empty\empty\empty\empty
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                \ConfigureHinput{scrreprt}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \Configure{float}
-   {\ifOption{refcaption}{}{\csname par\endcsname\ShowPar \leavevmode}}
-     {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="float"\Hnewline>}}
-   {\ifvmode \IgnorePar \fi\EndP
-     \HCode{</figure>}\csname par\endcsname\ShowPar}
-
-\ConfigureEnv{figure}
+\ConfigureEnv{figure*}
 {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
     \bgroup \Configure{float}{\ShowPar}{}{}%
    }
@@ -788,6 +873,77 @@ tex4ht}
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                \ConfigureHinput{scrreprt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \Configure{float}
+   {\ifOption{refcaption}{}{\csname par\endcsname\ShowPar \leavevmode}}
+     {\:xhtml{\IgnorePar\EndP}\HCode{<figure class="float"\Hnewline>}}
+   {\ifvmode \IgnorePar \fi\EndP
+     \HCode{</figure>}\csname par\endcsname\ShowPar}
+
+\ConfigureEnv{figure}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
+\ConfigureEnv{figure*}
+{\:xhtml{\IgnorePar\EndP}\HCode{<figure class="figure">\Hnewline}%
+    \bgroup \Configure{float}{\ShowPar}{}{}%
+   }
+   {\egroup
+   \:xhtml{\IgnorePar\EndP}\HCode{</figure>}\ShowPar
+\par}
+   {}{}
+
+\Css{figure.float, div.figure {margin-left: auto; margin-right: auto;}}
+\Css{figure.figure {text-align:center;}}
+
+\Configure{caption}{\:xhtml{\IgnorePar\EndP}\HCode{<figcaption class="caption" ><span class="id">}}
+   {: } {\HCode{</span><span \Hnewline class="content">}}
+   {\HCode{</span></figcaption>}\HCode{<!--tex4ht:label?:
+   \cur:th\:currentlabel\space-->}%
+}
+\Css{figcaption.caption {text-indent:-2em; margin-left:3em; margin-right:1em;
+                  text-align:center;}}
+\Css{figcaption.caption span.id{font-weight: bold; white-space: nowrap; }}
+\Css{p + figcaption, img + figcaption{margin-top: 1em;}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+\endinput\empty\empty\empty\empty\empty\empty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

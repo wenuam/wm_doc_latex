@@ -90,7 +90,7 @@ LinLibertineMTB-lf-ly1 1 255
 'Y' '' Y 89
 'Z' '' Z 90
 '[' '' bracketleft 91
-'\' '' backslash 92
+'&#x005C;' '' backslash 92
 ']' '' bracketright 93
 '' ''
 '_' '' underscore 95

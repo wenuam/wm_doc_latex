@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-malayalam.ldf}[polyglossia: module for Malayalam]
 
@@ -6,6 +6,8 @@
 
 \PolyglossiaSetup{malayalam}{
   bcp47=ml,
+  bcp47-language=ml,
+  bcp47-script=Mlym,
   script=Malayalam,
   scripttag=mlym,
   langtag=MAL, %FIXME there is also MLR for "Malayalam Reformed"

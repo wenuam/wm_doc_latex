@@ -1,10 +1,12 @@
 % !TEX encoding = UTF-8 Unicode
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-piedmontese.ldf}[2013/02/12 v1.0 polyglossia: module for Piedmontese]
 \makeatletter
 \PolyglossiaSetup{piedmontese}{
   bcp47=pms,
+  bcp47-language=pms,
+  bcp47-script=Latn,
   hyphennames={piedmontese},
   hyphenmins={2,2},
   langtag=PMS,
@@ -15,22 +17,22 @@
 % BCP-47 compliant aliases
 \setlanguagealias*{piedmontese}{pms}
 
-\define@boolkey{piedmontese}[piedmontese@]{babelshorthands}[true]{}
+\DeclareKeys[polyglossia/gloss/piedmontese]
+  {
+    babelshorthands.if = piedmontese@babelshorthands,
+    babelshorthands.default:n = true
+  }
 
 \ifsystem@babelshorthands
-  \setkeys{piedmontese}{babelshorthands=true}
+  \SetGlossOptions{piedmontese}{babelshorthands=true}
 \else
-  \setkeys{piedmontese}{babelshorthands=false}
+  \SetGlossOptions{piedmontese}{babelshorthands=false}
 \fi
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
 \def\piedmontese@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{piedmontese}%
   \declare@shorthand{piedmontese}{"}{%
     \relax\ifmmode
@@ -60,7 +62,7 @@
 \xpgpms@@next}
 
 \def\nopiedmontese@shorthands{%
-  \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+  \xpg@deactivate@shorthands%
 }
 \@namedef{captions\CurrentOption}{%
     \def\prefacename{Prefassion}%
@@ -91,7 +93,7 @@
       ëd luj\or d'agost\or dë stèmber\or d'otóber\or ëd novèmber\or dë dzèmber%
       \fi\space dal\space\number\year}}
       
-\AtEndPreamble{% 
+\AddToHook{begindocument/before}{% 
   \edef\xpgpms@savedvalues{%
     \clubpenalty=\the\clubpenalty\space
     \@clubpenalty=\the\@clubpenalty\space

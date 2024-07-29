@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-lao.ldf}[polyglossia: module for Lao]
 
 \PolyglossiaSetup{lao}{
   bcp47=lo,
+  bcp47-language=lo,
+  bcp47-script=Laoo,
   script=Lao,
   scripttag=lao,
   langtag=LAO,
@@ -20,14 +22,23 @@
 
 \newif\if@lao@numerals
 \def\tmp@lao{lao}
-\define@key{lao}{numerals}[arabic]{%
-	\def\@tmpa{#1}%
-	\ifx\@tmpa\tmp@lao\@lao@numeralstrue\else
-	  \@lao@numeralsfalse\fi
-}
+
+\DeclareKeys[polyglossia/gloss/lao]
+  {
+    numerals.choice:,
+    numerals / arabic.code =
+      {%
+        \@lao@numeralsfalse
+      },
+    numerals / lao.code =
+      {%
+        \@lao@numeralstrue
+      },
+    numerals.default:n = arabic
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{lao}{numerals=arabic}
+\InitializeGlossOptions{lao}{numerals=arabic}
 
 % Translations provided by Brian Wilson <bountonw at gmail.com>
 \def\captionslao{%

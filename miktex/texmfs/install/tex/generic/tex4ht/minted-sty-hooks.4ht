@@ -1,5 +1,5 @@
-% minted-sty-hook.4ht, generated from tex4ht-4ht.tex
-% Copyright 2020 TeX Users Group
+% minted-sty-hooks.4ht, generated from tex4ht-4ht.tex
+% Copyright 2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,9 +16,9 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2020-12-13-11:14}
+\immediate\write-1{version 2022-06-08-15:03}
 
-\AddToHook{package/after/minted}{%
+\AddToHook{package/minted/after}{%
 \@ifpackageloaded{xcolor}{}{\RequirePackage{xcolor}}
 \newcommand{\:minted@def@opt@switch}[2][false]{%
   \define@booleankey{minted@opt@g}{#2}%

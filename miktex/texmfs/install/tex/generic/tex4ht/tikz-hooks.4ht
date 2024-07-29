@@ -1,5 +1,5 @@
-% tikz-hooks.4ht (2021-10-21-13:56), generated from tex4ht-4ht.tex
-% Copyright 2021 TeX Users Group
+% tikz-hooks.4ht (2023-08-27-08:01), generated from tex4ht-4ht.tex
+% Copyright 2020-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,7 +16,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-10-21-13:56}
+\immediate\write-1{version 2023-08-27-08:01}
 
 \ifdefined\pgfsysdriver\else%
   \typeout{*****************************}
@@ -24,6 +24,7 @@
   document before use of TikZ if you want to another driver. Use tikz+ option if your TikZ pictures use patterns.}%
   \def\pgfsysdriver{pgfsys-dvisvgm4ht.def}%
 \fi%
+\ifdefined\find:externalize\else
 \:AtEndOfPackage{%
 \let\use:tikzlibrary\usetikzlibrary
 \def\find:externalize#1external#2\@nil{%
@@ -42,4 +43,5 @@
 }
 \append:defI\use@@tikzlibrary{\find:externalize##1external\@nil}%
 }
+\fi
 

@@ -1,8 +1,8 @@
-%% The LaTeX package tcolorbox - version 6.0.3 (2023/03/17)
+%% The LaTeX package tcolorbox - version 6.3.0 (2024/07/10)
 %% tcblistingscode.code.tex: Auxiliary code for colorboxes with listings
 %%
 %% -------------------------------------------------------------------------------------------
-%% Copyright (c) 2006-2023 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
+%% Copyright (c) 2006-2024 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
 %% -------------------------------------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -18,7 +18,7 @@
 %% This work consists of all files listed in README
 %%
 %\makeatletter
-\tcb@set@library@version{6.0.3}
+\tcb@set@library@version{6.3.0}
 
 \tcbuselibrary{pro@cessing}
 
@@ -164,15 +164,29 @@
   \begin{tcolorbox}[capture=\tcb@listing@capture,savedelimiter=tcolorbox]\tcb@listing@process\end{tcolorbox}%
 }
 
-\long\def\tcb@run@system@command#1{%
-  \ifcase\pdf@shellescape\relax
-    \tcb@error{You must invoke LaTeX with the -shell-escape flag}{Pass the -shell-escape flag to LaTeX.}%
-  \or\or
-    \tcb@warning{System call with restricted shell escape may fail}%
-  \fi%
-  \ShellEscape{#1}%
-  \relax%
+\ExplSyntaxOn
+\cs_new_protected:Npn \__tcbox_run_system_command:n #1
+  {
+    \sys_if_shell:TF
+      {
+        \sys_if_shell_restricted:T
+          {
+            \tcb@warning{System~call~with~restricted~shell~escape~may~fail}
+          }
+      }
+      {
+        \tcb@error{You~must~invoke~LaTeX~with~the~-shell-escape~flag}
+          {Pass~the~-shell-escape~flag~to~LaTeX.}
+      }
+    \sys_shell_now:e {#1}
+  }
+
+\tcbset
+{
+  run~system~command/.style={process~code={\__tcbox_run_system_command:n{#1}}},
 }
+
+\ExplSyntaxOff
 
 
 \tcbset{%
@@ -219,7 +233,6 @@
   process code/.code={\appto\tcb@listing@process@hook{#1}},%
   no process/.code={\def\tcb@listing@process@hook{}},%
   compilable listing/.style={listing file={\jobname-listing-\thetcblistingcount.tex}},
-  run system command/.style={process code={\tcb@run@system@command{#1}}},%
   run@system@command/.style 2 args={run system command={#1\space#2\space\filename@area\filename@base}},%
   run pdflatex/.style={run@system@command={pdflatex}{#1}},%
   run xelatex/.style={run@system@command={xelatex}{#1}},%
@@ -355,8 +368,8 @@
   }
 \NewDocumentCommand \__tcobox_new_tcbinputlisting_i:w { m +O{} m }
   {
-    \__tcobox_set_backslash_removed:Nn \l_tmpa_tl { #3 }
-    \exp_args:NNnV \__tcobox_new_tcbinputlisting_ii:w #1 {#2} \l_tmpa_tl
+    \__tcobox_set_backslash_removed:Nn \l__tcobox_tmpa_tl { #3 }
+    \exp_args:NNnV \__tcobox_new_tcbinputlisting_ii:w #1 {#2} \l__tcobox_tmpa_tl
   }
 \NewDocumentCommand \newtcbinputlisting { }
   {
@@ -377,8 +390,8 @@
   }
 \NewDocumentCommand \__tcobox_new_TCBInputListing:w { m +O{} m }
   {
-    \__tcobox_set_backslash_removed:Nn \l_tmpa_tl { #3 }
-    \exp_args:NNnV \__tcobox_new_TCBInputListing:Nnnnn #1 {#2} \l_tmpa_tl
+    \__tcobox_set_backslash_removed:Nn \l__tcobox_tmpa_tl { #3 }
+    \exp_args:NNnV \__tcobox_new_TCBInputListing:Nnnnn #1 {#2} \l__tcobox_tmpa_tl
   }
 \NewDocumentCommand \DeclareTCBInputListing { }
   {

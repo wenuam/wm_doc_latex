@@ -1,6 +1,6 @@
-% memoir.4ht (2021-01-29-14:14), generated from tex4ht-4ht.tex
+% memoir.4ht (2023-08-16-13:07), generated from tex4ht-4ht.tex
 % Copyright 2003-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-01-29-14:14}
+\immediate\write-1{version 2023-08-16-13:07}
 
 \input book.4ht
 \input verse.4ht
@@ -63,6 +63,18 @@
 \newcounter{Hfootnote}
 \fi
 }{}
+\def\:tempa#1|#2|#3\\{%
+  \html:addr\hbox{\Link-{}{dx\last:haddr}\EndLink}%
+  \expandafter\protected@write\csname \jobname @idxfile\endcsname{}{\string\beforeentry{\RefFileNumber\FileNumber}{dx\last:haddr}{}}%
+  \expandafter\protected@write\csname \jobname @idxfile\endcsname{}{\string\indexentry[\@idxfile]{#1}{\thepage}}%
+  \endgroup%
+  \@esphack%
+}
+\HLet\@@wrindexhyp\:tempa
+\HLet\@@wrspindexhyp\:tempa
+
+% we use make4ht's splitindex functionality, which produces .ind files in the form of \jobname-idxname.ind
+\renewcommand{\printindex}[1][\jobname]{\@input@{\jobname-#1.ind}}
 
 \ifx \memgobble\:UnDef
    \pend:defI\getthelinenumber{%

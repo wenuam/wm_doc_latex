@@ -1,5 +1,5 @@
 \ProvidesFile{csquotes.def}
-  [2022-09-14 v5.2n csquotes generic definitions (JAW)]
+  [2024-04-04 v5.2o csquotes generic definitions (JAW)]
 
 % Set defaults
 
@@ -63,11 +63,11 @@
   {\textquoteleft}
   {\textquoteright}
 \DeclareQuoteStyle{dutch}
-  {\quotedblbase}
+  {\textquotedblleft}
   {\textquotedblright}
   [0.05em]
-  {\quotesinglbase}% unsure
-  {\textquoteright}% unsure
+  {\textquoteleft}
+  {\textquoteright}
 \DeclareQuoteStyle[american]{english}% verified
   {\textquotedblleft}
   {\textquotedblright}
@@ -187,6 +187,12 @@
   {\textquotedblright}
   [0.05em]
   {\quotesinglbase}
+  {\textquoteright}
+\DeclareQuoteStyle{lithuanian}
+  {\quotedblbase}
+  {\textquotedblleft}
+  [0.05em]
+  {\textquoteright}
   {\textquoteright}
 \DeclareQuoteStyle[guillemets]{norwegian}
   {\guillemotleft}
@@ -397,6 +403,7 @@
 \DeclareQuoteOption{japanese}
 \DeclareQuoteOption{latin}
 \DeclareQuoteOption{latvian}
+\DeclareQuoteOption{lithuanian}
 \DeclareQuoteOption{norwegian}
 \DeclareQuoteOption{polish}
 \DeclareQuoteOption{portuguese}

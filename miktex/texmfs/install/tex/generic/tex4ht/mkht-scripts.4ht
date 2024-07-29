@@ -1,5 +1,5 @@
-% mkht-scripts.4ht (2020-11-23-10:05), generated from tex4ht-mkht.tex
-% Copyright 2009-2020 TeX Users Group
+% mkht-scripts.4ht (2023-09-10-08:49), generated from tex4ht-mkht.tex
+% Copyright 2009-2023 TeX Users Group
 % Copyright 2000-2009 Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -18,7 +18,7 @@
 % If you modify this program, changing the
 % version identification would be appreciated.
 %
-\immediate\write-1{version \ifx \JOBNAME\UnDefined 2020-11-23-10:05\else |version\fi}
+\immediate\write-1{version \ifx \JOBNAME\UnDefined 2023-09-10-08:49\else |version\fi}
 
 
 \ifx \JOBNAME\UnDef
@@ -40,7 +40,6 @@
 \Quote{'}
 \Argchar{$}
 \Dirchar{-f/}
-\Rubycall{}
 \Echooff{}
 \Remark{#}
 
@@ -148,7 +147,6 @@
 \Quote{}
 \Argchar{%}
 \Dirchar{}
-\Rubycall{call }
 \Echooff{@echo off}
 \Remark{Rem }
 

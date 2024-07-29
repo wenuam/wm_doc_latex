@@ -1,8 +1,10 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-amharic.ldf}[polyglossia: module for Amharic]
 \PolyglossiaSetup{amharic}{
   bcp47=am,
+  bcp47-language=am,
+  bcp47-script=Ethi,
   script=Ethiopic,
   scripttag=ethi,
   langtag=AMH,

@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-syriac.ldf}[polyglossia: module for Syriac]
 
@@ -7,6 +7,8 @@
 
 \PolyglossiaSetup{syriac}{
   bcp47=syr,
+  bcp47-language=syr,
+  bcp47-script=Syrc,
   script=Syriac,
   scripttag=syrc,
   langtag=SYR,
@@ -20,25 +22,37 @@
 % BCP-47 compliant aliases
 \setlanguagealias*{syriac}{syr}
 
-\def\syriacnumber#1{\@syriacnumber{#1}}%
+\def\syriacnumber#1{\@syriacnumber{#1}}
 
 \newif\if@eastern@numerals
-\def\tmp@eastern{eastern}
-\def\tmp@abjad{abjad}
-\define@key{syriac}{numerals}[western]{%
-	\def\@tmpa{#1}%
-	\ifx\@tmpa\tmp@abjad
-	  \let\syriacnumber\abjadsyriac
-	\else
-	  \ifx\@tmpa\tmp@eastern
-      \@eastern@numeralstrue
-	  \else
-      \@eastern@numeralsfalse
- 	  \fi
-  \fi}
+\newif\ifsyriac@customsep\syriac@customsepfalse
+\def\xpg@sepmark{}
+
+\DeclareKeys[polyglossia/gloss/syriac]
+  {
+    sectionsep.code = \gdef\xpg@sepmark{#1}\syriac@customseptrue,
+    sectionsep.default:n = .,
+    numerals.choice:,
+    numerals / eastern.code =
+      {%
+        \@eastern@numeralstrue
+        \SetLanguageKeys{syriac}{bcp47-extension-u=nu-syrc}%
+      },
+    numerals / western.code =
+      {%
+        \@eastern@numeralsfalse
+        \SetLanguageKeys{syriac}{bcp47-extension-u=nu-latn}%
+      },
+    numerals / abjad.code =
+      {%
+          \let\syriacnumber\abjadsyriac
+      },
+    numerals.default:n = eastern,
+    numerals/unknown.code = \xpg@warning{Unknown Syriac numerals option `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{syriac}{numerals=western}
+\InitializeGlossOptions{syriac}{numerals=western}
 	
 %\define@key{polyglossia}{syriaclocale}[default]{%
 %	\def\@syriac@locale{#1}}
@@ -122,16 +136,16 @@
       %%% we test for the presence of one of ١٢٣٤٥٦٧٨٩٠ in the Syriac font, 
       %%% else we try \arabicfont if defined (and give a warning), 
       %%% else we fall back to the Western numerals.
-      \xpg@if@char@available{0661}%
-          {\protect\arabicdigits{\number#1}}%
-          {\arabicdigits{\number#1}
-           \ifcsdef{arabicfont}%
-	     {\protect\arabicdigits{\number#1}%
-	      \xpg@warning{You have specified the option numerals=eastern for Syriac, but the Syriac font does not contain the appropriate glyphs:
-                           I am using \string\arabicfont instead}}%
+      \IfCharIsAvailableTF{0661}%
+          {\@ensure@LTR{\protect\arabicdigits{\number#1}}}%
+          {\@ensure@LTR{\arabicdigits{\number#1}}
+           \@ifundefined{arabicfont}%
 	     {\number#1%%% <---changed from \RL{\protect\reset@font\protect\number#1}%
 	      \xpg@warning{You have specified the option numerals=eastern for Syriac, but the Syriac font does not contain the appropriate glyphs:
                            since \string\arabicfont is not defined, we'll use Western numerals instead}}%
+	     {\@ensure@LTR{\protect\arabicdigits{\number#1}}%
+	      \xpg@warning{You have specified the option numerals=eastern for Syriac, but the Syriac font does not contain the appropriate glyphs:
+                           I am using \string\arabicfont instead}}%
           }%
    \else
      %%\RL{\protect\reset@font\number#1}%
@@ -163,16 +177,92 @@
   \let\@arabic\xpg@save@arabic%
 }
 
-% Save original \MakeUppercase definition
-\let\xpg@save@MakeUppercase\MakeUppercase
-
-\def\blockextras@syriac{%
-   \def\MakeUppercase##1{##1}%
+\def\syriac@xetex@capsformat{%
+  \let\xpg@save@sepmark\@SepMark%
+  \SepMark{\xpg@sepmark}
 }
 
+\def\nosyriac@xetex@capsformat{%
+   \ifcsname xpg@save@sepmark\endcsname%
+     \SepMark{\xpg@save@sepmark}
+   \fi%
+}
+
+\def\syriac@luatex@capsformat{%
+  %
+  % change chapter and part headings
+  \ifsyriac@customsep
+     \ifcsname chapter\endcsname%
+        \let\xpg@save@thesection\thesection%
+        \renewcommand*\thesection{\thechapter\xpg@sepmark\@arabic\c@section}
+        \let\xpg@save@theequation\theequation%
+        \renewcommand*\theequation{%
+	    \ifnum \c@chapter>\z@ \thechapter\xpg@sepmark\fi\@arabic\c@equation}
+        \let\xpg@save@thefigure\thefigure%
+	\renewcommand*\thefigure{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@figure}
+        \let\xpg@save@thetable\thetable%
+	\renewcommand*\thetable{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@table}
+     \fi%
+     \let\xpg@save@thesubsection\thesubsection%
+     \renewcommand\thesubsection
+	{\thesection\xpg@sepmark\@arabic\c@subsection}
+     \let\xpg@save@thesubsubsection\thesubsubsection%
+     \renewcommand\thesubsubsection{\thesubsection\xpg@sepmark\@arabic\c@subsubsection}
+     \let\xpg@save@theparagraph\theparagraph%
+     \renewcommand\theparagraph
+         {\thesubsubsection\xpg@sepmark\@arabic\c@paragraph}
+     \let\xpg@save@thesubparagraph\thesubparagraph%
+     \renewcommand\thesubparagraph{\theparagraph\xpg@sepmark\@arabic\c@subparagraph}
+  \fi% (end \ifsyriac@customsep)
+}
+
+\def\nosyriac@luatex@capsformat{%
+   \ifcsname xpg@save@thesection\endcsname%
+        \let\thesection\xpg@save@thesection%
+   \fi%
+   \ifcsname xpg@save@theequation\endcsname%
+        \let\theequation\xpg@save@theequation%
+   \fi%
+   \ifcsname xpg@save@thefigure\endcsname%
+        \let\thefigure\xpg@save@thefigure%
+   \fi%
+   \ifcsname xpg@save@thetable\endcsname%
+        \let\thetable\xpg@save@thetable%
+   \fi%
+   \ifcsname xpg@save@thesubsection\endcsname%
+        \let\thesubsection\xpg@save@thesubsection%
+      \ifcsname xpg@save@thesubsubsection\endcsname%
+        \let\thesubsubsection\xpg@save@thesubsubsection%
+      \fi%
+   \fi%
+   \ifcsname xpg@save@theparagraph\endcsname%
+        \let\theparagraph\xpg@save@theparagraph%
+   \fi%
+   \ifcsname xpg@save@thesubparagraph\endcsname%
+        \let\thesubparagraph\xpg@save@thesubparagraph%
+   \fi%
+}
+
+\def\blockextras@syriac{%
+   \ifsyriac@customsep
+      \ifxetex
+        \syriac@xetex@capsformat
+      \else
+        \syriac@luatex@capsformat
+      \fi   
+   \fi
+}
+%
 \def\noextras@syriac{%
-   % restore original \MakeUppercase definition
-   \let\MakeUppercase\xpg@save@MakeUppercase%
+    \ifsyriac@customsep
+      \ifxetex
+        \nosyriac@xetex@capsformat
+      \else
+        \nosyriac@luatex@capsformat
+      \fi   
+   \fi
 }
 
 \endinput

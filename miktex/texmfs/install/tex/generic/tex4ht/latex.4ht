@@ -1,6 +1,6 @@
-% latex.4ht (2022-02-01-14:27), generated from tex4ht-4ht.tex
+% latex.4ht (2023-10-02-13:11), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2022 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-02-01-14:27}
+\immediate\write-1{version 2023-10-02-13:11}
 
 \ifx\SaveMkHalignConf:g\:UnDef \else \expandafter\endinput\fi
 
@@ -49,7 +49,9 @@
                  \let\pageno\c@page   \fi
 \let\accent:def\def
 \pend:def\protect:wrtoc{\:protect
-   \Configure{ }{ }\toc:lbl:idx}
+   \Configure{ }{ }%
+   \let\\\space%
+ \toc:lbl:idx}
   \def\endMkHalign{\EndMkHalign}
 \def\:protect{\vrb:tt
   \let\protect\@unexpandable@protect
@@ -134,6 +136,10 @@
 \def\:temp#1{\leavevmode\a:oalign\o:oalign:{#1}\b:oalign}
 \HLet\oalign\:temp
 \NewConfigure{oalign}{2}
+
+\ifdefined\MAKETITLE\else
+\chardef\%=`\%
+\fi
 
      
                       
@@ -430,8 +436,16 @@
 \let\o:ref\:ref
 \def\::ref#1{{\:SUBOff\:SUPOff\xdef\RefArg{#1}}\expandafter\o:ref
                                                \expandafter{\RefArg}}
-\def\:ref{\Protect\::ref}
+\DeclareDocumentCommand\:ref{s}{\IfBooleanTF{#1}{\Protect\::ref}{\Protect\::ref}}
 \let\ref\:ref
+\def\::Ref#1{%
+  \let\olda:rEfLiNK\rEfLiNK%%
+  \def\rEfLiNK##1##2{\Link{##1}{}\edef\:ref:currentlabel{##2}\expandafter\MakeUppercase\:ref:currentlabel\EndLink}%
+  \::ref{#1}%
+  \let\rEfLiNK\olda:rEfLiNK%
+}
+\DeclareDocumentCommand\:Ref{s}{\IfBooleanTF{#1}{\Protect\::Ref}{\Protect\::Ref}}
+\let\Ref\:Ref
 \let\:newl@bel\@newl@bel
 \let\n:wlbl\@newl@bel
 \def\@newl@bel#1#2{{\:SUBOff\:SUPOff
@@ -447,14 +461,15 @@
 \let\:currentlabel\empty
 \NewConfigure{@:currentlabel}[1]{\concat:config\a:@:currentlabel{#1}}
 \let\a:@:currentlabel\relax
-\def\cur:lbl#1{{\a:@:currentlabel
+\def\cur:lbl#1{{\let\saved:currentlabel\:currentlabel\a:@:currentlabel
   \def\:currentlabel{\par}%
 \ifx\@currentlabel\:currentlabel
    \def\:currentlabel{\let\:currentlabel\empty}%
 \else \def\:currentlabel{#1}%
    \edef\:currentlabel{\def\noexpand
                  \:currentlabel{\ifx\:currentlabel\empty
-         \ifx \:@currentlabel\:UnDef \@currentlabel
+         \ifx \:@currentlabel\:UnDef
+         \ifx\saved:currentlabel \@currentlabel\@currentlabel\else\saved:currentlabel\fi
          \else \:@currentlabel \fi
       \else
           \expandafter\ifx\csname #1:Count\endcsname\relax
@@ -579,7 +594,7 @@
       \pend:defI\begin{\let\chk:pic\EndPicture }
       \let\o:begin:\begin
       \let\choose:begin\@firstoftwo
-\def\begin#1{\csname @begin:#1\endcsname
+\DeclareRobustCommand\begin[1]{\csname @begin:#1\endcsname
   \choose:begin
     {\let\choose:begin\@firstoftwo \ifx \EndPicture\:Undef
    \PushStack\envn:list\n:list  \SaveEverypar
@@ -611,7 +626,7 @@
 }%
     {\o:begin:{#1}}}
 \def\recall:afterend{\ifx \chk:pic\:UnDef
-        \ifhmode \hfill\break\fi
+        % \ifhmode \hfill\break\fi <- this added spurious space after inline environments
 \RecallEverypar
 \fi}
 \:CheckOption{hooks+}  \if:Option
@@ -627,7 +642,7 @@
    \expandafter\ifx\csname @begin:#1\endcsname\relax\fi
    \expandafter\concat:config\csname @begin:#1\endcsname{#2}}
 \let\o:end:\end
-\def\end#1{\choose:begin
+\DeclareRobustCommand\end[1]{\choose:begin
   {%\IgnoreIndent
   \ifvmode \ifx \EndPicture\:UnDef
    \def\:temp{\def\:temp{%
@@ -803,6 +818,10 @@
 \Configure{!}{\mskip-\thinmuskip}
 \Configure{:}{\mskip\medmuskip}
 \Configure{>}{\mskip\medmuskip}
+\ProvideDocumentCommand\left:temp{m}{\a:left{#1}\o:left:#1\b:left{#1}}
+\HLet\left\left:temp
+\ProvideDocumentCommand\right:temp{m}{\a:right{#1}\o:right:#1\b:right{#1}}
+\HLet\right\right:temp
 \def\:temp{\csname a:'\endcsname
    \bgroup \aftergroup\:pr@m@s
 \prim@s}
@@ -863,6 +882,7 @@ $\vcenter
 \HLet\underline\:tempc
 \NewConfigure{underline}{2}
 \NewConfigure{MathjaxSource}{1}
+\NewConfigure{MathJaxSource}[1]{\Configure{MathjaxSource}{#1}}
 
                                     \catcode`\#13 \catcode`\!6
 \def\reg:eq:narray!1\cr{\SaveMkHalignConf:g{eq:narray\if@eqnsw\else *\fi}
@@ -939,8 +959,8 @@ $\vcenter
 \NewConfigure{lrbox}{1}
 \long\def\:tempc[#1][#2]#3{\o:@imakebox:[#1][#2]{{#3}}}
 \HLet\@imakebox\:tempc
-\let\:sbox\sbox
-\long\def\sbox#1#2{\:sbox#1{{#2}}}
+\DeclareRobustCommand\:sbox[2]{\o:sbox:{#1}{{#2}}}
+\HLet\sbox\:sbox
 \HAssign\:mpNum=0
 \HAssign\minipageNum=0
 \def \@setminipage{%
@@ -1403,6 +1423,13 @@ $\vcenter
    \def\af:float{#4}}
 \gHAssign\capt:cnt0
 \Configure{float}{}{}{}
+\ExplSyntaxOn
+\seq_new:N\:savedindex
+\def\:initsaveindex{\seq_gclear:N\:savedindex}
+\def\:saveindex#1{\seq_gput_right:Nn\:savedindex{#1}}
+\def\:printsavedindex{\seq_map_inline:Nn\:savedindex{\index{##1}}}
+\ExplSyntaxOff
+
 \long\def\:tempc#1[#2]#3{\par \cur:lbl{}%
   \begingroup
    \gHAdvance\TitleCount by 1
@@ -1418,9 +1445,15 @@ $\vcenter
      {#1}\relax}}\:temp
 \endgroup
 \begingroup
+    \:initsaveindex%
+\let\index\:saveindex%
+
     \@parboxrestore \normalsize
     \@makecaption{\csname fnum@#1\endcsname}{\ignorespaces #3}\par
-  \endgroup \let\skip:anchor\:UnDef
+  \endgroup
+\:printsavedindex%
+
+\let\skip:anchor\:UnDef
 }
 \def\numberline#1{\hbox to\@tempdima{#1\hfil} }
 \HLet\@caption\:tempc
@@ -2084,14 +2117,16 @@ $\vcenter
      XXI\or XXII\or XXIII\or XXIV\or XV\or XVI\else
      \expandafter\uppercase\expandafter{\romannumeral ##1}\fi}%
    \a:currentlabel
-   \edef\:temp{#2}\ifx \:temp\empty
-   \else \global\let\@currentlabel\:temp\fi
+   \expandafter\ifcsname p@#1\endcsname%
+   \edef\:temp{\csname p@#1\expandafter\endcsname\csname the#1\endcsname}\ifx \:temp\empty
+   \else \global\let\@currentlabel\:temp\fi\fi
 \egroup
 %
    \xdef\cur:th{x\last:haddr}%
    \let\:tempa\uppercase \def\uppercase##1{##1}\cur:lbl{}%
 \let\uppercase\:tempa
 %
+   \xdef\:currentlabel{#2}%
    \edef\:SecAnchor{\cur:th\:currentlabel}%
  }
 
@@ -2270,15 +2305,7 @@ $\vcenter
 \InitHBorder
 
 \:CheckOption{new-accents}     \if:Option \else
-   \let\:tabacckludge\@tabacckludge
-\def\@tabacckludge#1{\csname #1\endcsname}
-\long\def\:temp#1{\bgroup  \let\@tabacckludge\:tabacckludge
-   \csname o:MakeUppercase :\endcsname{#1}\egroup}
-\expandafter\HLet\csname MakeUppercase \endcsname\:temp
-\long\def\:temp#1{\bgroup  \let\@tabacckludge\:tabacckludge
-   \csname o:MakeLowercase :\endcsname{#1}\egroup}
-\expandafter\HLet\csname MakeLowercase \endcsname\:temp
-\let\@acci\' \let\@accii\` \let\@acciii\=
+   \let\@acci\' \let\@accii\` \let\@acciii\=
 \def\:tempc#1{%
    \if '#1\let\:temp=\@acci   \else
    \if `#1\let\:temp=\@accii  \else
@@ -2298,9 +2325,9 @@ $\vcenter
 \expandafter\:temp\usepackage!*?: 
 \def\:tempa{\@latex@e@error}
 \ifx \:temp\:tempa
-   % latex209.4ht (2022-02-01-14:27), generated from tex4ht-4ht.tex
+   % latex209.4ht (2023-10-02-13:11), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2022 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -2317,7 +2344,7 @@ $\vcenter
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-02-01-14:27}
+\immediate\write-1{version 2023-10-02-13:11}
 
 \let\:fnsymbol\@fnsymbol
 \def\@fnsymbol#1{{\hbox{$\:fnsymbol{#1}$}}}

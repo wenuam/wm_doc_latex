@@ -1,4 +1,4 @@
-% ifthen.4ht (2022-01-02-14:32), generated from tex4ht-4ht.tex
+% ifthen.4ht (2022-06-08-14:13), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
 % Copyright 2009-2022 TeX Users Group
 %
@@ -17,12 +17,12 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-01-02-14:32}
+\immediate\write-1{version 2022-06-08-14:13}
 
 
-   \@ifpackageloaded{nameref}{%
+   \ifdefined\NROrg@ifthenelse%
 \let\ifthenelse\NROrg@ifthenelse%
-}{}
+\fi
 
    \long\def\:tempc{%
    \let\sv:begingroup\begingroup

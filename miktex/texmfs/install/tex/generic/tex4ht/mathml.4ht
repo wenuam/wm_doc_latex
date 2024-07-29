@@ -1,5 +1,5 @@
-% mathml.4ht (2021-11-30-15:01), generated from tex4ht-mathml.tex
-% Copyright 2009-2021 TeX Users Group
+% mathml.4ht (2023-10-05-13:12), generated from tex4ht-mathml.tex
+% Copyright 2009-2023 TeX Users Group
 % Copyright 1999-2009 Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-11-30-15:01}
+\immediate\write-1{version 2023-10-05-13:12}
 
 \exit:ifnot{Preamble,% 
 accents,% 
@@ -32,6 +32,7 @@ amstex1,%
 amstext,% 
 array,% 
 bm,% 
+cancel,% 
 dcolumn,% 
 etex4ht,% 
 fontmath,% 
@@ -43,6 +44,7 @@ rlbabel,%
 sistyle,% 
 subeqnarray,% 
 tex4ht,% 
+ulem,% 
 ushort,% 
 vanilla}
 
@@ -556,14 +558,14 @@ vanilla}
 \Configure{halignTB<>}{array}{\HCode{\Hnewline
    \a:mathml equalrows="false"
    \ifx\columnlines\empty\else\a:mathml columnlines="\columnlines" \fi
-   \a:mathml equalcolumns="false" \a:mathml class="array"}<>\HAlign}
+   \a:mathml equalcolumns="false" \a:mathml class="array" \a:mathml displaystyle="true"}<>\HAlign}
 \Configure{array}
    {\halignTB{array}}
    {\ifvmode \IgnorePar\fi \expandafter\tmp:toks\expandafter{\Clr}%
 \HCode{<!--\the\tmp:toks-->}%
 \Tg</\a:mathml mtable>}
-   {\Tg<\a:mathml mtr>}{\Tg</\a:mathml mtr>}
-   {\HCode{<\a:mathml mtd\Hnewline \mml:class="array"
+   {\Tg<\a:mathml mtr \mml:class="array-row">}{\Tg</\a:mathml mtr>}
+   {\HCode{<\a:mathml mtd\Hnewline \mml:class="array-td"
    \ifnum 1<\HMultispan columnspan="\HMultispan"\fi}%
    \halignTD    \HCode{>}%
 }
@@ -600,18 +602,18 @@ vanilla}
 \def\:MM{m}
 \def\mathml:hborder{%
 \Configure{HBorder}
-   {<\a:mathml mtr\Hnewline \mml:class="hline">}
-   {<\a:mathml mtd><mo> \string&\#x0332; </mo></\a:mathml mtd>
+   {<\a:mathml mtr\Hnewline \mml:class="array-hline">}
+   {<\a:mathml mtd \mml:class="hline-mtd"></\a:mathml mtd>
 }
    {</\a:mathml mtr>}
-   {<\a:mathml mtr\Hnewline \mml:class="cline">}
+   {<\a:mathml mtr\Hnewline \mml:class="array-cline">}
    {<\a:mathml mtd></\a:mathml mtd>}
-   {<\a:mathml mtd><mo> \string&\#x0332; </mo></\a:mathml mtd>
+   {<\a:mathml mtd \mml:class="hline-mtd"></\a:mathml mtd>
 }
    {</\a:mathml mtr>}
    {<\a:mathml mtr\Hnewline
-         \mml:class="vspace" style="font-size:\HBorderspace">}
-   {<\a:mathml mtd\Hnewline></\a:mathml mtd>}
+         \mml:class="array-vspace" style="font-size:\HBorderspace">}
+   {}
    {</\a:mathml mtr>}
   }
 
@@ -657,6 +659,9 @@ vanilla}
    {\ifmathml \providemtextclass{\mml:class="emph"
          mathvariant="italic" }\fi}
    {}%
+\def\:closebf{\HCode{</\a:mathml mi>}\EndPauseMathClass}
+\def\:tempa{\ifmmode\expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi{\PauseMathClass\HCode{<\a:mathml mi mathvariant="bold">}\aftergroup\:closebf}{\o:bf:}}
+\HLet\bf\:tempa
 
 \let\A:fbox=\a:fbox
 \let\B:fbox=\b:fbox
@@ -719,7 +724,8 @@ vanilla}
    {\ifvmode \IgnorePar \fi \EndP \ShowPar \par}
    {}{}
 \Configure{eqnarray}
-   {\HCode{<\a:mathml mtable\Hnewline \mml:class="eqnarray\ifx
+   {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true"
+       \mml:class="eqnarray\ifx
        \@seqncr\@eqncr\else-star\fi"
        \a:mathml columnalign="right center left" >}}%
    {\HCode{</\a:mathml mtable>}}
@@ -830,11 +836,15 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \:CheckOption{new-accents}     \if:Option \else
   \Configure{accent}\widetilde\widetilde{{}{}}
   {}
-  {\HCode{<\a:mathml mover\Hnewline accent="false"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
     \:widetilde:over  \HCode{</\a:mathml mover>}}
+  \Configure{accent}\tilde\tilde{{}{}}
+  {}
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+    \:tilde:over  \HCode{</\a:mathml mover>}}
   \Configure{accent}\widehat\widehat{{}{}}
   {}
-  {\HCode{<\a:mathml mover\Hnewline accent="false"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
     \:widehat:over  \HCode{</\a:mathml mover>}}
 \fi
 \:CheckOption{new-accents}     \if:Option \else
@@ -856,18 +866,18 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    \fi
 \fi
 \let\mml:TeX\TeX
-\def\TeX{\ifmathml
+\def\TeX{\ifmathml\ifmtext TeX\else
    \HCode{<\a:mathml mtext
-      \mml:class="TeX">TeX</\a:mathml mtext>}\else \mml:TeX\fi}
+      \mml:class="TeX">TeX</\a:mathml mtext>}\fi\else \mml:TeX\fi}
 \Configure{afterSUB}{'}{\def\SUB:prime{\SUB:SUP}}
 \Configure{'}
    {\let\:primes=\empty}
    {\relax \csname SUB:prime\endcsname\sp{%
       \global\let\SUB:prime=\:UnDef
       \def\:tempa{\prime\prime}\ifx \:tempa\:primes
-              \mathop{\HCode{\string&\#x2033;}}\else
+              \mathop{\HCode{<\a:mathml mi>\string&\#x2033;</\a:mathml mi>}}\else
       \def\:tempa{\prime\prime\prime}\ifx \:tempa\:primes
-              \mathop{\HCode{\string&\#x2034;}}\else
+              \mathop{\HCode{<\a:mathml mi>\string&\#x2034;</\a:mathml mi>}}\else
               \:primes \fi\fi}%
    }
    {\let\prime=\relax \xdef\:primes{\:primes\prime}}
@@ -1349,8 +1359,8 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    \expandafter\HLet\csname #1\endcsname\:tempc
 }
 \:tempb{lim}
-\:tempb{limsup}
-\:tempb{liminf}
+% \:tempb{limsup}
+% \:tempb{liminf}
 \:tempb{max}
 \:tempb{min}
 \:tempb{sup}
@@ -1358,6 +1368,13 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \:tempb{det}
 \:tempb{Pr}
 \:tempb{gcd}
+
+
+\def\:limspaces#1#2{\HCode{<\a:mathml mi>#1</\a:mathml mi><\a:mathml mspace class="thinspace"  width="0.17em"></\a:mathml mspace><\a:mathml mi>#2</\a:mathml mi><\a:mathml mspace class="thinspace" width="0.17em"></\a:mathml mspace>}}
+\def\:tempa{\mathop{\:limspaces{lim}{sup}}\limits}
+\HLet\limsup\:tempa
+\def\:tempa{\mathop{\:limspaces{lim}{inf}}\limits}
+\HLet\liminf\:tempa
 \def\:temp#1#2{\def#1{\PauseMathClass{\HCode{<mi mathvariant="normal">}\ht:special{t4ht@+\string&{35}x#2{59}}\a:HChar\HCode{</mi>}}\EndPauseMathClass}}
 \:temp\Psi{03A8}
 \:temp\Delta{0394}
@@ -1366,6 +1383,10 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \:temp\Sigma{03A3}
 \:temp\Upsilon{03A5}
 \:temp\Omega{03A9}
+\AtBeginDocument{%
+\Configure{mathop*}{*}{}{}
+   { \Configure{mathop}{*}{<mo>}{</mo>}{} }
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
@@ -1411,6 +1432,9 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   {4142434445464748494A4B4C4D4E4F505152535455565758595A} 
 \egroup
 \fi
+
+\def\:tempa#1{\bgroup\HCode{<\a:mathml mstyle\Hnewline mathvariant="script">}#1\HCode{</\a:mathml mstyle>}\egroup}
+\HLet\mathcal\:tempa
 
 \expandafter\ifx \csname o@everypar\endcsname\relax \else
 \expandafter\ifx \csname ht:everypar\endcsname\relax
@@ -1552,14 +1576,14 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 }
 
 \Configure{overrightarrow}
-  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover class="overrightarrow">%
+  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover accent="true" class="overrightarrow">%
    \Tg<\a:mathml mrow\Hnewline>\:gobble}
-  {\Tg</\a:mathml mrow>\mathop{\HCode{&\#x20D7;}}%
+  {\Tg</\a:mathml mrow>\HCode{<\a:mathml mo>&\#x2192;</\a:mathml mo>}%
    \Tg</\a:mathml mover>$\egroup}
 \Configure{overleftarrow}
-  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover class="overleftarrow">%
+  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover accent="true" class="overleftarrow">%
    \Tg<\a:mathml mrow\Hnewline>\:gobble}
-  {\Tg</\a:mathml mrow>\mathop{\HCode{&\#x20D6;}}%
+  {\Tg</\a:mathml mrow>\HCode{<\a:mathml mo>&\#x2190;</\a:mathml mo>}%
    \Tg</\a:mathml mover>$\egroup}
 \Configure{big}
    {}{}
@@ -1603,7 +1627,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
          {<\a:mathml munder
                  \a:mathml accentunder="false"><\a:mathml mrow>}
          {</\a:mathml mrow><\a:mathml mo>\string
-               &\#xFE38;</\a:mathml mo></\a:mathml munder>}
+               &\#x23DF;</\a:mathml mo></\a:mathml munder>}
          {\Configure{mathop}{}{}{}{}}%
    }
    {\let\o:underbrace:=\displaystyle}
@@ -1612,17 +1636,17 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \Configure{MathClass}{1}{*}{<\a:mathml mi\Hnewline
              \mml:class="MathClass-op">}{</\a:mathml mi><mo> &\#x2061;<!--FUNCTION APPLICATION--></mo>}{}
 \Configure{MathClass}{2}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-bin">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-bin" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{3}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-rel">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-rel" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{4}{*}{<\a:mathml mo\Hnewline
-          \mml:class="MathClass-open" stretchy="false">}
+          \mml:class="MathClass-open" \a:mathml stretchy="false">}
                         {</\a:mathml mo>}{}
 \Configure{MathClass}{5}{*}{<\a:mathml mo\Hnewline
-          \mml:class="MathClass-close" stretchy="false">}
+          \mml:class="MathClass-close" \a:mathml stretchy="false">}
                         {</\a:mathml mo>}{}
 \Configure{MathClass}{6}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-punc">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-punc" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{7}{*}{<\a:mathml mn>}{</\a:mathml mn>}
                            {0123456789}
 \ifx \mathordMathClass\:UnDef
@@ -1673,12 +1697,20 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
       font-style: normal;
    }
 }
+\NewConfigure{mathversion-style}[2]{\expandafter\gdef\csname :mathversion-#1\endcsname{#2}}
+% ToDo: Add support for other mathversions
+\Configure{mathversion-style}{bold}{\a:mathml mathvariant="bold-italic"}
+\append:defI\mathversion{%
+    % \a:DviMathML is executed at the beginning of math \a:@math is hook for attributes. we need to append out tags to it
+    \Configure{DviMathML}{\append:def\a:@math{\ifcsname :mathversion-\math@version\endcsname\expandafter\csname :mathversion-\math@version\endcsname\fi}}{}%
+}
+
 \def\:tempd#1#2{%
    \expandafter\def\csname #1\endcsname{\mathchar"13#2\relax}%
    \MathSymbol\mathop{#1}%
    \expandafter\def\csname #1:limits\endcsname{\expandafter
                     \:same \math:sym\mathop{#1}\limits}%
-   \expandafter\def\csname #1:nolimits\endcsname{\expandafter
+   \expandafter\ProvideDocumentCommand\csname #1:nolimits\endcsname{}{\expandafter
                   \:same \math:sym\mathop{#1}\nolimits}%
    \expandafter\edef\csname n:#1:\endcsname{\noexpand\ifDisplayMath
           \noexpand\expandafter \expandafter\noexpand \csname #1:limits\endcsname
@@ -1709,9 +1741,6 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 
 
 
@@ -1762,7 +1791,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 \Configure{equation}
   {\Configure{gather}
-     {\HCode{<\a:mathml mtable\Hnewline
+     {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true"
         \mml:class="equation"><\a:mathml mtr><\a:mathml mtd>}\IgnorePar }
      {\HCode{</\a:mathml mtd></\a:mathml mtr></\a:mathml mtable>}}
      {}
@@ -1820,7 +1849,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    {\HCode{<\a:mathml mtd\Hnewline \mml:class="split-mtd">}}
    {\HCode{</\a:mathml mtd>}}
 \Configure{multline}
-   {\HCode{<\a:mathml mtable\Hnewline  \mml:class="multline">}}
+   {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true"  \mml:class="multline">}}
    {\HCode{</\a:mathml mtable>}}
    {\HCode{<\a:mathml mtr>%
            <\a:mathml mtd\Hnewline \mml:class="multline">}}
@@ -1828,18 +1857,18 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    {\HCode{</\a:mathml mtd><\a:mathml mtd>}}
    {}
 \Configure{multline*}
-   {\HCode{<\a:mathml mtable\Hnewline \mml:class="multline-star">}}
+   {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true" \mml:class="multline-star">}}
    {\HCode{</\a:mathml mtable>}}
    {\HCode{<\a:mathml mtr><\a:mathml mtd\Hnewline
                                         \mml:class="multline-star">}}
    {\HCode{</\a:mathml mtd></\a:mathml mtr>}}
 \Configure{gather}
-   {\HCode{<\a:mathml mtable\Hnewline \mml:class="gather">}}
+   {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true" \mml:class="gather">}}
    {\HCode{</\a:mathml mtable>}}
    {\HCode{<\a:mathml mtr>}}    {\HCode{</\a:mathml mtr>}}
    {\HCode{\Hnewline<\a:mathml mtd>}}   {\HCode{</\a:mathml mtd>}}
 \Configure{gather*}
-   {\HCode{<\a:mathml mtable\Hnewline \mml:class="gather-star">}}
+   {\HCode{<\a:mathml mtable\Hnewline \a:mathml displaystyle="true" \mml:class="gather-star">}}
    {\HCode{</\a:mathml mtable>}}
    {\HCode{<\a:mathml mtr>}}    {\HCode{</\a:mathml mtr>}}
    {\HCode{\Hnewline<\a:mathml mtd>}}   {\HCode{</\a:mathml mtd>}}
@@ -1876,7 +1905,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
        \DisplayMathtrue
     \fi
     \HCode{<\a:mathml mtable\Hnewline
-                \a:mathml columnalign="left" \mml:class="#2">}}
+       \a:mathml displaystyle="true" \a:mathml columnalign="left" \mml:class="#2">}}
    {\HCode{</\a:mathml mtable>}\end:mathalign }
    {\HCode{<\a:mathml mtr>}}    {\HCode{</\a:mathml mtr>}}
    {\HCode{<\a:mathml mtd\Hnewline
@@ -1987,7 +2016,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
          \HCode{</\a:mathml mtd></\a:mathml mtr>}%
      \fi\fi
     }
-\Configure{boldsymbol}{\bgroup\HCode{<mstyle mathvariant="bold-italic">}}{\HCode{</mstyle>}\egroup}
+\Configure{boldsymbol}{\bgroup\HCode{<\a:mathml mstyle mathvariant="bold-italic">}}{\HCode{</\a:mathml mstyle>}\egroup}
 \Configure{maketag}
   {\ifmathml
      \ifmtext \expandafter\expandafter\expandafter\no:maketag\fi
@@ -2064,6 +2093,14 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
                                  mrow></\a:mathml mfrac></\a:mathml mfenced>}
    \fi
  }
+\pend:def\dfrac{\Configure{genfrac}{\HCode{<\a:mathml mstyle \a:mathml displaystyle="true"><mfrac><mrow>}
+  \Configure{over}{}{}}{}{}{\HCode{</mrow><mrow>}
+} {}{\HCode{</mrow></mfrac></\a:mathml mstyle>}}}
+\pend:def\tfrac{\Configure{genfrac}{\HCode{<\a:mathml mstyle \a:mathml displaystyle="false"><mfrac><mrow>}
+  \Configure{over}{}{}}{}{}{\HCode{</mrow><mrow>}
+}{}{\HCode{</mrow></mfrac></\a:mathml mstyle>}}}
+\pend:def\dbinom{\Configure{genfrac}{\HCode{<\a:mathml mstyle \a:mathml displaystyle="true">}}{}{}{}{}{\HCode{</\a:mathml mstyle>}}}
+\pend:def\tbinom{\Configure{genfrac}{\HCode{<\a:mathml mstyle \a:mathml displaystyle="false">}}{}{}{}{}{\HCode{</\a:mathml mstyle>}}}
 \def\:tempc{\ifDisplayMath\mathop:prefix{}\fi\o:n:iint::}
 \HLet\n:iint:\:tempc
 \def\:tempc{\ifDisplayMath\mathop:prefix{}\fi\o:n:iiint::}
@@ -2093,6 +2130,13 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    {\HCode{<\a:mathml mtd
        \a:mathml columnalign="\ifodd\HCol right\else left\fi" >}}
    {\HCode{</\a:mathml mtd>}}
+\Configure{boxed}
+   {\ifmathml \Tg<\a:mathml menclose \a:mathml notation="box">\Tg<\a:mathml mrow>%
+    \else     \HCode{<span class="boxed">}\IgnorePar\fi}
+   {\ifmathml \Tg</\a:mathml mrow>\Tg</\a:mathml menclose>%
+    \else \HCode{</span>}\fi}
+\Css{.boxed{border: 1px solid black; padding-left:2px;
+                                     padding-right:2px;}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
@@ -2119,6 +2163,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{amstex1}
@@ -2546,14 +2591,14 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 }
 
 \Configure{overrightarrow}
-  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover class="overrightarrow">%
+  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover accent="true" class="overrightarrow">%
    \Tg<\a:mathml mrow\Hnewline>\:gobble}
-  {\Tg</\a:mathml mrow>\mathop{\HCode{&\#x20D7;}}%
+  {\Tg</\a:mathml mrow>\HCode{<\a:mathml mo>&\#x2192;</\a:mathml mo>}%
    \Tg</\a:mathml mover>$\egroup}
 \Configure{overleftarrow}
-  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover class="overleftarrow">%
+  {\leavevmode\hbox\bgroup$\Tg<\a:mathml mover accent="true" class="overleftarrow">%
    \Tg<\a:mathml mrow\Hnewline>\:gobble}
-  {\Tg</\a:mathml mrow>\mathop{\HCode{&\#x20D6;}}%
+  {\Tg</\a:mathml mrow>\HCode{<\a:mathml mo>&\#x2190;</\a:mathml mo>}%
    \Tg</\a:mathml mover>$\egroup}
 \Configure{big}
    {}{}
@@ -2597,7 +2642,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
          {<\a:mathml munder
                  \a:mathml accentunder="false"><\a:mathml mrow>}
          {</\a:mathml mrow><\a:mathml mo>\string
-               &\#xFE38;</\a:mathml mo></\a:mathml munder>}
+               &\#x23DF;</\a:mathml mo></\a:mathml munder>}
          {\Configure{mathop}{}{}{}{}}%
    }
    {\let\o:underbrace:=\displaystyle}
@@ -2606,17 +2651,17 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \Configure{MathClass}{1}{*}{<\a:mathml mi\Hnewline
              \mml:class="MathClass-op">}{</\a:mathml mi><mo> &\#x2061;<!--FUNCTION APPLICATION--></mo>}{}
 \Configure{MathClass}{2}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-bin">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-bin" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{3}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-rel">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-rel" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{4}{*}{<\a:mathml mo\Hnewline
-          \mml:class="MathClass-open" stretchy="false">}
+          \mml:class="MathClass-open" \a:mathml stretchy="false">}
                         {</\a:mathml mo>}{}
 \Configure{MathClass}{5}{*}{<\a:mathml mo\Hnewline
-          \mml:class="MathClass-close" stretchy="false">}
+          \mml:class="MathClass-close" \a:mathml stretchy="false">}
                         {</\a:mathml mo>}{}
 \Configure{MathClass}{6}{*}{<\a:mathml mo\Hnewline
-             \mml:class="MathClass-punc">}{</\a:mathml mo>}{}
+             \mml:class="MathClass-punc" \a:mathml stretchy="false">}{</\a:mathml mo>}{}
 \Configure{MathClass}{7}{*}{<\a:mathml mn>}{</\a:mathml mn>}
                            {0123456789}
 \ifx \mathordMathClass\:UnDef
@@ -2663,11 +2708,15 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \:CheckOption{new-accents}     \if:Option \else
   \Configure{accent}\widetilde\widetilde{{}{}}
   {}
-  {\HCode{<\a:mathml mover\Hnewline accent="false"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
     \:widetilde:over  \HCode{</\a:mathml mover>}}
+  \Configure{accent}\tilde\tilde{{}{}}
+  {}
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+    \:tilde:over  \HCode{</\a:mathml mover>}}
   \Configure{accent}\widehat\widehat{{}{}}
   {}
-  {\HCode{<\a:mathml mover\Hnewline accent="false"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
+  {\HCode{<\a:mathml mover\Hnewline accent="true"><\a:mathml mrow\Hnewline>}#2\HCode{</\a:mathml mrow>}%
     \:widehat:over  \HCode{</\a:mathml mover>}}
 \fi
 \:CheckOption{new-accents}     \if:Option \else
@@ -2689,18 +2738,18 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
    \fi
 \fi
 \let\mml:TeX\TeX
-\def\TeX{\ifmathml
+\def\TeX{\ifmathml\ifmtext TeX\else
    \HCode{<\a:mathml mtext
-      \mml:class="TeX">TeX</\a:mathml mtext>}\else \mml:TeX\fi}
+      \mml:class="TeX">TeX</\a:mathml mtext>}\fi\else \mml:TeX\fi}
 \Configure{afterSUB}{'}{\def\SUB:prime{\SUB:SUP}}
 \Configure{'}
    {\let\:primes=\empty}
    {\relax \csname SUB:prime\endcsname\sp{%
       \global\let\SUB:prime=\:UnDef
       \def\:tempa{\prime\prime}\ifx \:tempa\:primes
-              \mathop{\HCode{\string&\#x2033;}}\else
+              \mathop{\HCode{<\a:mathml mi>\string&\#x2033;</\a:mathml mi>}}\else
       \def\:tempa{\prime\prime\prime}\ifx \:tempa\:primes
-              \mathop{\HCode{\string&\#x2034;}}\else
+              \mathop{\HCode{<\a:mathml mi>\string&\#x2034;</\a:mathml mi>}}\else
               \:primes \fi\fi}%
    }
    {\let\prime=\relax \xdef\:primes{\:primes\prime}}
@@ -3207,24 +3256,27 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
       {</\a:mathml mtext></\a:mathml mrow>}}}
 \HLet\textdef@\:tempc
 
-\def\:tempc{\qopname\relax m{lim inf}}
+\def\:tempc{\qopname\relax m{\:limspaces{lim}{inf}}}
 \HLet\liminf=\:tempc
-\def\:tempc{\qopname\relax m{lim sup}}
+\def\:tempc{\qopname\relax m{\:limspaces{lim}{sup}}}
 \HLet\limsup=\:tempc
-\def\:tempc{\qopname\relax m{proj lim}}
+\def\:tempc{\qopname\relax m{\:limspaces{proj}{lim}}}
 \HLet\projlim=\:tempc
-\def\:tempc{\qopname\relax m{inj lim}}
+\def\:tempc{\qopname\relax m{\:limspaces{inj}{lim}}}
 \HLet\injlim=\:tempc
 \Configure{qopname}
    {\Configure{mathop}{*}
-      {<\a:mathml mi \mml:class="qopname">}
-  {</\a:mathml mi><mo> &\#x2061;<!--FUNCTION APPLICATION--> </mo>}
+      {<\a:mathml mrow \mml:class="qopname">}
+  {</\a:mathml mrow><mo> &\#x2061;<!--FUNCTION APPLICATION--> </mo>}
       {}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 
 
@@ -3255,14 +3307,14 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \Configure{halignTB<>}{array}{\HCode{\Hnewline
    \a:mathml equalrows="false"
    \ifx\columnlines\empty\else\a:mathml columnlines="\columnlines" \fi
-   \a:mathml equalcolumns="false" \a:mathml class="array"}<>\HAlign}
+   \a:mathml equalcolumns="false" \a:mathml class="array" \a:mathml displaystyle="true"}<>\HAlign}
 \Configure{array}
    {\halignTB{array}}
    {\ifvmode \IgnorePar\fi \expandafter\tmp:toks\expandafter{\Clr}%
 \HCode{<!--\the\tmp:toks-->}%
 \Tg</\a:mathml mtable>}
-   {\Tg<\a:mathml mtr>}{\Tg</\a:mathml mtr>}
-   {\HCode{<\a:mathml mtd\Hnewline \mml:class="array"
+   {\Tg<\a:mathml mtr \mml:class="array-row">}{\Tg</\a:mathml mtr>}
+   {\HCode{<\a:mathml mtd\Hnewline \mml:class="array-td"
    \ifnum 1<\HMultispan columnspan="\HMultispan"\fi}%
    \halignTD    \HCode{>}%
 }
@@ -3301,6 +3353,13 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
 
 
 
@@ -3649,6 +3708,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{gauss}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3708,7 +3768,6 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{rlbabel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3745,7 +3804,6 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{dcolumn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3757,6 +3815,15 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3872,6 +3939,10 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
     \ifnum\HCol=2
        \PauseMathClass
        \HCode{<\a:mathml mtext>}%
+       % the content of this environment is displayed as text, we must switch back to the normal math processing
+       % in inline math
+       \Configure{$}{\EndPauseMathClass\HCode{</\a:mathml mtext>}}{\PauseMathClass\HCode{<\a:mathml mtext>}}{}%
+       \Configure{()}{\HCode{</\a:mathml mtext>}\EndPauseMathClass$}{$\PauseMathClass\HCode{<\a:mathml mtext>}}{}%
     \fi
    }
    {\ifnum\HCol=2
@@ -3884,6 +3955,10 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 
 
 
@@ -3970,6 +4045,7 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 
@@ -4109,6 +4185,69 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                \ConfigureHinput{ulem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \Configure{uline-math}
+   {\HCode{<\a:mathml menclose class="uline-math" notation="bottom">}\NoFonts} {\EndNoFonts\HCode{</\a:mathml menclose>}}
+\Configure{uuline-math}
+   {\HCode{<\a:mathml menclose class="uuline-math" notation="bottom">}\NoFonts} {\EndNoFonts\HCode{</\a:mathml menclose>}}
+\Css{.uuline-math{ border-bottom:3px double black; }}
+\Configure{sout-math}
+   {\HCode{<\a:mathml menclose class="sout-math" notation="horizontalstrike">}\NoFonts} {\EndNoFonts\HCode{</\a:mathml menclose>}}
+\Configure{xout-math}
+   {\HCode{<\a:mathml menclose class="xout-math" notation="horizontalstrike bottom">}\NoFonts}
+   {\EndNoFonts\HCode{</\a:mathml menclose>}}
+\Configure{uwave-math}
+   {\HCode{<\a:mathml menclose class="uwave-math" notation="bottom">}\NoFonts}
+   {\EndNoFonts\HCode{</\a:mathml menclose>}}
+\Configure{dashuline-math}
+   {\HCode{<\a:mathml mstyle class="dashuline-math" notation="bottom">}\NoFonts}
+   {\EndNoFonts\HCode{</\a:mathml mstyle>}}
+\Css{.dashuline-math {border-bottom: 1px dashed black;}}
+\Configure{dotuline-math}
+   {\HCode{<\a:mathml mstyle class="dotuline-math" notation="bottom">}\NoFonts}
+   {\EndNoFonts\HCode{</\a:mathml mstyle>}}
+\Css{.dotuline-math {border-bottom: 1px dotted black;}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+\endinput\empty\empty\empty\empty\empty\empty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                \ConfigureHinput{cancel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \Configure{cancel-math}{\HCode{<\a:mathml menclose notation="updiagonalstrike">}}{\HCode{</\a:mathml menclose>}}
+\Configure{bcancel-math}{\HCode{<\a:mathml menclose notation="downdiagonalstrike">}}{\HCode{</\a:mathml menclose>}}
+\Configure{xcancel-math}{\HCode{<\a:mathml menclose notation="updiagonalstrike downdiagonalstrike">}}{\HCode{</\a:mathml menclose>}}
+\Configure{cancelto}
+{\HCode{<\a:mathml msup><\a:mathml menclose notation="updiagonalarrow"><\a:mathml mrow>}}
+{\HCode{</\a:mathml mrow></\a:mathml menclose><\a:mathml mrow>}}
+{\HCode{</\a:mathml mrow></\a:mathml msup>}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+\endinput\empty\empty\empty\empty\empty\empty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 

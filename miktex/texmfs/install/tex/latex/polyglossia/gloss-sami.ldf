@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-sami.ldf}[polyglossia: module for Sami]
 
 \PolyglossiaSetup{sami}{
   bcp47=se,
+  bcp47-language=se,
+  bcp47-script=Latn,
   babelname=samin,
   hyphennames={samin},
   hyphenmins={2,2},
@@ -26,19 +28,19 @@
 %      % northern:
 %      \def\sami@variant{samin}%
 %      \SetLanguageKeys{sami}{language=Northern Sami,langtag=NSM}%
-%      \xpg@fontsetup@latin{sami}%
+%      \SetupLatinPolyglossiaFont{sami}%
 %   \or
 %      % other:
 %      \def\sami@variant{}%
 %      \SetLanguageKeys{sami}{language= Sami,langtag=}%
-%      \xpg@fontsetup@latin{sami}%
+%      \SetupLatinPolyglossiaFont{sami}%
 %   \fi
 %   \xpg@info{Option: sami, variant=\xpg@val}%
 %}{\xpg@warning{Unknown sami variant `#1'}}
 
 
 %\def\sami@language{%
-%   \polyglossia@setup@language@patterns{\sami@variant}%
+%   \SetupPolyglossiaLangPatterns{\sami@variant}%
 %}%
 
 \def\captionssami@northern{%

@@ -4,9 +4,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                    %
 \def\xstringname               {xstring}                             %
-\def\xstringversion              {1.85}                              %
+\def\xstringversion              {1.86}                              %
 %                                                                    %
-\def\xstringdate              {2023/01/14}                           %
+\def\xstringdate              {2023/08/22}                           %
 %                                                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                    %
@@ -29,12 +29,12 @@
 \ifdefined\usepackage\else
 	\immediate\write-1 {Package: xstring \xstringdate\space v\xstringversion\space String manipulations (CT)}%
 \fi
-\newcount\integerpart
-\newcount\decimalpart% compteurs utilisés par xstring
 
 \edef\restorexstringcatcode{\catcode\number`\_ =\number\catcode`\_\relax}
 \catcode`\_=11
 
+\newcount\xs_counta
+\newcount\xs_countb% compteurs utilisés par xstring
 \long\def\xs_execfirst#1#2{#1}
 \long\def\xs_execsecond#1#2{#2}
 \long\def\xs_gobarg#1{}
@@ -64,7 +64,9 @@
 \long\def\xs_gobtobrace#1#{}
 \long\def\xs_ifx#1{\ifx#1\expandafter\xs_execfirst\else\expandafter\xs_execsecond\fi}
 \def\xs_ifnum#1{\ifnum#1\expandafter\xs_execfirst\else\expandafter\xs_execsecond\fi}
-\long\def\xs_ifempty#1{\expandafter\xs_ifx\expandafter{\expandafter\relax\detokenize{#1}\relax}}
+\long\def\xs_ifemptyarg#1{\expandafter\xs_ifx\expandafter{\expandafter\relax\detokenize{#1}\relax}}
+\long\def\xs_ifemptymacro#1{\xs_ifx{#1\empty}}
+\let\xs_ifempty\xs_ifemptyarg
 
 \def\xs_toks_toverb{% lit 1 argument et le transforme en verb
 	\begingroup
@@ -75,7 +77,7 @@
 }
 
 \def\setverbdelim#1{% définit quel est le délimiteur de verb
-	\xs_exparg\xs_ifempty{\xs_gobarg#1}%
+	\xs_exparg\xs_ifemptyarg{\xs_gobarg#1}%
 		{}
 		{\errmessage{Package xstring Warning: verb delimiter "\detokenize{#1}" is not a single token}}%
 	\def\xs_read_verb##1#1##2#1{\endgroup\xs_assign_verb{##2}}% on appelle l'exécution de fin
@@ -103,7 +105,7 @@
 		\expandafter\xs_assigntokenizeresult\scantokens\expandafter{\expandafter\relax\xs_reserved_A}% on fait l'assignation
 }%
 
-\long\def\xs_assign_xstringresult#1#2{\xs_ifempty{#2}{#1}{\def#2{#1}}}
+\long\def\xs_assign_xstringresult#1#2{\xs_ifemptyarg{#2}{#1}{\def#2{#1}}}
 
 \def\xs_ldef{\long\def}
 \def\xs_ledef{\long\edef}
@@ -145,10 +147,10 @@
 % Cette macro interne prend la 1ere unité syntaxique de #1 et assigne le résultat à #2
 \long\def\xs_returnfirstsyntaxunit#1#2{%
 	\let\xs_toks\relax
-	\xs_ifempty{#1}
+	\xs_ifemptyarg{#1}
 		{\let#2\empty
 		}
-		{\xs_eearg\xs_ifempty{\expandafter\xs_beforespace\detokenize{#1} \_nil}% #1 commence par un espace ?
+		{\xs_eearg\xs_ifemptyarg{\expandafter\xs_beforespace\detokenize{#1} \_nil}% #1 commence par un espace ?
 			{\def#2{ }}
 			{\xs_ifbeginwithbrace{#1}
 				{\def\xs_groupfound{\xs_exparg{\def#2}{\expandafter{#2}}\xs_gobtonil}% on met #2 dans des accolades et on finit
@@ -165,10 +167,10 @@
 }
 
 \long\def\xs_removefirstsyntaxunit#1#2{%
-	\xs_ifempty{#1}
+	\xs_ifemptyarg{#1}
 		{\let#2\empty
 		}
-		{\xs_eearg\xs_ifempty{\expandafter\xs_beforespace\detokenize{#1} \_nil}% #1 commence par un espace ?
+		{\xs_eearg\xs_ifemptyarg{\expandafter\xs_beforespace\detokenize{#1} \_nil}% #1 commence par un espace ?
 			{\xs_exparg\xs_ifbeginwithbrace{\xs_gobspace#1}
 				{\xs_exparg{\def#2}{\xs_gobtobrace#1}}%
 				{\xs_exparg{\def#2}{\xs_afterspace#1\_nil}}%
@@ -211,7 +213,7 @@
 		\xs_exparg\xs_assign_one_arg{\number\numexpr##1+#1-1}%
 		\edef\xs_reserved_B{\noexpand\xs_expand\csname xs_arg_\romannumeral\numexpr##1\endcsname}%
 		\xs_ifnum{##1=1 }% si c'est le premier argument
-			{\xs_ifempty{#3}%
+			{\xs_ifemptyarg{#3}%
 				{\xs_eaddtomacro\xs_newargs{\expandafter{\xs_reserved_B}}%
 				\edef\xs_reserved_B{\ifnum##1>#4 xs_def\else xs_assign\fi}%
 				}% et s'il y a un argument optionnel alors, on met des crochets
@@ -301,7 +303,7 @@
 % \xs_atbegingroup      (un groupe vient d'être ouvert)
 % \xs_atnextsyntaxunit  (la future US n'est pas un groupe)
 \def\xs_read_reserved_C{%
-	\xs_exparg\xs_ifempty{\xs_reserved_C}%
+	\xs_ifemptymacro\xs_reserved_C
 		{\xs_ifnum{\xs_nestlevel=0 }
 			{}
 			{\xs_atendofgroup
@@ -312,15 +314,15 @@
 		\xs_exparg\xs_removefirstsyntaxunit{\xs_reserved_C}\xs_reserved_C
 		\xs_exploregroups
 		\xs_ifx{\bgroup\xs_toks}
-			{\advance\integerpart1
+			{\advance\xs_counta1
 			\begingroup
 				\expandafter\def\expandafter\xs_reserved_C\xs_reserved_A
 				\xs_calc_grouIP
 				\def\xs_nestlevel{1}%
-				\integerpart0
+				\xs_counta0
 				\xs_atbegingroup
 			}
-			{\advance\decimalpart1
+			{\advance\xs_countb1
 			\xs_atnextsyntaxunit
 			}%
 		\xs_read_reserved_C
@@ -331,12 +333,12 @@
 % 1 sous-routine est appelée :
 % \xs_atoccurfound      (une occurrence a été trouvée)
 \def\xs_read_reserved_D{%
-	\xs_exparg\xs_ifempty{\xs_reserved_D}%
+	\xs_ifemptymacro\xs_reserved_D
 		{\xs_ifnum{\xs_nestlevel=0 }
 			{}
 			{\edef\__temp{%
 				\endgroup
-				\noexpand\decimalpart=\number\decimalpart\relax
+				\noexpand\xs_countb=\number\xs_countb\relax
 				\unexpanded{\xs_addtomacro\xs_reserved_C}{{\unexpanded\expandafter{\xs_reserved_C}}}%
 				}%
 			\__temp
@@ -344,7 +346,7 @@
 			}%
 		}%
 		{\xs_exptwoargs\xs_IfBeginWith_i\xs_reserved_D\xs_reserved_E
-			{\advance\decimalpart1
+			{\advance\xs_countb1
 			\let\xs_reserved_D\xs_reserved_A
 			\xs_atoccurfound
 			}%
@@ -352,13 +354,13 @@
 			\xs_exparg\xs_removefirstsyntaxunit{\xs_reserved_D}\xs_reserved_D
 			\xs_exploregroups
 			\xs_ifx{\bgroup\xs_toks}
-				{\advance\integerpart1
+				{\advance\xs_counta1
 				\begingroup
 					\expandafter\def\expandafter\xs_reserved_D\xs_reserved_A
 					\xs_calc_grouIP
 					\let\xs_reserved_C\empty
 					\def\xs_nestlevel{1}%
-					\integerpart0
+					\xs_counta0
 				}
 				{\xs_eaddtomacro\xs_reserved_C{\xs_reserved_A}%
 				}%
@@ -376,7 +378,7 @@
 }
 
 \def\xs_StrRemoveBraces_i{%
-	\xs_exparg\xs_ifempty{\xs_reserved_C}%
+	\xs_ifemptymacro\xs_reserved_C
 		{\xs_ifnum{\xs_nestlevel=0 }
 			{}
 			{\xs_endgroup_eaddtomacro\xs_reserved_B\xs_reserved_B
@@ -414,13 +416,13 @@
 	
 \long\def\xs_cutafteroccur_i#1#2#3{%
 	\def\xs_reserved_D{#1}\let\xs_reserved_C\empty\def\xs_reserved_E{#2}%
-	\decimalpart0 \integerpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+	\xs_countb0 \xs_counta0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 	\def\xs_atoccurfound{%
-		\xs_ifnum{\decimalpart=\numexpr(#3)\relax}
+		\xs_ifnum{\xs_countb=\numexpr(#3)\relax}
 			{\edef\__temp{%
 				\def\noexpand\xs_reserved_C{\unexpanded\expandafter{\xs_reserved_C}}%
 				\def\noexpand\xs_reserved_D{\unexpanded\expandafter{\xs_reserved_D}}%
-				\noexpand\decimalpart=\number\decimalpart\relax
+				\noexpand\xs_countb=\number\xs_countb\relax
 				}%
 			\expandafter\xs_exitallgroups\__temp
 			\xs_gobarg% mange l'appel récursif \xs_read_reserved_D dans \xs_read_reserved_D
@@ -429,7 +431,7 @@
 			}%
 	}%
 	\xs_read_reserved_D
-	\xs_ifnum{\decimalpart=\numexpr(#3)\relax}% occurrence trouvée ?
+	\xs_ifnum{\xs_countb=\numexpr(#3)\relax}% occurrence trouvée ?
 		{\let\xs_reserved_E\xs_reserved_D
 		\xs_exparg{\def\xs_reserved_D}{\xs_reserved_C#2}%
 		}
@@ -441,20 +443,20 @@
 
 \xs_newmacro*3\IfSubStr{1}{2}{0}{%
 	\xs_cutafteroccur{#2}{#3}{#1}%
-	\xs_exparg\xs_ifempty{\xs_reserved_D}\xs_execsecond\xs_execfirst
+	\expandafter\expandafter\expandafter\unless\xs_ifemptymacro\xs_reserved_D
 }
 
 \xs_newmacro*2\IfBeginWith{}{2}{0}{%
-	\xs_ifempty{#2}%
+	\xs_ifemptyarg{#2}%
 		{\xs_execsecond}
 		{\xs_IfBeginWith_i{#1}{#2}}%
 }
 
 \long\def\xs_IfBeginWith_i#1#2{%
-	\xs_ifempty{#2}%
+	\xs_ifemptyarg{#2}%
 		{\xs_execfirst% #2 est vide, tous les tests sont passés avec succès : on renvoie #3
 		}
-		{\xs_ifempty{#1}%
+		{\xs_ifemptyarg{#1}%
 			{\xs_execsecond% #1 est vide, c'est que #2 est + long que #1 : on renvoie #4
 			}
 			{\xs_returnfirstsyntaxunit{#2}\xs_reserved_B
@@ -471,13 +473,13 @@
 }
 
 \xs_newmacro*2\IfEndWith{}{2}{0}{%
-	\xs_ifempty{#2}%
+	\xs_ifemptyarg{#2}%
 		{\xs_execsecond
 		}
 		{\xs_StrCount{#1}{#2}[\xs_reserved_A]%
 		\xs_ifnum{\xs_reserved_A=0 }
 			{\xs_execsecond}
-			{\xs_exparg\xs_ifempty{\xs_reserved_C}}%
+			{\xs_ifemptymacro\xs_reserved_C}%
 		}%
 }
 
@@ -495,90 +497,160 @@
 	\xs_exparg\xs_cutafteroccur\xs_reserved_C{#5}{#2}%
 	\xs_exparg\xs_cutafteroccur\xs_reserved_C{#4}{#1}%
 	\gdef\groupID{}%
-	\xs_exparg\xs_ifempty{\xs_reserved_C}%
-		\xs_execsecond
-		\xs_execfirst
+	\expandafter\expandafter\expandafter\unless\xs_ifemptymacro\xs_reserved_D% bugfix 1.86, c'est \xs_reserved_D et non pas \xs_reserved_C !
 }
 
 \xs_newmacro*4\IfSubStrBehind{1,1}{3}{0}{\xs_IfSubStrBehind_i[#1]{#2}{#3}{#4}}
 \long\def\xs_IfSubStrBehind_i[#1,#2]#3#4#5{\xs_IfSubStrBefore_i[#2,#1]{#3}{#5}{#4}}
 
-\long\def\xs_formatnumber#1#2{%
-	\xs_ifempty{#1}%
-		{\def#2{0X}% si vide, renvoie 0X
+\def\xs_errnumber{X}
+\def\xs_testifzero#1{% teste si #1 est constitué de 0
+	\xs_testifzero_a#1\relax
+}
+\def\xs_testifzero_a#1{%
+	\xs_ifx{\relax#1}
+		{%
+		\def\remain_part{0}%
+		\xs_execfirst
 		}
-		{\xs_returnfirstsyntaxunit{#1}\xs_reserved_A
-		\def\xs_reserved_B{+}%
-		\xs_ifx{\xs_reserved_A\xs_reserved_B}
-			{\xs_removefirstsyntaxunit{#1}\xs_reserved_C
-			\xs_exparg\xs_ifempty{\xs_reserved_C}%
-				{\def#2{+0X}}
-				{\xs_exparg{\def#2}{\expandafter+\expandafter0\xs_reserved_C}}%
+		{%
+		\xs_ifx{0#1}
+			{%
+			\xs_testifzero_a
 			}
-			{\def\xs_reserved_B{-}%
-			\xs_ifx{\xs_reserved_A\xs_reserved_B}
-				{\xs_removefirstsyntaxunit{#1}\xs_reserved_A
-				\xs_exparg\xs_ifempty{\xs_reserved_A}%
-					{\def#2{-0X}}%
-					{\xs_exparg{\def#2}{\expandafter-\expandafter0\xs_reserved_A}}%
+			{%
+			\xs_testifzero_b#1%
+			}%
+		}%
+}
+\def\xs_testifzero_b#1\relax{%
+	\def\remain_part{#1}%
+	\xs_execsecond
+}
+\xs_newmacro\IfDecimal{}{1}{0}{%
+	\def\integerpart{0}\def\xs_intpartlen{0}%
+	\def\decimalpart{0}\def\xs_decpartlen{0}%
+	\let\xs_decimalsep\empty
+	\let\afterdecimal\empty
+	\expandafter\xs_parsesigns\expandafter{\expandafter}\detokenize\expandafter{\expanded{#1}}\relax
+}
+\def\xs_parsesigns#1#2{% #1= signes lus #2=caractère en cours
+	\xs_ifx{\relax#2}
+		{%
+		\let\afterdecimal\xs_errnumber
+		\xs_execsecond
+		}
+		{%
+		\xs_ifnum{\xs_ifx{+#2}10\xs_ifx{-#2}10>0 }
+			{%
+			\xs_parsesigns{#1#2}%
+			}
+			{%
+			\edef\xs_sgnpart{\ifnum#11=-1 -\fi}%
+			\let\integerpart\empty
+			\xs_parseintpart0#2%
+			}%
+		}%
+}
+\def\xs_parseintpart#1#2{% #1=nombre de caractères lus  #2=caractère en cours
+	\xs_ifx{\relax#2}
+		{%
+		\def\xs_intpartlen{#1}%
+		\xs_ifnum{#1>0 }
+			{%
+			\edef\integerpart{\xs_sgnpart\integerpart}%
+			\xs_execfirst
+			}
+			{%
+			\let\afterdecimal\xs_errnumber
+			\xs_execsecond
+			}%
+		}
+		{%
+		\xs_ifdigit{#2}
+			{%
+			\edef\integerpart{\integerpart#2}%
+			\expandafter\xs_parseintpart\expandafter{\number\numexpr#1+1}%
+			}
+			{%
+			\def\xs_intpartlen{#1}%
+			\xs_ifnum{\xs_ifx{.#2}10\xs_ifx{,#2}10>0 }
+				{%
+				\def\xs_decimalsep{#2}%
+				\expandafter\xs_testifzero\expandafter{\integerpart}
+					{\def\integerpart{0}}
+					{\edef\integerpart{\xs_sgnpart\remain_part}}%
+				\let\decimalpart\empty
+				\xs_parsedecpart0%
 				}
-				{\def#2{0#1}%
+				{%
+				\xs_gobtoendnumber#2%
 				}%
 			}%
 		}%
 }
-
-\xs_newmacro\IfInteger{}{1}{0}{%
-	\xs_formatnumber{#1}\xs_reserved_A
-	\decimalpart0
-	\afterassignment\xs_defafterinteger\integerpart\xs_reserved_A\relax\_nil
-	\let\xs_after_intpart\afterinteger
-	\expandafter\xs_testdot\afterinteger\_nil
-	\xs_ifx{\empty\afterdecimal}
-		{\xs_ifnum{\decimalpart=0 }
-			{\xs_execfirst% partie décimale constituée de 0 --> seul cas où on renvoie vrai
+\def\xs_parsedecpart#1#2{% #1=nombre de caractères lus  #2=caractère en cours
+	\xs_ifx{\relax#2}
+		{%
+		\def\xs_decpartlen{#1}%
+		\xs_ifnum{#1>0 }
+			{%
+			\expandafter\xs_testifzero\expandafter{\decimalpart}
+				{%
+				\def\decimalpart{0}%
+				}
+				{}%
+			\xs_execfirst
 			}
-			{\expandafter\xs_defafterinteger\xs_after_intpart\relax\_nil
+			{%
+			\def\decimalpart{0}\def\xs_decpartlen{0}%
+			\let\afterdecimal\xs_errnumber
 			\xs_execsecond
 			}%
 		}
-		{\expandafter\xs_defafterinteger\xs_after_intpart\relax\_nil
-		\xs_execsecond
+		{%
+		\xs_ifdigit{#2}
+			{%
+			\edef\decimalpart{\decimalpart#2}%
+			\expandafter\xs_parsedecpart\expandafter{\number\numexpr#1+1}%
+			}
+			{%
+			\expandafter\xs_testifzero\expandafter{\decimalpart}
+				{%
+				\def\decimalpart{0}%
+				}
+				{}%
+			\xs_gobtoendnumber#2%
+			}%
 		}%
 }
-
-\xs_newmacro\IfDecimal{}{1}{0}{%
-	\xs_formatnumber{#1}\xs_reserved_A
-	\decimalpart0
-	\afterassignment\xs_defafterinteger\integerpart\xs_reserved_A\relax\_nil
-	\expandafter\xs_testdot\afterinteger\_nil
-	\xs_ifx{\empty\afterdecimal}
+\def\xs_gobtoendnumber#1\relax{\def\afterdecimal{#1}\xs_execsecond}
+\def\xs_ifdigit#1{%
+	\xs_ifnum{\ifnum`#1<`0 0\else1\fi \ifnum`#1>`9 0\else1\fi=11 }
 }
-
-\begingroup\catcode`\@ 11
-\long\gdef\xs_defafterinteger#1\relax\_nil{\def\@xs@afterinteger{#1}\let\afterinteger\@xs@afterinteger}
-\long\gdef\xs_defafterdecimal#1\_nil{\def\@xs@afterdecimal{#1}\let\afterdecimal\@xs@afterinteger}
-\endgroup
-
-\def\xs_testdot{%
-	\let\xs_decsep\empty
-	\xs_ifnxttok.
-		{\def\xs_decsep{.}\xs_readdecimalpart}%
-		{\xs_testcomma}%
-}
-
-\def\xs_testcomma{%
-	\xs_ifnxttok,
-		{\def\xs_dessep{,}\xs_readdecimalpart}%
-		{\xs_defafterdecimal}%
-}
-
-\long\def\xs_readdecimalpart#1#2\_nil{%
-	\xs_ifempty{#2}
-		{\def\xs_reserved_A{0X}}
-		{\def\xs_reserved_A{0#2}}%
-	\afterassignment\xs_defafterinteger\decimalpart\xs_reserved_A\relax\_nil
-	\expandafter\xs_defafterdecimal\afterinteger\_nil
+\xs_newmacro\IfInteger{}{1}{0}{%
+	\IfDecimal{#1}
+		{%
+		\xs_ifnum{\decimalpart=0 }
+			{%
+			\let\afterinteger\empty
+			\xs_execfirst
+			}
+			{%
+			\edef\afterinteger{\xs_decimalsep\decimalpart}%
+			\xs_execsecond
+			}%
+		}
+		{%
+		\xs_ifnum{\xs_ifx{\xs_decimalsep\empty}01\xs_ifx{\afterdecimal\xs_errnumber}10=11 }
+			{%
+			\let\afterinteger\xs_decimalsep
+			}
+			{%
+			\edef\afterinteger{\xs_decimalsep\afterdecimal}%
+			}%
+		\xs_execsecond
+		}
 }
 
 % test d'égalité sur des chaines (et des chaines contenant des nombres)
@@ -631,7 +703,7 @@
 	\long\def\xs_testcase##1##2##3\_nil{% lit les 2 premieres unités syntaxiques dans ##1 et ##2. Les autres dans ##3
 		#1{#2}{##1}% compare
 			{\xs_testopt{\xs_IfStringCase_ii{##2}}{}}% le test est positif, on exécute le code correspondant et on mange l'argument optionnel ## BUGfix dans 1.82
-			{\xs_ifempty{##3}%
+			{\xs_ifemptyarg{##3}%
 				{\xs_testopt{\xs_IfStringCase_i}{}}% s'il n'y a plus de cas, on exécute le code <autres cas> ## BUGfix dans 1.82
 				{\xs_testcase##3\_nil}% sinon, on recommence avec ce qui reste
 			}%
@@ -677,17 +749,17 @@
 % par la chaine #4 dans la chaine #2
 \xs_newmacro\StrSubstitute{0}{3}{1}{%
 	\def\xs_reserved_D{#2}\let\xs_reserved_C\empty\def\xs_reserved_E{#3}%
-	\decimalpart0 \integerpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+	\xs_countb0 \xs_counta0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 	\def\xs_atoccurfound{%
 		\xs_ifnum{#1<1 }
 			{\def\xs_reserved_A{#4}}
-			{\xs_ifnum{\decimalpart>#1 }
+			{\xs_ifnum{\xs_countb>#1 }
 				{\def\xs_reserved_A{#3}}
 				{\def\xs_reserved_A{#4}}%
 			}%
 		\xs_eaddtomacro\xs_reserved_C{\xs_reserved_A}%
 	}%
-	\xs_ifempty{#3}%
+	\xs_ifemptyarg{#3}%
 		{\xs_exparg\xs_assign_xstringresult{\xs_reserved_D}{#5}%
 		}
 		{\xs_read_reserved_D
@@ -702,17 +774,17 @@
 
 % Compte combien d'unités syntaxiques contient la chaine #1 ?
 \xs_newmacro\StrLen{}{1}{1}{%
-	\def\xs_reserved_C{#1}\decimalpart0 \def\xs_nestlevel{0}\gdef\groupID{0}%
+	\def\xs_reserved_C{#1}\xs_countb0 \def\xs_nestlevel{0}\gdef\groupID{0}%
 	\let\xs_atbegingroup\relax
-	\def\xs_atendofgroup{\expandafter\endgroup\expandafter\decimalpart\number\decimalpart\relax}%
+	\def\xs_atendofgroup{\expandafter\endgroup\expandafter\xs_countb\number\xs_countb\relax}%
 	\let\xs_atnextsyntaxunit\relax
 	\xs_read_reserved_C
-	\xs_exparg\xs_assign_xstringresult{\number\decimalpart}{#2}%
+	\xs_exparg\xs_assign_xstringresult{\number\xs_countb}{#2}%
 }
 
 % Macro interne fermant autant de groupes que nécessaire pour trouver une unité syntaxique derrière
 \def\xs_continuetonext{%
-	\xs_exparg\xs_ifempty{\xs_reserved_C}%
+	\xs_ifemptymacro\xs_reserved_C
 		{\ifnum\xs_nestlevel>0
 			\xs_endgroup_eaddtomacro\xs_reserved_B{\expandafter{\xs_reserved_B}}% on concatène
 			\expandafter\xs_continuetonext% on recommence
@@ -723,8 +795,8 @@
 \def\xs_calc_grouIP{%
 	\begingroup\def\xs_reserved_A{0}%
 	\xs_ifx{\xs_reserved_A\groupID}% si on arrive du groupe de niveau 0
-		{\endgroup\xdef\groupID{\number\integerpart}}% on met simplement le niveau
-		{\endgroup\xs_eearg{\gdef\groupID}{\expandafter\groupID\expandafter,\number\integerpart}}%
+		{\endgroup\xdef\groupID{\number\xs_counta}}% on met simplement le niveau
+		{\endgroup\xs_eearg{\gdef\groupID}{\expandafter\groupID\expandafter,\number\xs_counta}}%
 }
 
 % Cette macro coupe la chaine #1 après l'unité syntaxique n°#2
@@ -741,11 +813,11 @@
 \long\def\xs_StrSplit_ii#1#2{%
 	\let\xs_reserved_B\empty\def\xs_reserved_C{#2}\def\xs_reserved_D{#1}\gdef\groupID{}%
 	\ifnum#1>0
-		\decimalpart0 \integerpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+		\xs_countb0 \xs_counta0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 		\def\xs_atendofgroup{%
 			\edef\__temp{%
 				\endgroup
-				\noexpand\decimalpart=\number\decimalpart\relax
+				\noexpand\xs_countb=\number\xs_countb\relax
 				\unexpanded{\xs_addtomacro\xs_reserved_B}{{\unexpanded\expandafter{\xs_reserved_B}}}%
 				}%
 			\__temp
@@ -753,7 +825,7 @@
 		\def\xs_atbegingroup{\let\xs_reserved_B\empty}%
 		\def\xs_atnextsyntaxunit{%
 			\xs_eaddtomacro\xs_reserved_B{\xs_reserved_A}%
-			\xs_ifnum{\decimalpart=\xs_reserved_D\relax}
+			\xs_ifnum{\xs_countb=\xs_reserved_D\relax}
 				{\ifx\xs_reserved_C\empty\xs_reserved_E\fi
 				\edef\__temp{\def\noexpand\xs_reserved_B{\unexpanded\expandafter{\xs_reserved_B}}\def\noexpand\xs_reserved_C{\unexpanded\expandafter{\xs_reserved_C}}}%
 				\expandafter\xs_exitallgroups\__temp
@@ -771,7 +843,7 @@
 % \macroA reçoit ce qui se trouve avant la n ème occurrence <motif> dans <texte>
 % \macroB reçoit ce qui est après cette n ème occurrence
 \xs_newmacro*3\StrCut{1}{2}{0}{%
-	\xs_ifempty{#3}%
+	\xs_ifemptyarg{#3}%
 		{\gdef\groupID{}\let\xs_reserved_C\empty\let\xs_reserved_E\empty
 		}
 		{\xs_ifnum{#1<1 }
@@ -783,13 +855,13 @@
 
 \long\def\xs_StrCut_ii#1#2#3{%
 	\let\xs_reserved_C\empty\def\xs_reserved_D{#1}\def\xs_reserved_E{#2}%
-	\decimalpart0 \integerpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+	\xs_countb0 \xs_counta0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 	\def\xs_atoccurfound{%
-		\xs_ifnum{\decimalpart=\numexpr(#3)\relax}
+		\xs_ifnum{\xs_countb=\numexpr(#3)\relax}
 			{\edef\__temp{%
 				\def\noexpand\xs_reserved_C{\unexpanded\expandafter{\xs_reserved_C}}%
 				\def\noexpand\xs_reserved_D{\unexpanded\expandafter{\xs_reserved_D}}%
-				\noexpand\decimalpart=\number\decimalpart\relax
+				\noexpand\xs_countb=\number\xs_countb\relax
 				}%
 			\expandafter\xs_exitallgroups\__temp
 			\xs_gobarg% stoppe la récursivité dans \xs_read_reserved_D
@@ -852,11 +924,11 @@
 \xs_newmacro\StrChar{}{2}{1}{%
 	\let\xs_reserved_B\empty\def\xs_reserved_C{#1}\def\xs_reserved_D{#2}%
 	\ifnum#2>0
-		\def\groupID{0}\def\xs_nestlevel{0}\integerpart0 \decimalpart0
+		\def\groupID{0}\def\xs_nestlevel{0}\xs_counta0 \xs_countb0
 		\let\xs_atbegingroup\relax
-		\def\xs_atendofgroup{\expandafter\endgroup\expandafter\decimalpart\number\decimalpart\relax}%
+		\def\xs_atendofgroup{\expandafter\endgroup\expandafter\xs_countb\number\xs_countb\relax}%
 		\def\xs_atnextsyntaxunit{%
-			\ifnum\decimalpart=\xs_reserved_D% la n ième US est atteinte ?
+			\ifnum\xs_countb=\xs_reserved_D% la n ième US est atteinte ?
 				\edef\__temp{\def\noexpand\xs_reserved_B{\unexpanded\expandafter{\xs_reserved_A}}}% on capture l'US en cours qui est celle cherchée
 				\expandafter\xs_exitallgroups\__temp
 				\expandafter\xs_gobarg% stoppe la récursivité dans \xs_read_reserved_C
@@ -864,7 +936,7 @@
 		}%
 		\xs_read_reserved_C
 	\fi
-	\xs_exparg\xs_ifempty{\xs_reserved_B}%
+	\xs_ifemptymacro\xs_reserved_B
 		{\gdef\groupID{}}
 		{}%
 	\xs_exparg\xs_assign_xstringresult{\xs_reserved_B}{#3}%
@@ -873,13 +945,13 @@
 % Combien de fois compte t-on #2 dans #1 ?
 \xs_newmacro\StrCount{}{2}{1}{%
 	\def\xs_reserved_D{#1}\def\xs_reserved_E{#2}\let\xs_reserved_C\empty
-	\xs_ifempty{#2}%
+	\xs_ifemptyarg{#2}%
 		{\xs_assign_xstringresult{0}{#3}%
 		}
-		{\decimalpart0 \integerpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+		{\xs_countb0 \xs_counta0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 		\def\xs_atoccurfound{\let\xs_reserved_C\empty\xs_read_reserved_D}%
 		\xs_read_reserved_D
-		\xs_exparg\xs_assign_xstringresult{\number\decimalpart}{#3}%
+		\xs_exparg\xs_assign_xstringresult{\number\xs_countb}{#3}%
 		}%
 }
 
@@ -916,9 +988,9 @@
 \long\def\xs_StrCompare_i#1#2#3{%
 	\def\xs_StrCompare_iii##1{%
 		\let\xs_reserved_A\empty
-		\xs_exparg\xs_ifempty{\xs_reserved_C}%
+		\xs_ifemptymacro\xs_reserved_C
 			{\edef\xs_reserved_A{*\xs_comparecoeff}}%
-			{\xs_exparg\xs_ifempty{\xs_reserved_D}%
+			{\xs_ifemptymacro\xs_reserved_D
 				{\edef\xs_reserved_A{*\xs_comparecoeff}}
 				{}%
 			}%
@@ -928,7 +1000,7 @@
 		\xs_exparg\xs_returnfirstsyntaxunit{\xs_reserved_C}\xs_reserved_A
 		\xs_exparg\xs_returnfirstsyntaxunit{\xs_reserved_D}\xs_reserved_B
 		\xs_ifx{\xs_reserved_B\xs_reserved_A}
-			{\xs_exparg\xs_ifempty{\xs_reserved_A}%
+			{\xs_ifemptymacro\xs_reserved_A
 				{\xs_StrCompare_iii{##1}% les 2 unités syntaxiques sont égales, on renvoie la position
 				}
 				{\def\xs_next{\xs_exparg\xs_StrCompare_ii{\number\numexpr##1+1}}% les 2 unités syntaxiques sont égales et non vides, on recommence
@@ -953,13 +1025,13 @@
 
 \long\def\xs_StrFindGroup_i#1#2[#3]{%
 	\def\xs_StrFindGroup_ii{%
-		\xs_exparg\xs_ifempty{\xs_reserved_C}%
+		\xs_ifemptymacro\xs_reserved_C
 			{\xs_assign_xstringresult{}{#3}% s'il ne reste plus rien, on renvoie vide
 			}
 			{\xs_exparg\xs_returnfirstsyntaxunit{\xs_reserved_C}\xs_reserved_D
 			\xs_ifx{\bgroup\xs_toks}% si la 1ère unité syntaxique est un groupe explicite
-				{\advance\decimalpart1 % on augmente le compteur
-				\xs_ifnum{\decimalpart=\xs_reserved_A\relax}% on est au groupe cherché lors de la profondeur courante ?
+				{\advance\xs_countb1 % on augmente le compteur
+				\xs_ifnum{\xs_countb=\xs_reserved_A\relax}% on est au groupe cherché lors de la profondeur courante ?
 					{\xs_ifx{\empty\xs_reserved_B}% on est à la profondeur maximale ?
 						{\xs_exparg\xs_assign_xstringresult{\xs_reserved_D}{#3}}% on renvoie ce groupe
 						{\xs_exparg{\expandafter\xs_StrFindGroup_i\xs_reserved_D}{\xs_reserved_B}[#3]}% on recommence avec ce groupe et les profondeurs de recherche restantes
@@ -974,7 +1046,7 @@
 			}%
 	}%
 	\xs_extractgroupnumber{#2}\xs_reserved_A\xs_reserved_B
-	\decimalpart0
+	\xs_countb0
 	\xs_ifnum{\xs_reserved_A>0 }
 		{\def\xs_reserved_C{#1}}
 		{\let\xs_reserved_C\empty}%
@@ -996,7 +1068,7 @@
 	\begingroup
 		\xs_expandingroups
 		\xs_ifnum{#1>0 }
-			{\integerpart#1 \decimalpart0 \gdef\groupID{0}\def\xs_nestlevel{0}%
+			{\xs_counta#1 \xs_countb0 \gdef\groupID{0}\def\xs_nestlevel{0}%
 			\def\xs_atendofgroup{\xs_endgroup_eaddtomacro\xs_reserved_B{\expandafter{\xs_reserved_B}}}%
 			\def\xs_atbegingroup{\let\xs_reserved_B\empty}%
 			\def\xs_atnextsyntaxunit{\xs_eeaddtomacro\xs_reserved_B{\xs_reserved_A}}%
@@ -1042,7 +1114,7 @@
                         H I S T O R I Q U E
 ------------------------------------------------------------------------------
 v1.0    4/7/2008 : - Package achevé.
-         7/7/2008 : - Package publié sur CTAN.
+        7/7/2008 : - Package publié sur CTAN.
 ------------------------------------------------------------------------------
 v1.1    15/8/2008
    - Le package ne nécessite plus LaTeX et est désormais utilisable sous
@@ -1229,3 +1301,8 @@ v1.84 21/07/2021
   ------------------------------------------------------------------------------
 v1.85 14/01/2023
     - 2 espaces parasites corrigés
+------------------------------------------------------------------------------
+v1.86 20/08/2023
+    - correction d'un bug dans \xs_IfSubStrBefore_i (signalé par Abbas Shams)
+    - les tests \IfDecimal et \IfInteger ne sont plus limités par le nombre de
+      chiffres de leurs parties décimale ou entière

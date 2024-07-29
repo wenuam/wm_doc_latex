@@ -7,7 +7,7 @@
 %% glossaries-extra.dtx  (with options: `glossaries-extra-bib2gls.sty,package')
 %% 
 %%  glossaries-extra.dtx
-%%  Copyright 2022 Nicola Talbot
+%%  Copyright 2023 Nicola Talbot
 %% 
 %%  This work may be distributed and/or modified under the
 %%  conditions of the LaTeX Project Public License, either version 1.3
@@ -21,7 +21,7 @@
 %% 
 %%  The Current Maintainer of this work is Nicola Talbot.
 %% 
-%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
+%%  This work consists of the files glossaries-extra.dtx and glossaries-extra.ins and the derived files glossaries-extra.sty, glossaries-extra-abbrstyles.def, glossaries-extra-bib2gls.sty, glossaries-extra-stylemods.sty, glossary-bookindex.sty, glossary-longextra.sty, glossary-topic.sty, glossary-table.sty, example-glossaries-xr.tex, example-glossaries-acronym-desc.bib, example-glossaries-acronym.bib, example-glossaries-acronyms-lang.bib, example-glossaries-brief.bib, example-glossaries-childmultipar.bib, example-glossaries-childnoname.bib, example-glossaries-cite.bib, example-glossaries-images.bib, example-glossaries-long.bib, example-glossaries-longchild.bib, example-glossaries-multipar.bib, example-glossaries-parent.bib, example-glossaries-symbolnames.bib, example-glossaries-symbols.bib, example-glossaries-url.bib, example-glossaries-user.bib, example-glossaries-utf8.bib, example-glossaries-xr.bib, glossaries-extra-2021-11-22.sty, glossaries-extra-bib2gls-2021-11-22.sty, glossaries-extra-stylemods-2021-11-22.sty, glossary-bookindex-2021-11-22.sty, glossary-longextra-2021-11-22.sty, glossary-topic-2021-11-22.sty.
 %% 
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -40,8 +40,8 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \DeclareRelease{v1.48}{2021-11-22}{glossaries-extra-bib2gls-2021-11-22.sty}
-\DeclareCurrentRelease{v1.50}{2022-11-08}
-\ProvidesPackage{glossaries-extra-bib2gls}[2022/11/08 v1.50 (NLCT)]
+\DeclareCurrentRelease{v1.53}{2023-09-29}
+\ProvidesPackage{glossaries-extra-bib2gls}[2023/09/29 v1.53 (NLCT)]
 \ifglsacronym
   \providecommand*{\printunsrtacronyms}[1][]{%
    \printunsrtglossary[type=\acronymtype,#1]}%
@@ -83,6 +83,51 @@
 \ifdef\glshashchar
 {}
 {\edef\glshashchar{\expandafter\@gobble\string\#}}
+\newcommand*{\GlsXtrResourceInitEscSequences}{%
+ \def\u{\string\u}%
+ \def\.{\string\.}%
+ \def\\{\string\\}%
+ \def\/{\string\/}%
+ \def\|{\string\|}%
+ \def\&{\string\&}%
+ \def\+{\string\+}%
+ \def\<{\string\<}%
+ \def\>{\string\>}%
+ \def\*{\string\*}%
+ \def\${\string\$}%
+ \def\^{\string\^}%
+ \def\~{\string\~}%
+ \def\({\string\(}%
+ \def\){\string\)}%
+ \def\[{\string\[}%
+ \def\]{\string\]}%
+ \def\"{\string\"}%
+ \def\-{\string\-}%
+ \def\?{\string\?}%
+ \def\#{\string\#}%
+ \def\:{\string\:}%
+ \def\cs##1{\glsbackslash##1}%
+ \def\CS{\string\CS}%
+ \def\NULL{\string\NULL\space}%
+ \def\IN{\string\IN\space}%
+ \def\NIN{\string\NIN\space}%
+ \def\PREFIXOF{\string\PREFIXOF\space}%
+ \def\NOTPREFIXOF{\string\NOTPREFIXOF\space}%
+ \def\SUFFIXOF{\string\SUFFIXOF\space}%
+ \def\NOTSUFFIXOF{\string\NOTSUFFIXOF\space}%
+ \def\LC{\string\LC}%
+ \def\UC{\string\UC}%
+ \def\FIRSTLC{\string\FIRSTLC}%
+ \def\FIRSTUC{\string\FIRSTUC}%
+ \def\TITLE{\string\TITLE}%
+ \def\MGP{\string\MGP}%
+ \def\LEN{\string\LEN}%
+ \def\TRIM{\string\TRIM}%
+ \def\INTERPRET{\string\INTERPRET}%
+ \def\LABELIFY{\string\LABELIFY}%
+ \def\LABELIFYLIST{\string\LABELIFYLIST}%
+ \def\CAT{\string\CAT}%
+}
 \newcommand*{\GlsXtrIfHasNonZeroChildCount}{%
   \@ifstar\s@GlsXtrIfHasNonZeroChildCount\@GlsXtrIfHasNonZeroChildCount
 }
@@ -575,11 +620,33 @@
        \ifx\@gls@fallbacklabel\relax
         \ifcsvoid
         {glo@\glsdetoklabel{\@gls@thislabel}@\dglsfieldfallbackfieldlabel}%
-        {}%
+        {%
+          \GlossariesExtraInfo{Found entry `\@gls@thislabel' that
+           matches prefix `\@glsxtr@prefix' but field `#2' not set
+           and fallback field `\dglsfieldfallbackfieldlabel' not set}%
+        }%
         {%
           \let\@gls@fallbacklabel\@gls@thislabel
+          \GlossariesExtraInfo{Found entry `\@gls@thislabel' that
+           matches prefix `\@glsxtr@prefix' but field `#2' not set.
+           Fallback field `\dglsfieldfallbackfieldlabel' is set
+           so setting fallback entry to `\@gls@fallbacklabel' with
+           field `\dglsfieldfallbackfieldlabel'}%
         }%
+       \else
+         \GlossariesExtraInfo{Found entry `\@gls@thislabel' that
+          matches prefix `\@glsxtr@prefix' but field `#2' not set.
+          Fallback entry: `\@gls@fallbacklabel'}%
        \fi
+       \ifdefempty\@glsxtr@prefixedlist
+       {\let\@glsxtr@prefixedlist\@gls@thislabel}%
+       {%
+         \ifGlsXtrPrefixLabelFallbackLast
+           \epreto\@glsxtr@prefixedlist{\expandonce\@gls@thislabel,}%
+         \else
+           \eappto\@glsxtr@prefixedlist{,\expandonce\@gls@thislabel}%
+         \fi
+       }%
      }%
      {%
        \@endfortrue
@@ -601,6 +668,7 @@
  \if@endfor
  \else
   \ifx\@gls@fallbacklabel\relax
+    \GlossariesExtraWarning{No fallback found for `#1'}%
     \ifnum\count@>1\relax
       \ifGlsXtrPrefixLabelFallbackLast
       \else
@@ -612,6 +680,7 @@
   \else
     \let\@gls@thislabel\@gls@fallbacklabel
     \let\dglsfieldactualfieldlabel\dglsfieldfallbackfieldlabel
+    \let\@glsxtr@prefixedlist\@empty
   \fi
  \fi
  \edef\@glo@tmp{\endgroup

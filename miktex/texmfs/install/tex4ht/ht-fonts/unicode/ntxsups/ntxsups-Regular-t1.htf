@@ -58,7 +58,7 @@ ntxsups-Regular-t1 33 255
 'Y' '' Y.sup 89
 'Z' '' Z.sup 90
 '[' '' bracketleft.sup 91
-'\' '' backslash.sup 92
+'&#x005C;' '' backslash.sup 92
 ']' '' bracketright.sup 93
 '^' '' asciicircum.sup 94
 '&#xde;' '' underscore.sup 95

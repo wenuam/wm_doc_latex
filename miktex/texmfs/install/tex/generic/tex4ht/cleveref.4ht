@@ -1,5 +1,5 @@
-% cleveref.4ht (2021-12-27-13:23), generated from tex4ht-4ht.tex
-% Copyright 2018-2021 TeX Users Group
+% cleveref.4ht (2023-05-18-14:15), generated from tex4ht-4ht.tex
+% Copyright 2018-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,7 +16,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-12-27-13:23}
+\immediate\write-1{version 2023-05-18-14:15}
 
 
 
@@ -42,7 +42,7 @@
     {\def\@tempa{\csname cref@#1@alias\endcsname}}%
   \protected@xdef\cref@currentlabel{%
     [\@tempa][\arabic{#1}][\cref@result]%
-    \csname p@#1\endcsname\csname the#1\endcsname}
+    \csname p@#1\endcsname\csname the#1\endcsname}%
     \cref:currentlabel{#1}%
     }%
 \def\refstepcounter@optarg[#1]#2{%
@@ -53,19 +53,21 @@
     {\def\@tempa{\csname cref@#1@alias\endcsname}}%
   \protected@xdef\cref@currentlabel{%
     [\@tempa][\arabic{#2}][\cref@result]%
-    \csname p@#2\endcsname\csname the#2\endcsname}
+    \csname p@#2\endcsname\csname the#2\endcsname}%
     \cref:currentlabel{#2}%
   }%
 
 \ifdefined\@firstoffive\else%
-  \def\@firstoffive#1#2#3#4#5{#1}
+  \def\@firstoffive#1#2#3#4#5{#1}%
 \fi
 \def\:tempa#1#2{\bgroup%
   \def\rEfLiNK##1##2{\Link{##1}{}}%
-  \expandafter\expandafter\expandafter\@firstoffive\csname r@#2\endcsname{}{}{}{}{}%
+  \def\XRrEfLiNK[##1]##2##3{\Link[##1]{##2}{}}% handle links from Xr and Xr-hyper
   \cref@getlabel{#2}{\@templabel}%
-  #1{\@templabel}{}{}%
-  \EndLink\egroup%
+  #1{% add links only around reference numbers, not the previous text, because it can contain punctuation
+    \expandafter\expandafter\expandafter\@firstoffive\csname r@#2\endcsname{}{}{}{}{}%
+  \@templabel\EndLink}{}{}%
+  \egroup%
 }%
 
 \HLet\@@@setcref=\:tempa
@@ -76,11 +78,11 @@
   \def\:tempb[#1]#2#3#4{%
    % call original amsthm theorem definition, but
    % disable \:thm in order to prevent infinite loop
-   \let\:thm\:gobble
+   \let\:thm\:gobble%
    \cref@thmnoarg{#2}%
    \o:cref@thmoptarg:[#1]{#2}{#3}{#4}
   }%
-  \HLet\cref@thmoptarg\:tempb
+  \HLet\cref@thmoptarg\:tempb%
 }{}%
 
 

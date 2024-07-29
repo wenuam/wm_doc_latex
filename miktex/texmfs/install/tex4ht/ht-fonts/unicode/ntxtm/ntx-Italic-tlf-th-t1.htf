@@ -91,7 +91,7 @@ ntx-Italic-tlf-th-t1 0 255
 'Y' '' Y 89
 'Z' '' Z 90
 '[' '' bracketleft.up 91
-'\' '' backslash 92
+'&#x005C;' '' backslash 92
 ']' '' bracketright.up 93
 '^' '' asciicircum 94
 '_' '' underscore 95

@@ -13,11 +13,20 @@
 %% This program is provided under the terms of the LaTeX Project Public License with some
 %% modifications. See the file LICENSE for information.
 %% 
+\ifx\ProvidesPackage\undefined\else
+\ProvidesPackage{ucs}[2023/11/09 v2.4 UCS: Unicode input support]%
+\fi
+\ifx\Umathchar\undefined\else
+\ifx\PackageWarningNoLine\undefined\else
+\PackageWarningNoLine{ucs}{ucs package ignored with utf8 based engines}
+\fi
+\expandafter\endinput
+\fi
 \catcode`\@11
 
 \ifx\AddToHook\@undefined\else
 \AddToHook{package/hyperref/after}{%
- \def\HyPsd@expand@utfvii{%
+ \def\HyPsd@expand@UTFviii{%
     \count@"C2
     \@tempcnta"E0
     \def\UTFviii@tmp{%
@@ -38,6 +47,7 @@
     \UTFviii@loop
 
   }
+ \let\HyPsd@expand@utfvii\HyPsd@expand@UTFviii
 }
 \fi
 
@@ -150,9 +160,6 @@
   \else
     \csname\uc@temp@a\endcsname{#1}%
   \fi}
-\ifx\ProvidesPackage\undefined\else
-\ProvidesPackage{ucs}[2022/08/07 v2.3 UCS: Unicode input support]%
-\fi
 \ifx\@@input\undefined\input uni-global.def \else\input{uni-global.def}\fi
 \DeclareUnicodeOption{fasterrors}
 \DeclareUnicodeOption{warnunknown}

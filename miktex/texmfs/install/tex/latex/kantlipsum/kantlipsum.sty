@@ -12,16 +12,14 @@
 %% Released under the LaTeX Project Public License v1.3c or later
 %% See http://www.latex-project.org/lppl.txt
 %% ---------------------------------------------------------------
-\RequirePackage{expl3}[2019/07/01]
-\RequirePackage{xparse}
 \ProvidesExplPackage
   {kantlipsum}
-  {2019/07/23}
-  {0.8}
+  {2023/11/27}
+  {0.8c}
   {Generate text in Kantian style}
-\@ifpackagelater { expl3 } { 2019/07/01 }
-  { }
-  {
+\@ifl@t@r\ExplLoaderFileDate{2022-11-09}
+  {}
+  {%
     \PackageError { kantlipsum } { Support~package~expl3~too~old }
       {
         You~need~to~update~your~installation~of~the~bundles~
@@ -105,7 +103,7 @@
   }
 \cs_new_protected:Nn \__kgl_process:nnnn
   {
-   \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g__kgl_pars_seq {#1} }
+   \tl_set:Ne \l_tmpa_tl { \seq_item:Nn \g__kgl_pars_seq {#1} }
    \tl_if_novalue:nTF {#4}
     { \__kgl_extract:nnV {#3} {#3} \l_tmpa_tl }
     { \__kgl_extract:nnV {#3} {#4} \l_tmpa_tl }
@@ -138,23 +136,23 @@
       \msg_error:nnn {kantlipsum} {already-defined} {#1}
      }
      {
-      \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g__kgl_pars_seq {#2} }
+      \tl_set:Ne \l_tmpa_tl { \seq_item:Nn \g__kgl_pars_seq {#2} }
       \tl_if_novalue:nTF {#4}
        { \__kgl_extract:nnV {#3} {#3} \l_tmpa_tl }
        { \__kgl_extract:nnV {#3} {#4} \l_tmpa_tl }
-      \cs_new:Npx #1 { \l_tmpa_tl }
+      \cs_new:Npe #1 { \l_tmpa_tl }
      }
   }
 \cs_new_protected:Nn \__kgl_extract:nnn
   {
    \seq_set_split:Nnn \l__kgl_sentences_seq { . } {#3}
    \seq_clear:N \l_tmpa_seq
-   \seq_indexed_map_inline:Nn \l__kgl_sentences_seq
+   \seq_map_indexed_inline:Nn \l__kgl_sentences_seq
     {
      \int_compare:nT { #1 <= ##1 <= #2 }
       {\seq_put_right:Nn \l_tmpa_seq { ##2 } }
     }
-   \tl_set:Nx \l_tmpa_tl { \seq_use:Nn \l_tmpa_seq { .~ }. }
+   \tl_set:Ne \l_tmpa_tl { \seq_use:Nn \l_tmpa_seq { .~ }. }
   }
 \cs_generate_variant:Nn \__kgl_extract:nnn { nnV }
 \group_begin:
@@ -3231,9 +3229,9 @@ whole content of philosophy.}
 \__kgl_newword:n {duck}
 \__kgl_newword:n {Kant}
 \group_end:
-\msg_info:nnx {kantlipsum} {how-many}
+\msg_info:nne {kantlipsum} {how-many}
   { \int_eval:n {\seq_count:N \g__kgl_pars_seq} }
-%% Copyright (C) 2011-2019 by
+%% Copyright (C) 2011-2023 by
 %%   Enrico Gregorio
 %%   enrico DOT gregorio AT univr DOT it
 %% 

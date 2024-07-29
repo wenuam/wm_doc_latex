@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-mongolian.ldf}[polyglossia: module for Mongolian]
 
@@ -6,6 +6,8 @@
 
 \PolyglossiaSetup{mongolian}{
   bcp47=mn,
+  bcp47-language=mn,
+  bcp47-script=Cyrl,
   script=Cyrillic,
   scripttag=cyrl,
   langtag=MNG,
@@ -28,46 +30,49 @@
 
 \newif\ifcyrillic@numerals
 \newif\ifcyrillic@asbuk@numerals
-\define@choicekey*+{mongolian}{numerals}[\xpg@val\xpg@nr]{arabic,cyrillic,cyrillic-trad,cyrillic-alph}[arabic]{%
-   \ifcase\xpg@nr\relax
-      % arabic:
-      \cyrillic@numeralsfalse%
-      \cyrillic@asbuk@numeralsfalse%
-   \or
-      % cyrillic:
-      \cyrillic@numeralstrue%
-      \cyrillic@asbuk@numeralsfalse%
-   \or
-      % cyrillic-trad:
-      \cyrillic@numeralstrue%
-      \cyrillic@asbuk@numeralsfalse%
-   \or
-      % cyrillic-alph:
-      \cyrillic@numeralstrue%
-      \cyrillic@asbuk@numeralstrue%
-   \fi
-   \xpg@info{Option: Mongolian, numerals=\xpg@val}%
-}{\xpg@warning{Unknown Mongolian numerals value `#1'}}
 
-\define@boolkey{mongolian}[mongolian@]{babelshorthands}[true]{}
+\DeclareKeys[polyglossia/gloss/mongolian]
+  {
+    babelshorthands.if = mongolian@babelshorthands,
+    babelshorthands.default:n = true,
+    numerals.choice:,
+    numerals / arabic.code =
+      {%
+        \cyrillic@numeralsfalse
+        \cyrillic@asbuk@numeralsfalse
+      },
+    numerals / cyrillic.code =
+      {%
+        \cyrillic@numeralstrue
+        \cyrillic@asbuk@numeralsfalse
+      },
+    numerals / cyrillic-trad.code =
+      {%
+        \cyrillic@numeralstrue
+        \cyrillic@asbuk@numeralsfalse
+      },
+    numerals / cyrillic-alph.code =
+      {%
+        \cyrillic@numeralstrue
+        \cyrillic@asbuk@numeralstrue
+      },
+    numerals.default:n = arabic,
+    numerals/unknown.code = \xpg@warning{Unknown Mongolian numerals value `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{mongolian}{babelshorthands=false,numerals=arabic}
+\InitializeGlossOptions{mongolian}{babelshorthands=false,numerals=arabic}
 
 \ifsystem@babelshorthands
-  \setkeys{mongolian}{babelshorthands=true}
+  \SetGlossOptions{mongolian}{babelshorthands=true}
 \else
-  \setkeys{mongolian}{babelshorthands=false}
+  \SetGlossOptions{mongolian}{babelshorthands=false}
 \fi
 
-\ifcsundef{initiate@active@char}{%
-  \input{babelsh.def}%
-  \initiate@active@char{"}%
-  \shorthandoff{"}%
-}{}
+\InitializeBabelShorthands
 
 \def\mongolian@shorthands{%
-  \bbl@activate{"}%
+  \xpg@activate@shorthands%
   \def\language@group{mongolian}%
   \declare@shorthand{mongolian}{"`}{„}%
   \declare@shorthand{mongolian}{"'}{“}%
@@ -106,7 +111,7 @@
 }
 
 \def\nomongolian@shorthands{%
-  \@ifundefined{initiate@active@char}{}{\bbl@deactivate{"}}%
+  \xpg@deactivate@shorthands%
 }
 
 % Taken from babel-mongolian
@@ -117,7 +122,7 @@
    \def\bibname{Номзүй}%
    \def\chaptername{Бүлэг}%
    \def\appendixname{Хавсралт}%
-   \ifcsundef{thechapter}%
+   \@ifundefined{thechapter}%
      {\def\contentsname{Агуулга}}%
      {\def\contentsname{Гарчиг}}%
    \def\listfigurename{Зургийн жагсаалт}%

@@ -1,6 +1,6 @@
 --
 -- polyglossia-sanskrit.lua
--- part of polyglossia v1.60 -- 2023/02/11
+-- part of polyglossia v2.2 -- 2024/07/15
 --
 
 require('polyglossia-punct')

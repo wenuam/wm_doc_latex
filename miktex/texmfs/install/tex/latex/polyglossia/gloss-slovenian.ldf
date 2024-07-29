@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-slovenian.ldf}[polyglossia: module for Slovenian]
 
 \PolyglossiaSetup{slovenian}{
   bcp47=sl,
+  bcp47-language=sl,
+  bcp47-script=Latn,
   hyphennames={slovenian,slovene},
   babelname=slovene,
   hyphenmins={2,2},
@@ -17,10 +19,14 @@
 % Babel aliases
 \setlanguagealias{slovenian}{slovene}
 
-\define@boolkey{slovenian}[slovenian@]{localalph}[true]{}
+\DeclareKeys[polyglossia/gloss/slovenian]
+  {
+    localalph.if = slovenian@localalph,
+    localalph.default:n = true
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{slovenian}{localalph=false}
+\InitializeGlossOptions{slovenian}{localalph=false}
 
 
 \def\captionsslovenian{%

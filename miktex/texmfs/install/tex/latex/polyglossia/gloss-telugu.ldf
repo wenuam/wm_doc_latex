@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-telugu.ldf}[polyglossia: module for Telugu]
 
@@ -6,6 +6,8 @@
 
 \PolyglossiaSetup{telugu}{
   bcp47=te,
+  bcp47-language=te,
+  bcp47-script=Telu,
   script=Telugu,
   scripttag=telu,
   langtag=TEL,

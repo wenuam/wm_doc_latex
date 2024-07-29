@@ -1,6 +1,6 @@
-% report.4ht (2022-02-22-13:25), generated from tex4ht-4ht.tex
+% report.4ht (2023-04-10-13:46), generated from tex4ht-4ht.tex
 % Copyright 1997-2009 Eitan M. Gurari
-% Copyright 2009-2022 TeX Users Group
+% Copyright 2009-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2022-02-22-13:25}
+\immediate\write-1{version 2023-04-10-13:46}
 
 
 \Configure{UndefinedSec}{likepart}
@@ -78,8 +78,8 @@
 
 \pend:def\caption{\SkipRefstepAnchor}
 \long\def\c:theindex:#1#2#3#4#5#6#7#8#9{%
-   \def\theindex{%
-      \def\idx:item{\SaveEverypar\ht:everypar{}#1}%
+   \def\theindex{\SaveEverypar\ht:everypar{}#1%
+      \def\idx:item{}%
       \def\endtheindex{\idx:item#2\RecallEverypar}%
       \def\item{\idx:item\def\idx:item{#4}\let\index\@gobble #3}%
       \def\subitem{\idx:item\def\idx:item{#6}\let\index\@gobble #5}%
@@ -236,8 +236,8 @@ UnDFexyz}%
          \ifx \au:StartSec\:UnDef
             \let\au:StartSec\:StartSec
             \def\:StartSec{\:tableofcontents
-               \global\let\auto:toc\:UnDef \:StartSec}%
-            \pend:def\:tableofcontents{\gdef\:StartSec{\au:StartSec}}%
+               \global\let\auto:toc\:UnDef \global\let\:StartSec\au:StartSec\:StartSec}%
+            \append:def\tableofcontents{\gdef\:StartSec{\au:StartSec}}%
    \fi  \fi
 }
      
@@ -252,7 +252,7 @@ UnDFexyz}%
     \else
       \addcontentsline{toc}{part}{#1}%
     \fi
-    \csname @endpart\endcsname}
+    }
 \let\:tempb\part
 \Def:Section\part{\thepart}{#1}
 \let\:part\part
@@ -260,7 +260,9 @@ UnDFexyz}%
 \let\no@part\@part
 \def\@part[#1]#2{%
    {\let\addcontentsline\:gobbleIII\no@part[#1]{}}%
-   \HtmlEnv   \Toc:Title{#1}\:part{#2}}
+   \HtmlEnv   \Toc:Title{#1}\:part{#2}%
+   \csname @endpart\endcsname%
+ }
 \Def:Section\likepart{}{#1}
 \let\:likepart\likepart
 \let\likepart\:UnDef

@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-turkish.ldf}[polyglossia: module for Turkish]
 \RequirePackage{hijrical}
 \PolyglossiaSetup{turkish}{
   bcp47=tr,
+  bcp47-language=tr,
+  bcp47-script=Latn,
   hyphennames={turkish},
   hyphenmins={2,2},
   langtag=TRK,

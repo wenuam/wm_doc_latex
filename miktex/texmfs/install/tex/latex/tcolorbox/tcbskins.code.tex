@@ -1,8 +1,8 @@
-%% The LaTeX package tcolorbox - version 6.0.3 (2023/03/17)
+%% The LaTeX package tcolorbox - version 6.3.0 (2024/07/10)
 %% tcbskins.code.tex: Code for colorboxes with different skins
 %%
 %% -------------------------------------------------------------------------------------------
-%% Copyright (c) 2006-2023 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
+%% Copyright (c) 2006-2024 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
 %% -------------------------------------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -17,14 +17,9 @@
 %%
 %% This work consists of all files listed in README
 %%
-\tcb@set@library@version{6.0.3}
+\tcb@set@library@version{6.3.0}
 
-\RequirePackage{tikz}[2010/10/13]
 \RequirePackage{tikzfill.image}
-
-\newenvironment{tikzpicture@tcb@hooked}{%
-  \edef\tcb@tikzpicture@begin{\noexpand\tikzpicture[\expandonce\tcb@tikz@option@hook]}%
-  \tcb@tikzpicture@begin\tcb@tikz@begin@hook}{\tcb@tikz@end@hook\endtikzpicture}
 
 \def\tcb@creategeonodes@true{%
   \begin{scope}[every node/.style={line width=0mm,inner sep=0mm,outer sep=0mm,draw=none,fill=none,rectangle}]
@@ -438,7 +433,7 @@
 
 \tcbset{%
   base@unbroken/.style={%
-    clear@spec,graphical environment=tikzpicture@tcb@hooked,geometry nodes,%
+    clear@spec,geometry nodes,%
     set@outerboundary=\tcb@boundaryframe@standard,%
     shape@of@skin=unbroken,%
     set@extensions@preframe={\kvtcb@shadow},%
@@ -446,7 +441,7 @@
     set@extensions@final={\tcb@apply@finish}%
   },%
   base@first/.style={%
-    clear@spec,graphical environment=tikzpicture@tcb@hooked,geometry nodes,%
+    clear@spec,geometry nodes,%
     set@outerboundary=\tcb@boundaryframe@pathfirst,%
     shape@of@skin=first,%
     set@extensions@preframe={\kvtcb@shadow},%
@@ -454,7 +449,7 @@
     set@extensions@final={\tcb@apply@finish}%
   },%
   base@middle/.style={%
-    clear@spec,graphical environment=tikzpicture@tcb@hooked,geometry nodes,%
+    clear@spec,geometry nodes,%
     set@outerboundary=\tcb@boundaryframe@pathmiddle,%
     shape@of@skin=middle,%
     set@extensions@preframe={\kvtcb@shadow},%
@@ -462,7 +457,7 @@
     set@extensions@final={\tcb@apply@finish}%
   },%
   base@last/.style={%
-    clear@spec,graphical environment=tikzpicture@tcb@hooked,geometry nodes,%
+    clear@spec,geometry nodes,%
     set@outerboundary=\tcb@boundaryframe@pathlast,%
     shape@of@skin=last,%
     set@extensions@preframe={\kvtcb@shadow},%
@@ -885,7 +880,7 @@
   segmentation code={\tcb@drawspec@widgetsegment},%
   skin first=widgetmiddle,skin middle=widgetmiddle,skin last=widgetlast}
 
-\tcb@new@skin{spartan}{graphical environment=tikzpicture@tcb@hooked,geometry nodes=true,shape@of@skin=unbroken,%
+\tcb@new@skin{spartan}{geometry nodes=true,shape@of@skin=unbroken,%
   set@extensions@preframe=,set@extensions@postframe={\tcb@apply@underlay},set@extensions@final=,%
   frame engine=spartan,interior titled engine=spartan,interior engine=spartan,title engine=spartan,segmentation engine=spartan,%
   set@outerboundary=\tcb@boundaryframe@standard,%
@@ -893,7 +888,7 @@
 
 \tcbset{spartan/.style={skin=spartan}}
 
-\tcb@new@skin{draft}{clear@spec,graphical environment=tikzpicture@tcb@hooked,geometry nodes,shape@of@skin=unbroken,%
+\tcb@new@skin{draft}{clear@spec,geometry nodes,shape@of@skin=unbroken,%
   frame engine=empty,interior titled engine=empty,interior engine=empty,segmentation engine=path,title empty,%
   segmentation style={draw=black,dashed},
   set@extensions@postframe=,
@@ -1720,11 +1715,9 @@
 
 \cs_new:Npn \__tcobox_include_graphics:nn #1#2
   {
-    \tl_set:Nn \l_tmpa_tl { \includegraphics }
-    \tl_put_right:Nx \l_tmpa_tl { [#1] }
-    \l_tmpa_tl {#2}
+    \includegraphics [{#1}] {#2}
   }
-
+\cs_generate_variant:Nn \__tcobox_include_graphics:nn {en}
 
 \cs_new:Npn \__tcobox_include_graphics:
   {
@@ -1732,27 +1725,27 @@
 
     \int_compare:nNnT \kvtcb@graphics@orientation > {-1}
       {
-        \hbox_set:Nn \l_tmpa_box
+        \hbox_set:Nn \l__tcobox_tmpa_box
           {
-            \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl }{ \imagepath }
+            \__tcobox_include_graphics:en { \l__tcobox_graphics_options_tl }{ \imagepath }
           }
         \if_case:w \kvtcb@graphics@orientation
-          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} < {\box_ht_plus_dp:N \l_tmpa_box}
+          \dim_compare:nNnT {\box_wd:N\l__tcobox_tmpa_box} < {\box_ht_plus_dp:N \l__tcobox_tmpa_box}
             {
               \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=90}
             }
         \or:
-          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} < {\box_ht_plus_dp:N \l_tmpa_box}
+          \dim_compare:nNnT {\box_wd:N\l__tcobox_tmpa_box} < {\box_ht_plus_dp:N \l__tcobox_tmpa_box}
             {
               \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=-90}
             }
         \or:
-          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} > {\box_ht_plus_dp:N \l_tmpa_box}
+          \dim_compare:nNnT {\box_wd:N\l__tcobox_tmpa_box} > {\box_ht_plus_dp:N \l__tcobox_tmpa_box}
             {
               \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=90}
             }
         \or:
-          \dim_compare:nNnT {\box_wd:N\l_tmpa_box} > {\box_ht_plus_dp:N \l_tmpa_box}
+          \dim_compare:nNnT {\box_wd:N\l__tcobox_tmpa_box} > {\box_ht_plus_dp:N \l__tcobox_tmpa_box}
             {
               \tl_put_right:Nn \l__tcobox_graphics_options_tl {,angle=-90}
             }
@@ -1763,22 +1756,22 @@
       {
         \tcbox
           {
-            \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl }{ \imagepath }
+            \__tcobox_include_graphics:en { \l__tcobox_graphics_options_tl }{ \imagepath }
           }
       }
       {
         \legacy_if:nTF {tcb@fixedheight}
           {
             \begin{tcolorbox}
-              \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl,width=\linewidth,height=\tcbtextheight,keepaspectratio }{ \imagepath }
-          \end{tcolorbox}
+              \__tcobox_include_graphics:en { \l__tcobox_graphics_options_tl,width=\linewidth,height=\tcbtextheight,keepaspectratio }{ \imagepath }
+            \end{tcolorbox}
           }
           {
             \tl_if_empty:NTF \tcb@height@adjust
             {
               \begin{tcolorbox}
-                \__tcobox_include_graphics:nn { \l__tcobox_graphics_options_tl,width=\linewidth }{ \imagepath }
-              \end{tcolorbox}%
+                \__tcobox_include_graphics:en { \l__tcobox_graphics_options_tl,width=\linewidth }{ \imagepath }
+              \end{tcolorbox}
             }{% height fill
               \begin{tcolorbox}[
                 underlay=
@@ -1798,15 +1791,15 @@
 
 \cs_new:Npn \__tcobox_include_graphics_preparefile:n #1
   {
-    \file_parse_full_name:nNNN {#1} \l_tmpa_tl \imagename \l_tmpb_tl
-    \tl_put_right:NV \imagename \l_tmpb_tl
+    \file_parse_full_name:nNNN {#1} \l__tcobox_tmpa_tl \imagename \l__tcobox_tmpb_tl
+    \tl_put_right:NV \imagename \l__tcobox_tmpb_tl
     \tl_set_eq:NN \imagepath \imagename
-    \tl_if_empty:NF \l_tmpa_tl
+    \tl_if_empty:NF \l__tcobox_tmpa_tl
       {
         \tl_put_left:Nn \imagepath {/}
-        \tl_if_eq:NnF \l_tmpa_tl {/}
+        \tl_if_eq:NnF \l__tcobox_tmpa_tl {/}
           {
-            \tl_put_left:NV \imagepath \l_tmpa_tl
+            \tl_put_left:NV \imagepath \l__tcobox_tmpa_tl
           }
       }
     \tl_if_empty:NF \kvtcb@graphics@directory
@@ -1899,7 +1892,7 @@
 }\fi}
 
 \tcbset{%
-  hyperref node/.style 2 args={finish={\tcbhypernode{\hyperref[#1]}{#2}}},
+  hyperref node/.style 2 args={finish={\tcbhypernode{\hyperref[{#1}]}{#2}}},
   hyperref/.style={hyperref node={#1}{frame}},
   hyperref interior/.style={hyperref node={#1}{interior}},
   hyperref title/.style={hyperref node={#1}{title}},
@@ -1911,7 +1904,7 @@
   hyperurl/.style={hyperurl node={#1}{frame}},
   hyperurl interior/.style={hyperurl node={#1}{interior}},
   hyperurl title/.style={hyperurl node={#1}{title}},
-  hyperurl* node/.style n args={3}{finish={\tcbhypernode{\href[#1]{#2}}{#3}}},
+  hyperurl* node/.style n args={3}{finish={\tcbhypernode{\href[{#1}]{#2}}{#3}}},
   hyperurl*/.style 2 args={hyperurl* node={#1}{#2}{frame}},
   hyperurl* interior/.style 2 args={hyperurl* node={#1}{#2}{interior}},
   hyperurl* title/.style 2 args={hyperurl* node={#1}{#2}{title}},

@@ -35,9 +35,38 @@ local function update_element_name(el, name, prefix)
   el._name = newname
 end
 
-local function create_element(el, name, prefix)
-  return el:create_element(newname)
+local function create_element(el, name, prefix, attributes)
+  local attributes = attributes or {}
+  local newname = get_new_element_name(name, prefix)
+  return el:create_element(newname, attributes)
 end
+
+local function element_pos(el)
+  local pos, count = 0, 0
+  for _, node in ipairs(el:get_siblings()) do
+    if node:is_element() then
+      count = count + 1
+      if node == el then
+        pos = count
+      end
+    end
+  end
+  return pos, count
+end
+
+-- test if element is the first element in the current element list
+local function is_first_element(el)
+  local pos, count = element_pos(el)
+  return pos == 1 
+end
+
+-- test if element is the last element in the current element list
+local function is_last_element(el)
+  local pos, count = element_pos(el)
+  return pos == count
+end
+
+
 
 local function is_token_element(el)
   local name, prefix = get_element_name(el)
@@ -275,6 +304,14 @@ end
 local function fix_numbers(el)
   -- convert <mn>1</mn><mo>.</mo><mn>3</mn> to <mn>1.3</mn>
   if get_element_name(el) == "mn" then
+    -- sometimes minus sign can be outside <mn>
+    local x = el:get_sibling_node(-1)
+    if x and x:is_text()
+         and x:get_text() == "−" 
+    then
+      el:add_child_node(x:copy_node(), 1)
+      x:remove_node()
+    end
     local n = el:get_sibling_node(1)
     -- test if next  element is <mo class="MathClass-punc">.</mo>
     if n and n:is_element() 
@@ -357,18 +394,45 @@ local function fix_operators(x)
   end
 end
 
-local function is_last_element(el)
-  local siblings = el:get_siblings()
-  -- return true only if the current element is the last in the parent's children
-  for i = #siblings, 1, -1 do
-    local curr = siblings[i]
-    if curr == el then
-      return true
-    elseif curr:is_element() then
-      return false
-    end
-  end
-  return false
+local function get_third_parent(el)
+  local first = el:get_parent()
+  if not first then return nil end
+  local second = first:get_parent()
+  if not second then return nil end
+  return second:get_parent()
+end
+
+local function add_space(el, pos)
+  local parent = el:get_parent()
+  local name, prefix = get_element_name(el)
+  local space = create_element(parent, "mspace", prefix)
+  space:set_attribute("width", "0.3em")
+  parent:add_child_node(space, pos)
+end
+
+local function fix_dcases(el)
+	-- we need to fix spacing in dcases* environments
+	-- when you use something like:
+	-- \begin{dcases*}
+	-- 1 & if $a=b$ then
+	-- \end{dcases*}
+	-- the spaces around $a=b$ will be missing
+	-- we detect if the <mtext> elements contains spaces that are collapsed by the browser, and add explicit <mspace>
+	-- elements when necessary
+	if el:get_element_name() == "mtext" then
+		local parent = get_third_parent(el)
+		if parent and parent:get_element_name() == "mtable" and parent:get_attribute("class") == "dcases-star" then
+			local text = el:get_text()
+			local pos = el:find_element_pos()
+			if pos == 1 and text:match("%s$") then 
+				add_space(el, 2)
+			elseif text:match("^%s") and not el._used then
+				add_space(el, pos)
+				-- this is necessary to avoid infinite loop, we mark this element as processed
+				el._used = true
+			end
+		end
+	end
 end
 
 local function is_empty_row(el)
@@ -378,6 +442,9 @@ local function is_empty_row(el)
     for _, child in ipairs(el:get_children()) do
       if child:is_element() then count = count + 1 end
     end
+  else
+    -- row is not empty if it contains any text
+    return false
   end
   -- if there is one or zero childrens, then it is empty row
   return count < 2
@@ -398,6 +465,29 @@ local function delete_last_empty_mtr(el)
 
 end
 
+local function fix_rel_mo(el)
+  -- this is necessary for LibreOffice. It has a problem with relative <mo> that are
+  -- first childs in an element list. This often happens in equations, where first
+  -- element in a table column is an operator, like non-equal-, less-than etc.
+  local el_name, prefix = get_element_name(el)
+  if el_name == "mo" 
+     and not get_attribute(el, "fence") -- ignore fences
+     and not get_attribute(el, "form")  -- these should be also ignored
+     and not get_attribute(el, "accent") -- and accents too
+  then
+    local parent = el:get_parent()
+    if is_first_element(el) then
+      local mrow = create_element(parent, "mrow", prefix)
+      parent:add_child_node(mrow, 1)
+    elseif is_last_element(el) then
+      local mrow = create_element(parent, "mrow", prefix)
+      parent:add_child_node(mrow)
+    end
+  end
+
+end
+
+
 return function(dom)
   dom:traverse_elements(function(el)
     if settings.output_format ~= "odt" then
@@ -405,6 +495,7 @@ return function(dom)
       fix_mfenced(el)
     else
       fix_mo_to_mfenced(el)
+      fix_rel_mo(el)
     end
     fix_radicals(el)
     fix_token_elements(el)
@@ -413,6 +504,7 @@ return function(dom)
     fix_numbers(el)
     fix_operators(el)
     fix_mathvariant(el)
+    fix_dcases(el)
     top_mrow(el)
     delete_last_empty_mtr(el)
   end)

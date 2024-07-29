@@ -1,9 +1,11 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-welsh.ldf}[polyglossia: module for Welsh]
 
 \PolyglossiaSetup{welsh}{
   bcp47=cy,
+  bcp47-language=cy,
+  bcp47-script=Latn,
   hyphennames={welsh},
   hyphenmins={2,3},
   langtag=WEL,
@@ -13,21 +15,26 @@
 % BCP-47 compliant aliases
 \setlanguagealias*{welsh}{cy}
 
-\providebool{welsh@formaldate}
+\@ifundefined{ifwelsh@formaldate}%
+  {\newif\ifwelsh@formaldate}{}
 
-\define@choicekey*+{welsh}{date}[\xpg@val\xpg@nr]{long,short}[short]{%
-   \ifcase\xpg@nr\relax
-      % long:
-      \welsh@formaldatetrue
-   \or
-      % accented:
-      \welsh@formaldatefalse
-   \fi
-   \xpg@info{Option: Welsh, date=\xpg@val}%
-}{\xpg@warning{Unknown date value `#1'}}
+\DeclareKeys[polyglossia/gloss/welsh]
+  {
+    date.choice:,
+    date / long.code =
+      {%
+        \welsh@formaldatetrue
+      },
+    date / short.code =
+      {%
+        \welsh@formaldatefalse
+      },
+    date.default:n = short,
+    date/unknown.code = \xpg@warning{Unknown date value `#1'},
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{welsh}{date=short}
+\InitializeGlossOptions{welsh}{date=short}
 
 \def\captionswelsh{%
   \def\refname{Cyfeiriadau}%

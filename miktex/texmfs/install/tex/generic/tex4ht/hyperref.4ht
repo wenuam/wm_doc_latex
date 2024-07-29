@@ -1,6 +1,6 @@
-% hyperref.4ht (2021-05-16-13:57), generated from tex4ht-4ht.tex
+% hyperref.4ht (2022-07-01-14:27), generated from tex4ht-4ht.tex
 % Copyright 1999-2009 Eitan M. Gurari
-% Copyright 2009-2021 TeX Users Group
+% Copyright 2009-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-05-16-13:57}
+\immediate\write-1{version 2022-07-01-14:27}
 
 \csname end:hyperref\endcsname
 
@@ -361,10 +361,22 @@
                      \endcsname{\let\hyper:normalise\def}%
   \expandafter\pend:def\csname href \endcsname{\let\hyper:normalise\def}%
   \pend:defI\T@ref{\edef\RefArg{##1}}}
-\def\label@hyperref[#1]#2{{%
-   \def\hyperrefLabel{#2}%
-   \Configure{ref}
-     {\Link}{\EndLink}{\Configure{ref}{}{}{}#2}\ref{#1}}}
+\def\label@@hyperref#1#2#3{%
+  \ifx#1\relax
+    \protect\G@refundefinedtrue
+    \@latex@warning{%
+      Hyper reference `#2' on page \thepage \space undefined%
+    }%
+    \begingroup
+      \hyperrefundefinedlink{#3}%
+    \endgroup
+  \else%
+    \def\hyperrefLabel{#3}%
+    \Configure{ref}%
+      {\Link}{\EndLink}{\Configure{ref}{}{}{}#3}\ref{#2}%
+  \fi
+}
+
 \Configure{@newlabel}{\@onelevel@sanitize\@currentlabelname}
 \append:def\protect:wrtoc{\def\ref{\protect\o:ref}}
 
@@ -408,6 +420,28 @@
 \def\@hyper@readexternallink#1#2#3#4:#5:#6\\#7{%
       \hyper@linkurl{#3}{#7\ifx\\#2\\\else\##2\fi}}
 \catcode`\:=11
+\def\T@pageref#1{%
+  \Hy@safe@activestrue%
+  \expandafter\@setref\csname r@#1\endcsname\@secondoffive{#1}%
+  \Hy@safe@activesfalse%
+}%
+\def\T@Ref#1{%
+  \Hy@safe@activestrue%
+  \let\olda:rEfLiNK\rEfLiNK%%
+  \def\rEfLiNK##1##2{\Link{##1}{}\edef\:ref:currentlabel{##2}\expandafter\MakeUppercase\:ref:currentlabel\EndLink}%
+  \expandafter\@setref\csname r@#1\endcsname\@firstoffive{#1}%
+  \let\rEfLiNK\olda:rEfLiNK%
+  \Hy@safe@activesfalse%
+}%
+\def\@Refstar#1{%
+  \Hy@safe@activestrue
+  \let\olda:rEfLiNK\rEfLiNK%%
+  \def\rEfLiNK##1##2{\Link{##1}{}\edef\:ref:currentlabel{##2}\expandafter\MakeUppercase\:ref:currentlabel\EndLink}%
+  \expandafter\@setref\csname r@#1\endcsname\@firstoffive{#1}%
+  \let\rEfLiNK\olda:rEfLiNK%
+  \Hy@safe@activesfalse
+}%
+
 \def\@Form[#1]{%
    \def\default:textarea{Form}%
    \scan:args{}#1,//\a:Form }

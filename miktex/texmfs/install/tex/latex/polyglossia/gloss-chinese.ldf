@@ -1,12 +1,16 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-chinese.ldf}[polyglossia: module for Chinese]
 
 \PolyglossiaSetup{chinese}{
     bcp47=zh,
+    bcp47-language=zh,
+    bcp47-region=CN,
+    bcp47-script=Hans,
     script=CJK,
     scripttag=hani,
-    language=Chinese,
+    language={Chinese Simplified},
+    langtag=ZHS,
     hyphennames={nohyphenation},
     frenchspacing=false,
     fontsetup=true,
@@ -18,48 +22,60 @@
 \setlanguagealias*[variant=simplified]{chinese}{zh-CN}
 \setlanguagealias*[variant=traditional]{chinese}{zh-TW}
 
-\providebool{chinese@traditional}
+\@ifundefined{ifchinese@traditional}%
+  {\newif\ifchinese@traditional}{}
+
+\@ifundefined{ifchinese@numerals}%
+  {\newif\ifchinese@numerals}{}
 
 \def\chinese@variant{chinese}
 
-\newif\ifchinese@numerals
-\define@key{chinese}{numerals}[arabic]{%
-   \ifstrequal{#1}{chinese}%
-      {\chinese@numeralstrue}%
-      {\chinese@numeralsfalse}%
-}
-
-
-\define@choicekey*+{chinese}{variant}[\xpg@val\xpg@nr]{cn,simplified,tw,traditional}[cn]{%
-   \ifcase\xpg@nr\relax
-      % cn:
-      \chinese@traditionalfalse
-      \SetLanguageKeys{chinese}{bcp47=zh-CN}%
-      \xpg@info{Option: Chinese, variant=simplified}%
-   \or
-      % simplified:
-      \chinese@traditionalfalse
-      \SetLanguageKeys{chinese}{bcp47=zh-CN}%
-      \xpg@info{Option: Chinese, variant=simplified}%
-   \or
-      % tw:
-      \chinese@traditionaltrue
-      \SetLanguageKeys{chinese}{bcp47=zh-TW}%
-      \xpg@info{Option: Chinese, variant=traditional}%
-   \or
-      % traditional:
-      \chinese@traditionaltrue
-      \SetLanguageKeys{chinese}{bcp47=zh-TW}%
-      \xpg@info{Option: Chinese, variant=traditional}%
-   \fi
-}{\xpg@warning{Unknown Chinese variant `#1'}}
+\DeclareKeys[polyglossia/gloss/chinese]
+  {
+    variant.choice:,
+    variant / cn.code =
+      {%
+        \chinese@traditionalfalse
+        \SetLanguageKeys{chinese}{language={Chinese Simplified},langtag=ZHS,bcp47=zh-CN,bcp47-language=zh,bcp47-region=CN,bcp47-script=Hans}%
+      },
+    variant / simplified.code =
+      {%
+        \chinese@traditionalfalse
+        \SetLanguageKeys{chinese}{language={Chinese Simplified},langtag=ZHS,bcp47=zh-CN,bcp47-language=zh,bcp47-region=CN,bcp47-script=Hans}%
+      },
+    variant / tw.code =
+      {%
+        \chinese@traditionaltrue
+        \SetLanguageKeys{chinese}{language={Chinese Traditional},langtag=ZHT,bcp47=zh-TW,bcp47-language=zh,bcp47-region=TW,bcp47-script=Hant}%
+      },
+    variant / traditional.code =
+      {%
+        \chinese@traditionaltrue
+        \SetLanguageKeys{chinese}{language={Chinese Traditional},langtag=ZHT,bcp47=zh-TW,bcp47-language=zh,bcp47-region=TW,bcp47-script=Hant}%
+      },
+    variant.default:n = cn,
+    variant/unknown.code = \xpg@warning{Unknown Chinese variant `#1'},
+    numerals.choice:,
+    numerals / arabic.code =
+      {%
+        \chinese@numeralsfalse
+        \SetLanguageKeys{chinese}{bcp47-extension-u=nu-latn}%
+      },
+    numerals / chinese.code =
+      {%
+        \chinese@numeralstrue
+        \SetLanguageKeys{chinese}{bcp47-extension-u=nu-hant}%
+      },
+    numerals.default:n = arabic,
+    numerals/unknown.code = \xpg@warning{Unknown Chinese numerals value `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{chinese}{variant=cn,numerals=arabic}
-%\xpg@initialize@gloss@options{chinese}{variant=tw,numerals=arabic}
+\InitializeGlossOptions{chinese}{variant=cn,numerals=arabic}
+%\InitializeGlossOptions{chinese}{variant=tw,numerals=arabic}
 % Register alias options
-\xpg@set@alias@values{chinese}{variant}{cn}{simplified}
-\xpg@set@alias@values{chinese}{variant}{tw}{traditional}
+\SetLanguageAliasValues{chinese}{variant}{cn,simplified}
+\SetLanguageAliasValues{chinese}{variant}{tw,traditional}
 
 
 \def\chinese@capsformat{%
@@ -111,7 +127,7 @@
     \def\enclname{附件}%
     \def\ccname{抄送}%
     \def\headtoname{收件人}%
-    \def\\glossaryname{詞彙表}%
+    \def\glossaryname{詞彙表}%
 }
 \def\captions@chinese@simplified{%
     \def\contentsname{目录}%
@@ -134,7 +150,7 @@
     \def\enclname{附件}%
     \def\ccname{抄送}%
     \def\headtoname{收件人}%
-    \def\\glossaryname{词汇表}%
+    \def\glossaryname{词汇表}%
 }
 
 \newcount\c@TempJNum%

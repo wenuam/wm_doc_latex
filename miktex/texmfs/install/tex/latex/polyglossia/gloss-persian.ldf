@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-persian.ldf}[polyglossia: module for Persian]
 
@@ -8,6 +8,8 @@
 \RequirePackage{hijrical}
 \PolyglossiaSetup{persian}{
   bcp47=fa,
+  bcp47-language=fa,
+  bcp47-script=Arab,
   babelname=farsi,
   script=Arabic,
   direction=RL,
@@ -25,30 +27,36 @@
 \setlanguagealias{persian}{farsi}
 
 \newif\if@western@numerals
-\def\tmp@western{western}
-\define@key{persian}{numerals}[eastern]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@western\@western@numeralstrue\else%
-    \@western@numeralsfalse%
-  \fi}
-
-%this is needed for \abjad in arabicnumbers.sty
-\def\tmp@true{true}
-\define@key{persian}{abjadjimnotail}[true]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@true\abjad@jim@notailtrue%
-  \else
-    \abjad@jim@notailfalse
-  \fi}
-
-% NOT YET USED
-\define@key{persian}{locale}[default]{%
-  \def\@persian@locale{#1}}
+\newif\ifpersian@customsep\persian@customsepfalse
+\def\xpg@sepmark{}
 
 %TODO add option for CALENDAR
 
+\DeclareKeys[polyglossia/gloss/persian]
+  {
+    sectionsep.code = \gdef\xpg@sepmark{#1}\persian@customseptrue,
+    sectionsep.default:n = .,
+    abjadjimnotail.if = abjad@jim@notail,
+    abjadjimnotail.default:n = true,
+    locale.store = \@persian@locale,
+    locale.default:n = default,
+    numerals.choice:,
+    numerals / eastern.code =
+      {%
+          \@western@numeralsfalse
+          \SetLanguageKeys{persian}{bcp47-extension-u=nu-arab}%
+      },
+    numerals / western.code =
+      {%
+          \@western@numeralstrue
+          \SetLanguageKeys{persian}{bcp47-extension-u=nu-latn}%
+      },
+    numerals.default:n = eastern,
+    numerals/unknown.code = \xpg@warning{Unknown Persian numerals option `#1'}
+  }
+
 % Register default options
-\xpg@initialize@gloss@options{persian}{locale=default,numerals=eastern,abjadjimnotail=false}
+\InitializeGlossOptions{persian}{locale=default,numerals=eastern,abjadjimnotail=false}
 
 \def\farsigregmonth#1{\ifcase#1%
   \or ژانویه\or فوریه\or مارس\or آوریل\or مه\or ژوئن\or ژوئیه\or اوت\or سپتامبر\or اکتبر\or نوامبر\or دسامبر\fi}
@@ -93,9 +101,9 @@
   \if@western@numerals
     \number#1%
   \else
-    \xpg@if@char@available{06F0}%
-          {\farsidigits{\number#1}}%
-          {\arabicdigits{\number#1}}%
+    \IfCharIsAvailableTF{06F0}%
+          {\@ensure@LTR{\farsidigits{\number#1}}}%
+          {\@ensure@LTR{\arabicdigits{\number#1}}}%
   \fi
 }
 
@@ -127,15 +135,92 @@
    \let\@arabic\xpg@save@arabic%
 }
 
-% Save original \MakeUppercase definition
-\let\xpg@save@MakeUppercase\MakeUppercase
+\def\persian@xetex@capsformat{%
+  \let\xpg@save@sepmark\@SepMark%
+  \SepMark{\xpg@sepmark}
+}
+
+\def\nopersian@xetex@capsformat{%
+   \ifcsname xpg@save@sepmark\endcsname%
+     \SepMark{\xpg@save@sepmark}
+   \fi%
+}
+
+\def\persian@luatex@capsformat{%
+  %
+  % change chapter and part headings
+  \ifpersian@customsep
+     \ifcsname chapter\endcsname%
+        \let\xpg@save@thesection\thesection%
+        \renewcommand*\thesection{\thechapter\xpg@sepmark\@arabic\c@section}
+        \let\xpg@save@theequation\theequation%
+        \renewcommand*\theequation{%
+	    \ifnum \c@chapter>\z@ \thechapter\xpg@sepmark\fi\@arabic\c@equation}
+        \let\xpg@save@thefigure\thefigure%
+	\renewcommand*\thefigure{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@figure}
+        \let\xpg@save@thetable\thetable%
+	\renewcommand*\thetable{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@table}
+     \fi%
+     \let\xpg@save@thesubsection\thesubsection%
+     \renewcommand\thesubsection
+	{\thesection\xpg@sepmark\@arabic\c@subsection}
+     \let\xpg@save@thesubsubsection\thesubsubsection%
+     \renewcommand\thesubsubsection{\thesubsection\xpg@sepmark\@arabic\c@subsubsection}
+     \let\xpg@save@theparagraph\theparagraph%
+     \renewcommand\theparagraph
+         {\thesubsubsection\xpg@sepmark\@arabic\c@paragraph}
+     \let\xpg@save@thesubparagraph\thesubparagraph%
+     \renewcommand\thesubparagraph{\theparagraph\xpg@sepmark\@arabic\c@subparagraph}
+  \fi% (end \ifpersiancustomsep)
+}
+
+\def\nopersian@luatex@capsformat{%
+   \ifcsname xpg@save@thesection\endcsname%
+        \let\thesection\xpg@save@thesection%
+   \fi%
+   \ifcsname xpg@save@theequation\endcsname%
+        \let\theequation\xpg@save@theequation%
+   \fi%
+   \ifcsname xpg@save@thefigure\endcsname%
+        \let\thefigure\xpg@save@thefigure%
+   \fi%
+   \ifcsname xpg@save@thetable\endcsname%
+        \let\thetable\xpg@save@thetable%
+   \fi%
+   \ifcsname xpg@save@thesubsection\endcsname%
+        \let\thesubsection\xpg@save@thesubsection%
+      \ifcsname xpg@save@thesubsubsection\endcsname%
+        \let\thesubsubsection\xpg@save@thesubsubsection%
+      \fi%
+   \fi%
+   \ifcsname xpg@save@theparagraph\endcsname%
+        \let\theparagraph\xpg@save@theparagraph%
+   \fi%
+   \ifcsname xpg@save@thesubparagraph\endcsname%
+        \let\thesubparagraph\xpg@save@thesubparagraph%
+   \fi%
+}
 
 \def\blockextras@persian{%
-   \def\MakeUppercase##1{##1}%
+   \ifpersian@customsep
+      \ifxetex
+        \persian@xetex@capsformat
+      \else
+        \persian@luatex@capsformat
+      \fi   
+   \fi
+}
+%
+\def\noextras@persian{%
+    \ifpersian@customsep
+      \ifxetex
+        \nopersian@xetex@capsformat
+      \else
+        \nopersian@luatex@capsformat
+      \fi   
+   \fi
 }
 
-\def\noextras@persian{%
-   % restore original \MakeUppercase definition
-   \let\MakeUppercase\xpg@save@MakeUppercase
-}
 \endinput

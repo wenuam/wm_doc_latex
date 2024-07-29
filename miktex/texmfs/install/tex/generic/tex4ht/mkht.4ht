@@ -1,5 +1,5 @@
-% mkht.4ht (2020-11-23-10:05), generated from tex4ht-mkht.tex
-% Copyright 2009-2020 TeX Users Group
+% mkht.4ht (2023-09-10-08:49), generated from tex4ht-mkht.tex
+% Copyright 2009-2023 TeX Users Group
 % Copyright 1997-2009 Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -18,9 +18,9 @@
 % If you modify this program, changing the
 % version identification would be appreciated.
 %
-\immediate\write-1{version \ifx \JOBNAME\UnDefined 2020-11-23-10:05\else |version\fi}
+\immediate\write-1{version \ifx \JOBNAME\UnDefined 2023-09-10-08:49\else |version\fi}
 
-\immediate\write-1{version 2020-11-23-10:05}
+\immediate\write-1{version 2023-09-10-08:49}
 
 \def\exit{\documentclass{article}\begin{document}\end{document}\endinput}
 \bgroup
@@ -240,21 +240,6 @@ etex |<@|>5 |<'|>|<texinfo definitions|>|<get parameters|>|empty>>>
 
 \<restore cats\><<<
 \catcode`\@=0\catcode`\\=13 >>>
-%%%%%%%%%%%%%%%
-\section{ConTeXt}
-%%%%%%%%%%%%%%%
-
-
-\<context...\><<<
-|<unix line|>|<windows line|>
-        |<texexec|>
-        |<base|>tex4ht |<dir ch|>|<@|>1 |<III|>
-        |<base|>t4ht |<dir ch|>|<@|>1 |<IV|>
-
->>>
-
-\<texexec\><<<
-|<ruby call|>texexec --arg="ht-1=|<@|>2" --use=tex4ht --dvi --nobackend |<@|>5 |<@|>1 >>>
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{XeTeX}
@@ -323,7 +308,6 @@ mex |<@|>5 |<'|>|<tex definitions|>|<get parameters|>|empty>>>
 \def\Quote{\bgroup \setcats \Qcont}  \def\Qcont#1{\egroup\def\quote{#1}}
 \def\Argchar{\bgroup \setcats \Acont}\def\Acont#1{\egroup\def\argchar{#1}}
 \def\Dirchar{\bgroup \setcats \Dicont}\def\Dicont#1{\egroup\def\dirchar{#1}}
-\def\Rubycall{\bgroup \setcats \Dcont}\def\Dcont#1{\egroup\def\rubyCall{#1}}
 \def\Echooff{\bgroup \setcats \Dcont}\def\Dcont#1{\egroup\def\echoOff{#1}}
 \def\Ext{\bgroup \setcats \Econt}    \def\Econt#1{\egroup\def\ext{#1}%
     \def\firstln{unix}\ifx \firstln\ext
@@ -342,7 +326,6 @@ mex |<@|>5 |<'|>|<tex definitions|>|<get parameters|>|empty>>>
 \let\quote=\relax
 \let\argchar=\relax
 \let\dirchar=\relax
-\let\rubyCall=\relax
 \let\echoOff=\relax
 \let\ext=\relax
 \ifx \script\UnDef \let\script=\relax \fi
@@ -373,9 +356,6 @@ mex |<@|>5 |<'|>|<tex definitions|>|<get parameters|>|empty>>>
 \<base\><<<
 |base>>>
 
-\<ruby call\><<<
-|rubyCall>>>
-
 \<echo off\><<<
 |echoOff>>>
 
@@ -398,7 +378,7 @@ to insert the at-echo off only for Windows.
 
 \<windows line\><<<
 |<echo off|>
-|Rem |ScriptFileName|AddExtn (2020-11-23-10:05), generated from tex4ht-mkht.tex
+|Rem |ScriptFileName|AddExtn (2023-09-10-08:49), generated from tex4ht-mkht.tex
 |Rem Copyright 2009-2020 TeX Users Group
 |Rem Copyright 2003-2009 Eitan M. Gurari
 |Rem
@@ -437,7 +417,6 @@ to insert the at-echo off only for Windows.
    \temp\quote
    \temp\argchar
    \temp\dirchar
-   \temp\rubyCall
    \temp\echoOff
    \temp\ext
    \temp\script
@@ -466,12 +445,6 @@ to insert the at-echo off only for Windows.
 >>> %
 %
 \OutputCodE\<\pref texi.\ext\>   \script{\pref texi}{\ext}  %
-%
-\<\pref context.\ext\><<<
-\<context...\>
->>> %
-%
-\OutputCodE\<\pref context.\ext\>   \script{\pref context}{\ext}  %
 %
 \<\pref xetex.\ext\><<<
 \<htxetex...\>
@@ -510,7 +483,6 @@ to insert the at-echo off only for Windows.
 \Quote{'}
 \Argchar{$}
 \Dirchar{-f/}
-\Rubycall{}
 \Echooff{}
 \Remark{#}
 
@@ -527,7 +499,6 @@ to insert the at-echo off only for Windows.
 \Quote{}
 \Argchar{%}
 \Dirchar{}
-\Rubycall{call }
 \Echooff{@echo off}
 \Remark{Rem }
 

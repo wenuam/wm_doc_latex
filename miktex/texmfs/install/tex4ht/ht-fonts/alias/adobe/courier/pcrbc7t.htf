@@ -91,7 +91,7 @@ pcrbc7t 0 170
 'Y' '' Y 89
 'Z' '' Z 90
 '[' '' bracketleft 91
-'\' '' backslash 92
+'&#x005C;' '' backslash 92
 ']' '' bracketright 93
 '&#x02C6;' '' circumflex 94
 '_' '' underscore 95

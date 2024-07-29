@@ -1,5 +1,5 @@
-% ooffice-mml.4ht (2021-12-09-13:21), generated from tex4ht-ooffice.tex
-% Copyright 2009-2021 TeX Users Group
+% ooffice-mml.4ht (2023-01-19-13:31), generated from tex4ht-ooffice.tex
+% Copyright 2009-2023 TeX Users Group
 % Copyright 2001-2009 Maarten Wisse, James Naughton, Eitan M. Gurari
 %
 % This work may be distributed and/or modified under the
@@ -17,7 +17,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2021-12-09-13:21}
+\immediate\write-1{version 2023-01-19-13:31}
 
   \exit:ifnot{Preamble,% 
 amsmath,% 
@@ -112,7 +112,7 @@ tex4ht}
 <!-- \jobname-m\math:obj
 \space
      by TeX4ht from \jobname.tex line \the\inputlineno\space
-     2021-12-09-13:21\Hnewline
+     2023-01-19-13:31\Hnewline
      (http://www.cse.ohio-state.edu/\string ~gurari/TeX4ht/)
       -->\Hnewline
 }%
@@ -213,8 +213,8 @@ tex4ht}
                 style:horizontal-pos="center"
                 style:horizontal-rel="paragraph-content"
                 fo:background-color="transparent"
-                style:background-transparency="100\%"
-                fo:margin-left="5\%"
+                style:background-transparency="100\prcnt:ch"
+                fo:margin-left="5\prcnt:ch"
       >
       </style:graphic-properties>
     </style:style>\Hnewline
@@ -403,7 +403,7 @@ tex4ht}
 <style:style style:name="equation"
              style:family="table">\Hnewline
      <\style:tableproperties
-                 style:rel-width="88\%"
+                 style:rel-width="88\prcnt:ch"
                  fo:margin-left="1cm"
                  fo:margin-right="0cm"
                  fo:margin-top="0.3cm"
@@ -461,8 +461,6 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 
 
@@ -636,6 +634,11 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 
 
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{array}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -760,6 +763,11 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
 
 
 
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 \ConfigureHinput{rlbabel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,6 +787,30 @@ accent="true">&\#x0332;</\a:mathml mo></\a:mathml munder>}%
   
 \endinput\empty\empty\empty\empty\empty\empty
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

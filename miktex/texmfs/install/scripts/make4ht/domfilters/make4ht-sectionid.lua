@@ -58,7 +58,9 @@ local escape_name = function(name)
   --- convert table with normalized characters to string
   local name = table.concat(result)
   -- remove spaces
-  return name:gsub("%s+", "-")
+  name = name:gsub("%s+", "-")
+  name = name:gsub("^%-", "")
+  return name
 end
 
 local function parse_toc_line(line)
@@ -78,6 +80,9 @@ local function parse_toc(filename)
   if not mkutils.file_exists(filename) then return nil, "Cannot open TOC file "  .. filename end
   for line in io.lines(filename) do
     local id, name = parse_toc_line(line)
+    -- if section name doesn't contain any text, it would lead to id which contains only number
+    -- this is invalid in HTML
+    if name == "" then name = "_" end
     local orig_name = name
     -- not all lines in the .4tc file contains TOC entries
     if id then
@@ -109,10 +114,20 @@ local function set_id(el, id)
 end
 
     
+-- we want to remove <a id="xxx"> elements from some elements, most notably <figure>
+local elements_to_remove = {
+  figure = true,
+  figcaption
+}
+
+local function remove_a(el, parent, id)
+  parent:set_attribute("id", id)
+  el:remove_node()
+end
 
 return  function(dom, par)
     local msg
-    toc, msg = toc or parse_toc(par.input .. ".4tc")
+    toc, msg = toc or parse_toc(mkutils.file_in_builddir(par.input .. ".4tc", par))
     msg = msg or "Cannot load TOC"
     -- don't do anyting if toc cannot be found
     if not toc then 
@@ -135,8 +150,16 @@ return  function(dom, par)
       local id, href = el:get_attribute("id"), el:get_attribute("href") 
       if id then
         local name = toc[id]
+        local parent = el:get_parent()
+        -- remove unnecessary <a> elements if the parent doesn't have id yet
+        if elements_to_remove[parent:get_element_name()] 
+          and not parent:get_attribute("id") 
+          and el:get_element_name() == "a"
+        then
+          remove_a(el, parent, id)
+          set_id(el, name)
         -- replace id with new section id
-        if name and not toc_ids[name] then
+        elseif name and not toc_ids[name] then
           set_id(el, name)
         else
           if name then

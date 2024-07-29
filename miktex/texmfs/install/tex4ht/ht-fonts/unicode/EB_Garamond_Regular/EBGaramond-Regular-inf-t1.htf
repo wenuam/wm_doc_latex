@@ -91,7 +91,7 @@ EBGaramond-Regular-inf-t1 0 255
 'Y' '' Y.sinf 89
 'Z' '' Z.sinf 90
 '[' '' bracketleft.sinf 91
-'\' '' backslash.sinf 92
+'&#x005C;' '' backslash.sinf 92
 ']' '' bracketright.sinf 93
 '^' '' asciicircum.sinf 94
 '&#xde;' '' underscore.sinf 95

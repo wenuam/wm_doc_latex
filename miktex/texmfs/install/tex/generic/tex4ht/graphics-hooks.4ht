@@ -1,5 +1,5 @@
-% graphics-hooks.4ht (2020-10-17-13:53), generated from tex4ht-4ht.tex
-% Copyright 2020 TeX Users Group
+% graphics-hooks.4ht (2022-08-17-14:25), generated from tex4ht-4ht.tex
+% Copyright 2020-2022 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,9 +16,16 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2020-10-17-13:53}
+\immediate\write-1{version 2022-08-17-14:25}
 
 \ifdefined\XeTeXversion
   \PassOptionsToPackage{dvips}{graphics}
 \fi
+\ifdefined\recall:sup
+\recall:sup
+\:AtEndOfPackage{
+  \early:sup
+}
+\fi
+
 

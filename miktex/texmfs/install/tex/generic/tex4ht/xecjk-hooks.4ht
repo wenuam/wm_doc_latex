@@ -1,5 +1,5 @@
-% xecjk-hooks.4ht (2020-10-17-13:53), generated from tex4ht-4ht.tex
-% Copyright 2020 TeX Users Group
+% xecjk-hooks.4ht (2023-06-11-08:01), generated from tex4ht-4ht.tex
+% Copyright 2020-2023 TeX Users Group
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either
@@ -16,7 +16,7 @@
 %
 % If you modify this program, changing the
 % version identification would be appreciated.
-\immediate\write-1{version 2020-10-17-13:53}
+\immediate\write-1{version 2023-06-11-08:01}
 
 \:dontusepackage{xeCJK}
 \:AtEndOfPackage{%
@@ -32,6 +32,8 @@
 \DeclareDocumentCommand\xeCJKsetup{m}{}
 % }
 \AtBeginDocument{%
-  \xeuniuseblock{CJK}
+  \ifdefined\xeuniuseblock%
+  \xeuniuseblock{CJK}%
+  \fi%
 }
 

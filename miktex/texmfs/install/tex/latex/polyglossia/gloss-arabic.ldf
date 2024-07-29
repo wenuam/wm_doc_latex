@@ -1,4 +1,4 @@
-% Language definition file (part of polyglossia v1.60 -- 2023/02/11)
+% Language definition file (part of polyglossia v2.2 -- 2024/07/15)
 %
 \ProvidesFile{gloss-arabic.ldf}[polyglossia: module for Arabic]
 \RequireBidi
@@ -7,6 +7,9 @@
 
 \PolyglossiaSetup{arabic}{
   bcp47=ar,
+  bcp47-language=ar,
+  bcp47-script=Arab,
+  bcp47-region=YE,
   script=Arabic,
   direction=RL,
   langtag=ARA,
@@ -35,62 +38,112 @@
 \setlanguagealias*[locale=default]{arabic}{apd}
 \setlanguagealias*[locale=mashriq]{arabic}{ar-PS}
 
-\define@boolkey{arabic}[arabic@]{abjadalph}[true]{}
-
 \newif\ifeastern@numerals
-\def\tmp@mashriq{mashriq}
-\def\tmp@maghrib{maghrib}
-\define@key{arabic}{numerals}[mashriq]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@mashriq%
-    \eastern@numeralstrue%
-  \else
-    \ifx\@tmpa\tmp@maghrib\eastern@numeralsfalse\fi%
-  \fi}
-
-%this is needed for \abjad in arabicnumbers.sty
-\def\tmp@true{true}
-\define@key{arabic}{abjadjimnotail}[true]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@true\abjad@jim@notailtrue%
-  \else
-    \abjad@jim@notailfalse
-  \fi}
-
-\def\tmp@morocco{morocco}
-\def\tmp@algeria{algeria}
-\define@key{arabic}{locale}[default]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@morocco%
-    \eastern@numeralsfalse%
-    \SetLanguageKeys{arabic}{bcp47=ary}%
-  \else
-    \ifx\@tmpa\tmp@algeria%
-      \eastern@numeralsfalse%
-      \SetLanguageKeys{arabic}{bcp47=arq}%
-    \fi%
-  \fi%
-  \gdef\@@arabic@month{\@arabic@month{#1}}}
-
 \newif\if@hijrical
-\def\tmp@hijri{hijri}
-\def\tmp@islamic{islamic}
-\define@key{arabic}{calendar}[gregorian]{%
-  \def\@tmpa{#1}%
-  \ifx\@tmpa\tmp@hijri\@hijricaltrue%
-  \else
-    \ifx\@tmpa\tmp@islamic\@hijricaltrue%
-    \else\@hijricalfalse%
-    \fi
-  \fi}
+\newif\ifarabic@customsep\arabic@customsepfalse
 
-\define@key{arabic}{hijricorrection}[0]{%
-  \gdef\@hijri@correction{#1}}%
+\DeclareKeys[polyglossia/gloss/arabic]
+  {
+    hijricorrection.code = \gdef\arabic@hijri@correction{#1},
+    hijricorrection.default:n = 0,
+    sectionsep.code = \gdef\xpg@sepmark{#1}\arabic@customseptrue,
+    sectionsep.default:n = .,
+    abjadalph.if = arabic@abjadalph,
+    abjadalph.default:n = true,
+    abjadjimnotail.if = abjad@jim@notail,
+    abjadjimnotail.default:n = true,
+    numerals.choice:,
+    numerals / mashriq.code =
+      {%
+        \eastern@numeralstrue
+      },
+    numerals / maghrib.code =
+      {%
+        \eastern@numeralsfalse
+      },
+    numerals / eastern.code =
+      {%
+        \eastern@numeralstrue
+      },
+    numerals / western.code =
+      {%
+        \eastern@numeralsfalse
+      },
+    numerals.default:n = mashriq,
+    numerals/unknown.code = \xpg@warning{Unknown Arabic numerals option `#1'},
+    locale.choice:,
+    locale / default.code =
+      {%
+        \eastern@numeralstrue
+        \def\abjad@one{ا}%
+        \SetLanguageKeys{arabic}{bcp47=ar-YE,bcp47-language=ar}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / mashriq.code =
+      {%
+        \eastern@numeralstrue
+        \def\abjad@one{ا}%
+        \SetLanguageKeys{arabic}{bcp47=ar-IQ,bcp47-language=ar}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / libya.code =
+      {%
+        \eastern@numeralstrue
+        \def\abjad@one{ا}%
+        \SetLanguageKeys{arabic}{bcp47=ayl,bcp47-language=ar,bcp47-region=LY}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / algeria.code =
+      {%
+        \eastern@numeralsfalse
+        \def\abjad@one{أ}%
+        \SetLanguageKeys{arabic}{bcp47=arq,bcp47-language=ar,bcp47-region=DZ,bcp47-extension-u=nu-latn}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / tunisia.code =
+      {%
+        \eastern@numeralsfalse
+        \def\abjad@one{أ}%
+        \SetLanguageKeys{arabic}{bcp47=aeb,bcp47-language=ar,bcp47-region=TN,bcp47-extension-u=nu-latn}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / morocco.code =
+      {%
+        \eastern@numeralsfalse
+        \def\abjad@one{أ}%
+        \SetLanguageKeys{arabic}{bcp47=ary,bcp47-language=ar,bcp47-region=MA,bcp47-extension-u=nu-latn}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale / mauritania.code =
+      {%
+        \eastern@numeralstrue
+        \def\abjad@one{ا}%
+        \SetLanguageKeys{arabic}{bcp47=ar-MR,bcp47-language=ar,bcp47-region=MR}%
+        \gdef\@@arabic@month{\@arabic@month{#1}}%
+      },
+    locale.default:n = default,
+    locale/unknown.code = \xpg@warning{Unknown Arabic locale `#1'},
+    calendar.choice:,
+    calendar / gregorian.code =
+      {%
+        \@hijricalfalse
+      },
+    calendar / hijri.code =
+      {%
+        \@hijricaltrue
+      },
+    calendar / islamic.code =
+      {%
+        \@hijricaltrue
+      },
+    calendar.default:n = gregorian,
+    calendar/unknown.code = \xpg@warning{Unknown Arabic calendar option `#1'}
+  }
 
 % Register default options
-\xpg@initialize@gloss@options{arabic}{locale=default,calendar=gregorian,numerals=mashriq,hijricorrection=0,abjadjimnotail=false}
+\InitializeGlossOptions{arabic}{locale=default,calendar=gregorian,numerals=mashriq,hijricorrection=0,abjadjimnotail=false}
 % Register alias options
-\xpg@set@alias@values{arabic}{calendar}{islamic}{hijri}
+\SetLanguageAliasValues{arabic}{calendar}{islamic,hijri}
 
 \def\arabicgregmonth@default#1{\ifcase#1%
   % Egypt, Sudan, Yemen and Golf states
@@ -110,9 +163,12 @@
 \def\arabicgregmonth@mauritania#1{\ifcase#1%
   \or يناير\or فبراير\or مارس\or إبريل\or مايو\or يونيو\or يوليو\or أغشت\or شتمبر\or أكتوبر\or نوفمبر\or دجمبر\fi}
 
-\def\@arabic@month#1{\ifcsdef{arabicgregmonth@#1}{\expandafter\csname arabicgregmonth@#1\endcsname}%
-{\xpg@warning{Option `locale=#1' is not defined for Arabic: using `default' instead}%
-\arabicgregmonth@default}}
+\def\@arabic@month#1{%
+  \@ifundefined{arabicgregmonth@#1}%
+     {\xpg@warning{Option `locale=#1' is not defined for Arabic: using `default' instead}%
+      \arabicgregmonth@default}%
+     {\expandafter\csname arabicgregmonth@#1\endcsname}%
+}
 
 %\Hijritoday is now locale-aware and will format the date with this macro:
 \DefineFormatHijriDate{arabic}{\@ensure@RTL{\arabicnumber{\value{Hijriday}}%
@@ -144,18 +200,18 @@
 }
 \def\datearabic{%
  \def\today{%
-  \if@hijrical%
-    \Hijritoday[\@hijri@correction]%
+  \if@hijrical
+    \Hijritoday[\arabic@hijri@correction]%
   \else%
-    \if@RTL%
+    \if@RTL
        \arabicnumber\day\space\@@arabic@month{\month}%
         \space\arabicnumber\year%
     \else% in LR environment we format the gregorian date within \textenglish
-       \ifcsdef{english@loaded}{\textenglish{\today}}%else US format
-       {\normalfontlatin\ifcase\month\or January\or February\or March\or April\or May\or June\or%
-       July\or August\or September\or October\or November\or December\fi%
+       \iflanguageloaded{english}{\textenglish{\today}}%else US format
+       {\normalfontlatin\ifcase\month\or January\or February\or March\or April\or May\or June\or
+       July\or August\or September\or October\or November\or December\fi
        \space\number\day,\space\number\year}%
-    \fi%
+    \fi
  \fi}}
 
 % Use \providecommand here as the ldf file might
@@ -164,7 +220,7 @@
 
 \def\arabicnumber#1{%
   \ifeastern@numerals
-    \@ensure@dir{\arabicdigits{\number#1}}%
+    \@ensure@LTR{\arabicdigits{\number#1}}%
   \else
     \number#1%
   \fi}
@@ -181,9 +237,8 @@
    \or ح\or ط\or ي\or ك\or ل\or م\or ن%
    \or س\or ع\or ف\or ص\or ق\or ر\or ش%
    \or ت\or ث\or خ\or ذ\or ض\or ظ\or غ%
-   \else\xpg@ill@value{#1}{arabic@abjad@alph}\fi%
+   \else\xpg@ill@value{#1}{arabic@abjad@alph}\fi
 }
-
 
 \def\abjadmaghribi#1{%
 \ifnum#1>1999\xpg@ill@value{#1}{abjad}%
@@ -207,56 +262,131 @@
 
 %maghribi س -> ص ص -> ض ش -> س ض -> ظ ظ -> غ غ -> ش
 \def\abj@maghribi@num@ii#1{%
-  \ifcase#1\or ي\or ك\or ل\or م\or ن%
+  \ifcase#1\abjad@zero\or ي\or ك\or ل\or م\or ن%
            \or ص\or ع\or ف\or ض\fi
-  \ifnum#1=\z@\abjad@zero\fi\abj@num@i}
+  \abj@num@i}
 \def\abj@maghribi@num@iii#1{%
   \ifcase#1\or ق\or ر\or س\or ت\or ث%
            \or خ\or ذ\or ظ\or غ\fi
-  \ifnum#1=\z@\fi\abj@maghribi@num@ii}
+  \abj@maghribi@num@ii}
 \def\abj@maghribi@num@iv#1{%
   \ifcase#1\or ش\fi
-  \ifnum#1=\z@\fi\abj@maghribi@num@iii}
+  \abj@maghribi@num@iii}
 
 \def\arabic@numbers{%
  \ifarabic@abjadalph
-   \let\@alph\abjadalph%
-   \let\@Alph\abjadalph%
+   \let\@alph\abjadalph
+   \let\@Alph\abjadalph
  \else
-   \let\@alph\abjad%
-   \let\@Alph\abjad%
+   \let\@alph\abjad
+   \let\@Alph\abjad
  \fi
 }
 
 \def\noarabic@numbers{%
-  \let\@alph\latin@alph%
-  \let\@Alph\latin@Alph%
+  \let\@alph\latin@alph
+  \let\@Alph\latin@Alph
 }
 
 % Store original definition
 \let\xpg@save@arabic\@arabic
 
 \def\arabic@globalnumbers{%
-  \let\@arabic\arabicnumber%
+  \let\@arabic\arabicnumber
   \renewcommand\thefootnote{\localnumeral*{footnote}}%
   \renewcommand\theequation{\localnumeral*{equation}}%
 }
 
 \def\noarabic@globalnumbers{%
-   \let\@arabic\xpg@save@arabic%
+   \let\@arabic\xpg@save@arabic
 }
 
-% Save original \MakeUppercase definition
-\let\xpg@save@MakeUppercase\MakeUppercase
+\def\arabic@xetex@capsformat{%
+  \let\xpg@save@sepmark\@SepMark
+  \SepMark{\xpg@sepmark}
+}
+
+\def\noarabic@xetex@capsformat{%
+   \ifcsname xpg@save@sepmark\endcsname
+     \SepMark{\xpg@save@sepmark}
+   \fi
+}
+
+\def\arabic@luatex@capsformat{%
+  %
+  % change chapter and part headings
+  \ifarabic@customsep
+     \ifcsname chapter\endcsname
+        \let\xpg@save@thesection\thesection
+        \renewcommand*\thesection{\thechapter\xpg@sepmark\@arabic\c@section}
+        \let\xpg@save@theequation\theequation
+        \renewcommand*\theequation{%
+	    \ifnum \c@chapter>\z@ \thechapter\xpg@sepmark\fi\@arabic\c@equation}
+        \let\xpg@save@thefigure\thefigure
+	\renewcommand*\thefigure{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@figure}
+        \let\xpg@save@thetable\thetable
+	\renewcommand*\thetable{%
+	    \ifnum\c@chapter>\z@\thechapter\xpg@sepmark\fi\@arabic\c@table}
+     \fi
+     \let\xpg@save@thesubsection\thesubsection
+     \renewcommand\thesubsection
+	{\thesection\xpg@sepmark\@arabic\c@subsection}
+     \let\xpg@save@thesubsubsection\thesubsubsection
+     \renewcommand\thesubsubsection{\thesubsection\xpg@sepmark\@arabic\c@subsubsection}
+     \let\xpg@save@theparagraph\theparagraph
+     \renewcommand\theparagraph
+         {\thesubsubsection\xpg@sepmark\@arabic\c@paragraph}
+     \let\xpg@save@thesubparagraph\thesubparagraph
+     \renewcommand\thesubparagraph{\theparagraph\xpg@sepmark\@arabic\c@subparagraph}
+  \fi % (end \ifarabic@customsep)
+}
+
+\def\noarabic@luatex@capsformat{%
+   \ifcsname xpg@save@thesection\endcsname
+        \let\thesection\xpg@save@thesection
+   \fi
+   \ifcsname xpg@save@theequation\endcsname
+        \let\theequation\xpg@save@theequation
+   \fi
+   \ifcsname xpg@save@thefigure\endcsname
+        \let\thefigure\xpg@save@thefigure
+   \fi
+   \ifcsname xpg@save@thetable\endcsname
+        \let\thetable\xpg@save@thetable
+   \fi
+   \ifcsname xpg@save@thesubsection\endcsname
+        \let\thesubsection\xpg@save@thesubsection
+      \ifcsname xpg@save@thesubsubsection\endcsname
+        \let\thesubsubsection\xpg@save@thesubsubsection
+      \fi
+   \fi
+   \ifcsname xpg@save@theparagraph\endcsname
+        \let\theparagraph\xpg@save@theparagraph
+   \fi
+   \ifcsname xpg@save@thesubparagraph\endcsname
+        \let\thesubparagraph\xpg@save@thesubparagraph
+   \fi
+}
 
 \def\blockextras@arabic{%
-   \def\MakeUppercase##1{##1}%
-   % TODO disable \@Roman and \@roman ?
+   \ifarabic@customsep
+      \ifxetex
+        \arabic@xetex@capsformat
+      \else
+        \arabic@luatex@capsformat
+      \fi   
+   \fi
 }
 
 \def\noextras@arabic{%
-   % restore original \MakeUppercase definition
-   \let\MakeUppercase\xpg@save@MakeUppercase
+    \ifarabic@customsep
+      \ifxetex
+        \noarabic@xetex@capsformat
+      \else
+        \noarabic@luatex@capsformat
+      \fi   
+   \fi
 }
 
 \endinput

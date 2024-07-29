@@ -80,7 +80,7 @@ local parse_idx = function(content)
     elseif line:match("^\\indexentry") then
       -- replace the page number with the current
       -- index entry number
-      local result = line:gsub("{[0-9]+}$", "{"..current_entry .."}")
+      local result = line:gsub("%b{}$", "{"..current_entry .."}")
       buffer[#buffer+1] = get_utf8(result)
     else
       buffer[#buffer+1] = line
@@ -150,7 +150,7 @@ local get_idxname = function(par)
 end
 
 local prepare_tmp_idx = function(par)
-  par.idxfile = get_idxname(par)
+  par.idxfile = mkutils.file_in_builddir(get_idxname(par), par)
   if not par.idxfile or not mkutils.file_exists(par.idxfile) then return nil, "Cannot load idx file " .. (par.idxfile or "''") end
   -- construct the .ind name, based on the .idx name
   par.indfile = par.indfile or par.idxfile:gsub("idx$", "ind")
