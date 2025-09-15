@@ -45,9 +45,13 @@ class Use(ShapeElement):
         return ret
 
     def get_path(self):
-        """Returns the path of the cloned href plus any transformation"""
+        """Returns the path of the cloned href plus any transformation
+
+        .. versionchanged:: 1.3
+            include transform of the referenced element
+        """
         path = self.href.path
-        path.transform(self.href.transform)
+        path = path.transform(self.href.transform)
         return path
 
     def effective_style(self):
@@ -69,13 +73,18 @@ class Use(ShapeElement):
             self.to_dimensionless(self.get("y", 0)),
         )
         copy.style = self.style + copy.style
+        # Preserve the id of the clone to not break links that link the <use>
+        # As we replace exactly one element by exactly one, this should be safe.
+        old_id = self.get_id()
         self.replace_with(copy)
         copy.set_random_ids()
+        copy.set_id(old_id)
         return copy
 
     def shape_box(self, transform=None):
         """BoundingBox of the unclipped shape
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         effective_transform = Transform(transform) @ self.transform
         return self.href.bounding_box(effective_transform)

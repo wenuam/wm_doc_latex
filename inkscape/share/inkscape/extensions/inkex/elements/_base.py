@@ -25,22 +25,28 @@ Provide extra utility to each svg element type specific to its type.
 This is useful for having a common interface for each element which can
 give path, transform, and property access easily.
 """
+
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Tuple, Optional, overload, TypeVar, List
+from typing import Any, Tuple, Optional, overload, TypeVar, List, Callable
 from lxml import etree
+import re
 
 from ..interfaces.IElement import IBaseElement, ISVGDocumentElement
 
 from ..base import SvgOutputMixin
 from ..paths import Path
-from ..styles import Style, Classes
+from ..styles import Style, Classes, StyleValue
 from ..transforms import Transform, BoundingBox
 from ..utils import FragmentError
 from ..units import convert_unit, render_unit, parse_unit
 from ._utils import ChildToProperty, NSS, addNS, removeNS, splitNS
-from ..properties import BaseStyleValue, all_properties
+from ..properties import (
+    _ShorthandValueConverter,
+    _get_tokens_from_value,
+    all_properties,
+)
 from ._selected import ElementList
 from ._parser import NodeBasedLookup, SVG_PARSER
 
@@ -63,7 +69,8 @@ class BaseElement(IBaseElement):
         """Hook to do more restrictive check in addition to (ns,tag) match
 
         .. versionadded:: 1.2
-            The function has been made public."""
+            The function has been made public.
+        """
         return True
 
     tag_name = ""
@@ -110,25 +117,34 @@ class BaseElement(IBaseElement):
 
     typename = property(lambda self: type(self).__name__)
     """Type name of the element"""
+
     xml_path = property(lambda self: self.getroottree().getpath(self))
     """XPath representation of the element in its tree
-    
-    .. versionadded:: 1.1"""
+
+    .. versionadded:: 1.1
+    """
+
     desc = ChildToProperty("svg:desc", prepend=True)
     """The element's long-form description (for accessibility purposes)
-    
-    .. versionadded:: 1.1"""
+
+    .. versionadded:: 1.1
+    """
+
     title = ChildToProperty("svg:title", prepend=True)
     """The element's short-form description (for accessibility purposes)
-    
-    .. versionadded:: 1.1"""
+
+    .. versionadded:: 1.1
+    """
+
+    _root: Optional[ISVGDocumentElement] = None
 
     def __getattr__(self, name):
         """Get the attribute, but load it if it is not available yet"""
         if name in self.wrapped_props:
             (attr, cls) = self.wrapped_props[name]
+
             # The reason we do this here and not in _init is because lxml
-            # is inconsistant about when elements are initialised.
+            # is inconsistent about when elements are initialized.
             # So we make this a lazy property.
             def _set_attr(new_item):
                 if new_item:
@@ -137,9 +153,7 @@ class BaseElement(IBaseElement):
                     self.attrib.pop(attr, None)  # pylint: disable=no-member
 
             # pylint: disable=no-member
-            value = cls(self.attrib.get(attr, None), callback=_set_attr)
-            if name == "style":
-                value.element = self
+            value = cls(self.attrib.get(attr, None), callback=_set_attr, element=self)
             setattr(self, name, value)
             return value
         raise AttributeError(f"Can't find attribute {self.typename}.{name}")
@@ -148,7 +162,7 @@ class BaseElement(IBaseElement):
         """Set the attribute, update it if needed"""
         if name in self.wrapped_props:
             (attr, cls) = self.wrapped_props[name]
-            # Don't call self.set or self.get (infinate loop)
+            # Don't call self.set or self.get (infinite loop)
             if value:
                 if not isinstance(value, cls):
                     value = cls(value)
@@ -165,12 +179,22 @@ class BaseElement(IBaseElement):
             value = getattr(self, prop, None)
             # We check the boolean nature of the value, because empty
             # transformations and style attributes are equiv to not-existing
-            ret = str(value) if value else (default or None)
+            ret = str(value) if value else default
             return ret
         return super().get(addNS(attr), default)
 
     def set(self, attr, value):
         """Set element attribute named, with addNS support"""
+        if attr == "id" and value is not None:
+            try:
+                oldid = self.get("id", None)
+                if oldid is not None and oldid in self.root.ids:
+                    self.root.ids.pop(oldid)
+                if value in self.root.ids:
+                    raise ValueError(f"ID {value} already exists in this document")
+                self.root.ids[value] = self
+            except FragmentError:  # element is unrooted
+                pass
         if attr in self.wrapped_attrs:
             # Always keep the local wrapped class up to date.
             (prop, cls) = self.wrapped_attrs[attr]
@@ -211,12 +235,10 @@ class BaseElement(IBaseElement):
     @overload
     def add(
         self, child1: BaseElement, child2: BaseElement, *children: BaseElement
-    ) -> Tuple[BaseElement]:
-        ...
+    ) -> Tuple[BaseElement]: ...
 
     @overload
-    def add(self, child: T) -> T:
-        ...
+    def add(self, child: T) -> T: ...
 
     def add(self, *children):
         """
@@ -229,8 +251,8 @@ class BaseElement(IBaseElement):
 
     def tostring(self):
         """Return this element as it would appear in an svg document"""
-        # This kind of hack is pure maddness, but etree provides very little
-        # in the way of fragment printing, prefering to always output valid xml
+        # This kind of hack is pure madness, but etree provides very little
+        # in the way of fragment printing, preferring to always output valid xml
 
         svg = SvgOutputMixin.get_template(width=0, height=0).getroot()
         svg.append(self.copy())
@@ -246,6 +268,7 @@ class BaseElement(IBaseElement):
         """Sets the id attribute if it is not already set.
 
         The id consists of a prefix and an appended random integer of length size.
+
         Args:
             prefix (str, optional): the prefix of the new ID. Defaults to the tag name.
             size (Optional[int], optional): number of digits of the second part of the
@@ -278,6 +301,7 @@ class BaseElement(IBaseElement):
         """Same as set_random_id, but will apply also to children
 
         The id consists of a prefix and an appended random integer of length size.
+
         Args:
             prefix (str, optional): the prefix of the new ID. Defaults to the tag name.
             levels (int, optional): the depth of the tree traversion, if negative, no
@@ -342,14 +366,19 @@ class BaseElement(IBaseElement):
                 elem.style.update_urls(old_id, new_id)
 
     @property
-    def root(self):
+    def root(self) -> ISVGDocumentElement:
         """Get the root document element from any element descendent"""
+        if self._root is not None:
+            return self._root
+
         root, parent = self, self
         while parent is not None:
             root, parent = parent, parent.getparent()
 
         if not isinstance(root, ISVGDocumentElement):
             raise FragmentError("Element fragment does not have a document root!")
+
+        self._root = root
         return root
 
     def get_or_create(self, xpath, nodeclass=None, prepend=False):
@@ -357,7 +386,8 @@ class BaseElement(IBaseElement):
 
         .. versionchanged:: 1.1
             The ``nodeclass`` attribute is optional; if not given, it is looked up
-            using :func:`~inkex.elements._parser.NodeBasedLookup.find_class`"""
+            using :func:`~inkex.elements._parser.NodeBasedLookup.find_class`
+        """
         node = self.findone(xpath)
         if node is None:
             if nodeclass is None:
@@ -405,7 +435,10 @@ class BaseElement(IBaseElement):
             ElementList: list of ancestors
         """
 
-        return ElementList(self.root, self._ancestors(elem=elem, stop_at=stop_at))
+        try:
+            return ElementList(self.root, self._ancestors(elem=elem, stop_at=stop_at))
+        except FragmentError:
+            return ElementList(self, self._ancestors(elem=elem, stop_at=stop_at))
 
     def _ancestors(self, elem, stop_at):
         if isinstance(elem, BaseElement):
@@ -434,9 +467,7 @@ class BaseElement(IBaseElement):
         """Wrap xpath call and add svg namespaces"""
         return super().xpath(pattern, namespaces=namespaces)
 
-    def findall(
-        self, pattern, namespaces=NSS
-    ):  # pylint: disable=dangerous-default-value
+    def findall(self, pattern, namespaces=NSS):  # pylint: disable=dangerous-default-value
         """Wrap findall call and add svg namespaces"""
         return super().findall(pattern, namespaces=namespaces)
 
@@ -453,7 +484,8 @@ class BaseElement(IBaseElement):
     def remove_all(self, *types):
         """Remove all children or child types
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         types = tuple(NodeBasedLookup.find_class(t) for t in types)
         for child in self:
             if not types or isinstance(child, types):
@@ -461,12 +493,12 @@ class BaseElement(IBaseElement):
 
     def replace_with(self, elem):
         """Replace this element with the given element"""
-        self.addnext(elem)
+        self.getparent().replace(self, elem)
+
         if not elem.get("id") and self.get("id"):
             elem.set("id", self.get("id"))
         if not elem.label and self.label:
             elem.label = self.label
-        self.delete()
         return elem
 
     def copy(self):
@@ -480,16 +512,17 @@ class BaseElement(IBaseElement):
         duplicate.
 
         .. versionchanged:: 1.2
-            A random id is also set on all the duplicate's descendants"""
+            A random id is also set on all the duplicate's descendants
+        """
         elem = self.copy()
         self.addnext(elem)
         elem.set_random_ids()
         return elem
 
     def __str__(self):
-        # We would do more here, but lxml is VERY unpleseant when it comes to
+        # We would do more here, but lxml is VERY unpleasant when it comes to
         # namespaces, basically over printing details and providing no
-        # supression mechanisms to turn off xml's over engineering.
+        # suppression mechanisms to turn off xml's over engineering.
         return str(self.tag).split("}", maxsplit=1)[-1]
 
     @property
@@ -497,8 +530,9 @@ class BaseElement(IBaseElement):
         """Returns the referred-to element if available
 
         .. versionchanged:: 1.1
-            A setter for href was added."""
-        ref = self.get("xlink:href")
+            A setter for href was added.
+        """
+        ref = self.get("href") or self.get("xlink:href")
         if not ref:
             return None
         return self.root.getElementById(ref.strip("#"))
@@ -508,7 +542,10 @@ class BaseElement(IBaseElement):
         """Set the href object"""
         if isinstance(elem, BaseElement):
             elem = elem.get_id()
-        self.set("xlink:href", "#" + elem)
+        if self.get("href"):
+            self.set("href", "#" + elem)
+        else:
+            self.set("xlink:href", "#" + elem)
 
     @property
     def label(self):
@@ -521,15 +558,17 @@ class BaseElement(IBaseElement):
         self.set("inkscape:label", str(value))
 
     def is_sensitive(self):
-        """Return true if this element is sensitive in inkscape
+        """Return true if this element is sensitive in Inkscape
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return self.get("sodipodi:insensitive", None) != "true"
 
     def set_sensitive(self, sensitive=True):
         """Set the sensitivity of the element/layer
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         # Sensitive requires None instead of 'false'
         self.set("sodipodi:insensitive", ["true", None][sensitive])
 
@@ -537,7 +576,8 @@ class BaseElement(IBaseElement):
     def unit(self):
         """Return the unit being used by the owning document, cached
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         try:
             return self.root.unit
         except FragmentError:
@@ -547,14 +587,16 @@ class BaseElement(IBaseElement):
     def to_dimensional(value, to_unit="px"):
         """Convert a value given in user units (px) the given unit type
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return convert_unit(value, to_unit)
 
     @staticmethod
     def to_dimensionless(value):
         """Convert a length value into user units (px)
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return convert_unit(value, "px")
 
     def uutounit(self, value, to_unit="px"):
@@ -562,7 +604,8 @@ class BaseElement(IBaseElement):
         "Document" units are assumed. "Document units" are an Inkscape-specific concept.
         For most use-cases, :func:`to_dimensional` is more appropriate.
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return convert_unit(value, to_unit, default=self.unit)
 
     def unittouu(self, value):
@@ -572,14 +615,16 @@ class BaseElement(IBaseElement):
         :func:`to_dimensionless` (when the equivalent value without unit is needed) is
         more appropriate.
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return convert_unit(value, self.unit)
 
     def unit_to_viewport(self, value, unit="px"):
         """Converts a length value to viewport units, as defined by the width/height
         element on the root (i.e. applies the equivalent transform of the viewport)
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.to_dimensional(
             self.to_dimensionless(value) * self.root.equivalent_transform_scale, unit
         )
@@ -588,7 +633,8 @@ class BaseElement(IBaseElement):
         """Converts a length given on the viewport to the specified unit in the user
         coordinate system
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.to_dimensional(
             self.to_dimensionless(value) / self.root.equivalent_transform_scale, unit
         )
@@ -596,7 +642,8 @@ class BaseElement(IBaseElement):
     def add_unit(self, value):
         """Add document unit when no unit is specified in the string.
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return render_unit(value, self.unit)
 
     def cascaded_style(self):
@@ -625,16 +672,34 @@ class BaseElement(IBaseElement):
         """
         return Style.specified_style(self)
 
+    def get_computed_style(self, key):
+        """Returns the computed style value with respect to an element, i.e. the
+        cascaded style + inheritance, see
+        https://www.w3.org/TR/CSS22/cascade.html#computed-value.
+
+        This is more efficient if only few style values per element are queried. If
+        many attributes are queried, use :func:`specified_style`.
+
+        .. versionadded:: 1.4
+        """
+        return Style._get_style(key, self)
+
     def presentation_style(self):
         """Return presentation attributes of an element as style
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         style = Style()
         for key in self.keys():
-            if key in all_properties and all_properties[key][2]:
-                style[key] = BaseStyleValue.factory(
-                    declaration=key + ": " + self.attrib[key]
+            if (
+                key in all_properties
+                # Shorthands cannot be set by presentation attributes
+                and not isinstance(
+                    all_properties[key].converter, _ShorthandValueConverter
                 )
+                and all_properties[key].presentation
+            ):
+                style[key] = StyleValue(_get_tokens_from_value(self.attrib[key]))
         return style
 
     def composed_transform(self, other=None):
@@ -642,9 +707,92 @@ class BaseElement(IBaseElement):
         if none specified the transform is to the root document element
         """
         parent = self.getparent()
-        if parent is not None and isinstance(parent, BaseElement):
-            return parent.composed_transform() @ self.transform
+        if parent is not other and isinstance(parent, BaseElement):
+            return parent.composed_transform(other) @ self.transform
         return self.transform
+
+    def _add_to_tree_callback(self, element):
+        try:
+            element._root = self._root
+            self.root.add_to_tree_callback(element)
+        except (FragmentError, AttributeError):
+            pass
+
+    @staticmethod
+    def _remove_from_tree_callback(oldtree, element):
+        try:
+            oldtree.root.remove_from_tree_callback(element)
+        except (FragmentError, AttributeError):
+            pass
+
+    def __element_adder(
+        self, element: BaseElement, add_func: Callable[[BaseElement], None]
+    ):
+        BaseElement._remove_from_tree_callback(element, element)
+        # Make sure that we have an ID cache before adding the element,
+        # otherwise we will try to add this element twice to the cache
+        try:
+            self.root.ids
+        except FragmentError:
+            pass
+        try:
+            add_func(element)
+        except Exception as err:
+            BaseElement._add_to_tree_callback(element, element)
+            raise err
+        self._add_to_tree_callback(element)
+
+    # Overrides to keep track of styles and IDs
+    def addnext(self, element):
+        self.__element_adder(element, super(etree.ElementBase, self).addnext)
+
+    def addprevious(self, element):
+        self.__element_adder(element, super(etree.ElementBase, self).addprevious)
+
+    def append(self, element):
+        self.__element_adder(element, super(etree.ElementBase, self).append)
+
+    def clear(self, keep_tail=False):
+        subelements = iter(self)
+        old_id = self.get("id", None)
+        super().clear(keep_tail)
+        for element in subelements:
+            BaseElement._remove_from_tree_callback(self, element)
+        if old_id is not None and old_id in self.root.ids:
+            self.root.ids.pop(old_id)
+
+    def extend(self, elements):
+        for element in elements:
+            BaseElement._remove_from_tree_callback(element, element)
+        try:
+            self.root.ids
+        except FragmentError:
+            pass
+        try:
+            super().extend(elements)
+        except Exception as err:
+            for element in elements:
+                BaseElement._add_to_tree_callback(element, element)
+            raise err
+        for element in elements:
+            self._add_to_tree_callback(element)
+
+    def insert(self, index, element):
+        self.__element_adder(
+            element,
+            lambda element: super(etree.ElementBase, self).insert(index, element),
+        )
+
+    def remove(self, element):
+        super().remove(element)
+        BaseElement._remove_from_tree_callback(self, element)
+
+    def replace(self, old_element, new_element):
+        def replacer(new_element):
+            super(etree.ElementBase, self).replace(old_element, new_element)
+            BaseElement._remove_from_tree_callback(self, old_element)
+
+        self.__element_adder(new_element, replacer)
 
 
 NodeBasedLookup.default = BaseElement
@@ -654,9 +802,9 @@ class ShapeElement(BaseElement):
     """Elements which have a visible representation on the canvas"""
 
     @property
-    def path(self):
+    def path(self) -> Path:
         """Gets the outline or path of the element, this may be a simple bounding box"""
-        return Path(self.get_path())
+        return self.get_path()
 
     @path.setter
     def path(self, path):
@@ -664,13 +812,11 @@ class ShapeElement(BaseElement):
 
     @property
     def clip(self):
-        """Gets the clip path element (if any)
+        """Gets the clip path element (if any). May be set through CSS.
 
-        .. versionadded:: 1.1"""
-        ref = self.get("clip-path")
-        if not ref:
-            return None
-        return self.root.getElementById(ref)
+        .. versionadded:: 1.1
+        """
+        return self.get_computed_style("clip-path")
 
     @clip.setter
     def clip(self, elem):
@@ -707,7 +853,8 @@ class ShapeElement(BaseElement):
         """BoundingBox of the shape
 
         .. versionchanged:: 1.1
-            result adjusted for element's clip path if applicable."""
+            result adjusted for element's clip path if applicable.
+        """
         shape_box = self.shape_box(transform)
         clip = self.clip
         if clip is None or shape_box is None:
@@ -720,7 +867,8 @@ class ShapeElement(BaseElement):
 
         .. versionadded:: 1.1
             Previous :func:`bounding_box` function, returning the bounding box
-            without computing the effect of a possible clip."""
+            without computing the effect of a possible clip.
+        """
         path = self.path.to_absolute()
         if transform is True:
             path = path.transform(self.composed_transform())
@@ -731,19 +879,51 @@ class ShapeElement(BaseElement):
         return path.bounding_box()
 
     def is_visible(self):
-        """Returns false if the css says this object is invisible
+        """Returns false if this object is invisible
 
-        .. versionadded:: 1.1"""
-        if self.style.get("display", "") == "none":
-            return False
-        if not float(self.style.get("opacity", 1.0)):
-            return False
+        .. versionchanged:: 1.3
+            rely on cascaded_style() to include CSS and presentation attributes
+            include `visibility` attribute with check for inherit
+            include ancestors
+
+        .. versionadded:: 1.1
+        """
+        return self._is_visible()
+
+    def _is_visible(self, inherit_visibility=True):
+        # iterate over self and ancestors
+        # This does not use :func:`get_computed_style` but its own iteration
+        # logic to avoid duplicate evaluation of styles: a child is also invisible
+        # if the parent has opacity:0, but opacity is not inherited - so we need
+        # to check the specified style of all parents and ignore inheritance
+        # altogether
+        for element in [self] + list(self.ancestors()):
+            get_style = element.cascaded_style().get
+            # case display:none
+            if get_style("display", "inline") == "none":
+                return False
+            # case opacity:0
+            if not float(get_style("opacity", 1.0)):
+                return False
+            # only check if child's visibility is inherited
+            if inherit_visibility:
+                # case visibility:hidden
+                if get_style("visibility", "inherit") in (
+                    "hidden",
+                    "collapse",
+                ):
+                    return False
+                # case visibility: not inherit
+                elif get_style("visibility", "inherit") != "inherit":
+                    inherit_visibility = False
+
         return True
 
     def get_line_height_uu(self):
         """Returns the specified value of line-height, in user units
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         style = self.specified_style()
         font_size = style("font-size")  # already in uu
         line_height = style("line-height")
@@ -753,3 +933,23 @@ class ShapeElement(BaseElement):
         if parsed[1] == "%":
             return font_size * parsed[0] * 0.01
         return self.to_dimensionless(line_height)
+
+
+class ViewboxMixin:
+    """Mixin for elements with viewboxes, such as <svg>, <marker>"""
+
+    def parse_viewbox(self, vbox: Optional[str]) -> Optional[List[float]]:
+        """Parses a viewbox. If an error occurs during parsing,
+        (0, 0, 0, 0) is returned. If the viewbox is None, None is returned.
+
+        .. versionadded:: 1.3
+        """
+        if vbox is not None and isinstance(vbox, str):
+            try:
+                result = [float(unit) for unit in re.split(r",\s*|\s+", vbox)]
+            except ValueError:
+                result = []
+            if len(result) != 4:
+                result = [0, 0, 0, 0]
+            return result
+        return None

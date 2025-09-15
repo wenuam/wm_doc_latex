@@ -74,9 +74,7 @@ class ManualVerbosity:
         self.okay = okay
         self.dots = dots
 
-    def flip(
-        self, exc_type=None, exc_val=None, exc_tb=None
-    ):  # pylint: disable=unused-argument
+    def flip(self, exc_type=None, exc_val=None, exc_tb=None):  # pylint: disable=unused-argument
         """Swap the stored verbosity with the original"""
         self.okay, self.result.showAll = self.result.showAll, self.okay
         self.dots, self.result.dots = self.result.dots, self.okay
@@ -92,10 +90,12 @@ class MockMixin:
 
     Mocks are stored in an array attached to the test class (not instance!) which
     ensures that mocks can only ever be setUp once and can never be reset over
-    themselves. (just in case this looks weird at first glance)
+    themselves. (just in case this looks weird at first glance):
 
-    class SomeTest(MockingMixin, TestBase):
-        mocks = [(sys, 'exit', NoSystemExit("Nope!")]
+    .. code-block:: python
+
+        class SomeTest(MockingMixin, TestBase):
+            mocks = [(sys, 'exit', NoSystemExit("Nope!")]
     """
 
     mocks = []  # type: List[Tuple[Any, str, Any]]
@@ -200,7 +200,9 @@ class MockCommandMixin(MockMixin):
 
         try:
             for fdir in self.recorded_tempdirs:
+                data = replace(data, fdir + os.sep, "./")
                 data = replace(data, fdir, ".")
+                files = replace(files, fdir + os.sep, "./")
                 files = replace(files, fdir, ".")
             for fname in files:
                 data = replace(data, fname, os.path.basename(fname))
@@ -224,10 +226,12 @@ class MockCommandMixin(MockMixin):
 
         return ret
 
-    def ignore_command_mock(self, program, arglst):
+    def ignore_command_mock(self, program, arglst, path):
         """Return true if the mock is ignored"""
         if self and program and arglst:
-            return os.environ.get("NO_MOCK_COMMANDS")
+            env = os.environ.get("NO_MOCK_COMMANDS", 0)
+            if (not os.path.exists(path) and int(env) == 1) or int(env) == 2:
+                return True
         return False
 
     def mock_call(self, program, *args, **kwargs):
@@ -274,7 +278,9 @@ class MockCommandMixin(MockMixin):
         # Generate a unique key for this call based on _all_ it's inputs
         key = hashlib.md5(keystr.encode("utf-8")).hexdigest()
 
-        if self.ignore_command_mock(program, arglst):
+        if self.ignore_command_mock(
+            program, arglst, self.get_call_filename(program, key, create=True)
+        ):
             # Call original code. This is so programmers can run the test suite
             # against the external programs too, to see how their fair.
             if stdin is not None:
@@ -320,7 +326,7 @@ class MockCommandMixin(MockMixin):
             else:
                 values.append(str(arg))
 
-        for (_, value) in loargs:
+        for _, value in loargs:
             if isinstance(value, (tuple, list)):
                 for val in value:
                     if val is not True:
@@ -393,9 +399,7 @@ class MockCommandMixin(MockMixin):
         return command_dir
 
     def load_call(self, program, key, files):
-        """
-        Load the given call
-        """
+        """Load the given call"""
         fname = self.get_call_filename(program, key, create=False)
         with open(fname, "rb") as fhl:
             msg = EmailParser().parsestr(fhl.read().decode("utf-8"))
@@ -422,13 +426,12 @@ class MockCommandMixin(MockMixin):
 
         return stdout
 
-    def save_call(
-        self, program, key, stdout, files, msg, ext="output"
-    ):  # pylint: disable=too-many-arguments
-        """
-        Saves the results from the call into a debug output file, the resulting files
-        should be a Mime msg file format with each attachment being one of the input
-        files as well as any stdin and arguments used in the call.
+    def save_call(self, program, key, stdout, files, msg, ext="output"):  # pylint: disable=too-many-arguments
+        """Saves the results from the call into a debug output file.
+
+        The resulting files should be a Mime msg file format with each
+        attachment being one of the input files as well as any stdin and
+        arguments used in the call.
         """
         if stdout is not None and stdout.strip():
             # The stdout is counted as the msg body here
@@ -442,10 +445,12 @@ class MockCommandMixin(MockMixin):
                 part = MIMEText("Missing File", "plain", "utf-8")
                 part.add_header("Filename", os.path.basename(fname))
                 msg.attach(part)
-
         fname = self.get_call_filename(program, key, create=True) + "." + ext
+
         with open(fname, "wb") as fhl:
             fhl.write(msg.as_string().encode("utf-8"))
+        if int(os.environ.get("NO_MOCK_COMMANDS", 0)) == 1:
+            print(f"Saved mock call as {fname}, remove .{ext}")
 
     def save_key(self, program, key, keystr, ext="key"):
         """Save the key file if we are debugging the key data"""

@@ -22,18 +22,22 @@
 """
 Element interface for patterns, filters, gradients and path effects.
 """
+
 from __future__ import annotations
 from typing import List, Tuple, TYPE_CHECKING, Optional
 
 from lxml import etree
 
-from ..transforms import Transform
 from ..utils import parse_percent
+
+from ..transforms import Transform
 
 from ..styles import Style
 
 from ._utils import addNS
-from ._base import BaseElement
+from ._base import BaseElement, ViewboxMixin
+from ._groups import GroupBase
+from ..units import convert_unit
 
 
 if TYPE_CHECKING:
@@ -89,10 +93,55 @@ class Filter(BaseElement):
 
         tag_name = "feDisplacementMap"
 
+    class DistantLight(Primitive):
+        """DistanceLight Filter element
+        defines a light source for a DiffuseLighting or SpecularLighting Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feDistantLight"
+
     class Flood(Primitive):
         """DiffuseLightning Filter element"""
 
         tag_name = "feFlood"
+
+    class FuncA(Primitive):
+        """FuncR Filter element
+        defines the alpha channel transfer for a ComponentTransfer Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feFuncA"
+
+    class FuncB(Primitive):
+        """FuncR Filter element
+        defines the blue channel transfer for a ComponentTransfer Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feFuncB"
+
+    class FuncG(Primitive):
+        """FuncR Filter element
+        defines the green channel transfer for a ComponentTransfer Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feFuncG"
+
+    class FuncR(Primitive):
+        """FuncR Filter element
+        defines the red channel transfer for a ComponentTransfer Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feFuncR"
 
     class GaussianBlur(Primitive):
         """GaussianBlur Filter element"""
@@ -109,6 +158,15 @@ class Filter(BaseElement):
 
         tag_name = "feMerge"
 
+    class MergeNode(Primitive):
+        """MergeNode Filter element
+        defines an input for a Merge Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feMergeNode"
+
     class Morphology(Primitive):
         """Morphology Filter element"""
 
@@ -119,10 +177,28 @@ class Filter(BaseElement):
 
         tag_name = "feOffset"
 
+    class PointLight(Primitive):
+        """PointLight Filter elements
+        defines a light source for a DiffuseLighting or SpecularLighting Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "fePointLight"
+
     class SpecularLighting(Primitive):
         """SpecularLighting Filter element"""
 
         tag_name = "feSpecularLighting"
+
+    class SpotLight(Primitive):
+        """SpotLight Filter element
+        defines a light source for a DiffuseLighting or SpecularLighting Filter element
+
+        .. versionadded:: 1.4
+        """
+
+        tag_name = "feSpotLight"
 
     class Tile(Primitive):
         """Tile Filter element"""
@@ -138,14 +214,16 @@ class Filter(BaseElement):
 class Stop(BaseElement):
     """Gradient stop
 
-    .. versionadded:: 1.1"""
+    .. versionadded:: 1.1
+    """
 
     tag_name = "stop"
 
     @property
     def offset(self) -> float:
         """The offset of the gradient stop"""
-        return self.get("offset")
+        value = self.get("offset", default="0")
+        return parse_percent(value)
 
     @offset.setter
     def offset(self, number):
@@ -158,18 +236,78 @@ class Stop(BaseElement):
         return StopInterpolator(self, other).interpolate(fraction)
 
 
-class Pattern(BaseElement):
+class Pattern(BaseElement, ViewboxMixin):
     """Pattern element which is used in the def to control repeating fills"""
 
     tag_name = "pattern"
     WRAPPED_ATTRS = BaseElement.WRAPPED_ATTRS + (("patternTransform", Transform),)
+
+    def get_fallback(self, prop, default="0"):
+        val = self.get(prop, None)
+        if val is None:
+            if isinstance(self.href, Pattern):
+                return getattr(self.href, prop)
+            val = default
+        return val
+
+    x = property(lambda self: self.get_fallback("x"))
+    y = property(lambda self: self.get_fallback("y"))
+    width = property(lambda self: self.get_fallback("width"))
+    height = property(lambda self: self.get_fallback("height"))
+    patternUnits = property(
+        lambda self: self.get_fallback("patternUnits", "objectBoundingBox")
+    )
+
+    def get_viewbox(self) -> Optional[List[float]]:
+        """Get the viewbox of the pattern, falling back to the href's viewbox
+
+        .. versionadded:: 1.3
+        """
+        vbox = self.get("viewBox", None)
+        if vbox is None:
+            if isinstance(self.href, Pattern):
+                return self.href.get_viewbox()
+        return self.parse_viewbox(vbox)
+
+    def get_effective_parent(self, depth=0, maxDepth=10):
+        """If a pattern has no children, but a href, it uses the children from the href.
+        Avoids infinite recursion.
+
+        .. versionadded:: 1.3
+        """
+        if (
+            len(self) == 0
+            and self.href is not None
+            and isinstance(self.href, Pattern)
+            and depth < maxDepth
+        ):
+            return self.href.get_effective_parent(depth + 1, maxDepth)
+        return self
+
+
+class Mask(GroupBase):
+    """A structural object that serves as opacity mask
+
+    .. versionadded:: 1.3
+    """
+
+    tag_name = "mask"
+
+    def get_fallback(self, prop, default="0"):
+        return self.to_dimensionless(self.get(prop, default))
+
+    x = property(lambda self: self.get_fallback("x"))
+    y = property(lambda self: self.get_fallback("y"))
+    width = property(lambda self: self.get_fallback("width"))
+    height = property(lambda self: self.get_fallback("height"))
+    maskUnits = property(lambda self: self.get("maskUnits", "objectBoundingBox"))
 
 
 class Gradient(BaseElement):
     """A gradient instruction usually in the defs."""
 
     WRAPPED_ATTRS = BaseElement.WRAPPED_ATTRS + (("gradientTransform", Transform),)
-    """Additional to the :attr:`~inkex.elements._base.BaseElement.WRAPPED_ATTRS` of 
+    """Additional to the :attr:`~inkex.elements._base.BaseElement.WRAPPED_ATTRS` of
     :class:`~inkex.elements._base.BaseElement`, ``gradientTransform`` is wrapped."""
 
     orientation_attributes = ()  # type: Tuple[str, ...]
@@ -181,36 +319,37 @@ class Gradient(BaseElement):
     def stops(self):
         """Return an ordered list of own or linked stop nodes
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         gradcolor = (
             self.href
             if isinstance(self.href, (LinearGradient, RadialGradient))
             else self
         )
-        return sorted(
-            [child for child in gradcolor if isinstance(child, Stop)],
-            key=lambda x: parse_percent(x.offset),
-        )
+        return [child for child in gradcolor if isinstance(child, Stop)]
 
     @property
     def stop_offsets(self):
         # type: () -> List[float]
         """Return a list of own or linked stop offsets
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return [child.offset for child in self.stops]
 
     @property
     def stop_styles(self):  # type: () -> List[Style]
         """Return a list of own or linked offset styles
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         return [child.style for child in self.stops]
 
     def remove_orientation(self):
         """Remove all orientation attributes from this element
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         for attr in self.orientation_attributes:
             self.pop(attr)
 
@@ -222,7 +361,8 @@ class Gradient(BaseElement):
     ):
         """Interpolate with another gradient.
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         from ..tween import GradientInterpolator
 
         return GradientInterpolator(self, other, svg).interpolate(fraction)
@@ -230,12 +370,51 @@ class Gradient(BaseElement):
     def stops_and_orientation(self):
         """Return a copy of all the stops in this gradient
 
-        .. versionadded:: 1.1"""
+        .. versionadded:: 1.1
+        """
         stops = self.copy()
         stops.remove_orientation()
         orientation = self.copy()
         orientation.remove_all(Stop)
         return stops, orientation
+
+    def get_percentage_parsed_unit(self, attribute, value, svg=None):
+        """Parses an attribute of a gradient, respecting percentage values of
+        "userSpaceOnUse" as percentages of document size. See
+        https://www.w3.org/TR/SVG2/pservers.html#LinearGradientAttributes for details
+
+        .. versionadded:: 1.3
+        """
+        if isinstance(value, (float, int)):
+            return value
+        value = value.strip()
+        if len(value) > 0 and value[-1] == "%":
+            try:
+                value = float(value.strip()[0:-1]) / 100.0
+                gradientunits = self.get("gradientUnits", "objectBoundingBox")
+                if gradientunits == "userSpaceOnUse":
+                    if svg is None:
+                        raise ValueError("Need root SVG to determine percentage value")
+                    bbox = svg.get_page_bbox()
+                    if attribute in ("cx", "fx", "x1", "x2"):
+                        return bbox.width * value
+                    if attribute in ("cy", "fy", "y1", "y2"):
+                        return bbox.height * value
+                    if attribute in ("r"):
+                        return bbox.diagonal_length * value
+                if gradientunits == "objectBoundingBox":
+                    return value
+            except ValueError:
+                value = None
+        return convert_unit(value, "px")
+
+    def _get_or_href(self, attr, default, svg=None):
+        val = self.get(attr)
+        if val is None:
+            if type(self.href) is type(self):
+                return getattr(self.href, attr)()
+            val = default
+        return self.get_percentage_parsed_unit(attr, val, svg)
 
 
 class LinearGradient(Gradient):
@@ -268,6 +447,34 @@ class LinearGradient(Gradient):
             x2=self.to_dimensionless(p2t[0]),
             y2=self.to_dimensionless(p2t[1]),
         )
+
+    def x1(self, svg=None):
+        """Get the x1 attribute
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("x1", "0%", svg)
+
+    def x2(self, svg=None):
+        """Get the x2 attribute
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("x2", "100%", svg)
+
+    def y1(self, svg=None):
+        """Get the y1 attribute
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("y1", "0%", svg)
+
+    def y2(self, svg=None):
+        """Get the y2 attribute
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("y2", "0%", svg)
 
 
 class RadialGradient(Gradient):
@@ -302,6 +509,41 @@ class RadialGradient(Gradient):
             fy=self.to_dimensionless(p2t[1]),
         )
 
+    def cx(self, svg=None):
+        """Get the effective cx (horizontal center) attribute in user units
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("cx", "50%", svg)
+
+    def cy(self, svg=None):
+        """Get the effective cy (vertical center) attribute in user units
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("cy", "50%", svg)
+
+    def fx(self, svg=None):
+        """Get the effective fx (horizontal focal point) attribute in user units
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("fx", self.cx(svg), svg)
+
+    def fy(self, svg=None):
+        """Get the effective fx (vertical focal point) attribute in user units
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("fy", self.cy(svg), svg)
+
+    def r(self, svg=None):
+        """Get the effective r (gradient radius) attribute in user units
+
+        .. versionadded:: 1.3
+        """
+        return self._get_or_href("r", "50%", svg)
+
 
 class PathEffect(BaseElement):
     """Inkscape LPE element"""
@@ -312,7 +554,8 @@ class PathEffect(BaseElement):
 class MeshGradient(Gradient):
     """Usable MeshGradient XML base class
 
-    .. versionadded:: 1.1"""
+    .. versionadded:: 1.1
+    """
 
     tag_name = "meshgradient"
 
@@ -340,7 +583,8 @@ class MeshGradient(Gradient):
 class MeshRow(BaseElement):
     """Each row of a mesh gradient
 
-    .. versionadded:: 1.1"""
+    .. versionadded:: 1.1
+    """
 
     tag_name = "meshrow"
 
@@ -348,7 +592,8 @@ class MeshRow(BaseElement):
 class MeshPatch(BaseElement):
     """Each column or 'patch' in a mesh gradient
 
-    .. versionadded:: 1.1"""
+    .. versionadded:: 1.1
+    """
 
     tag_name = "meshpatch"
 

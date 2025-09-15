@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 #
 # Copyright (c) 2009 Bryan Hoyt (MIT License)
@@ -132,7 +132,7 @@ class PixelSnap(inkex.EffectExtension):
             "--max_gradient",
             type=float,
             default=0.5,
-            help="Maximum slope to consider straight (%)",
+            help="Maximum slope to consider straight (%%)",
         )
         pars.add_argument(
             "-s",
@@ -246,7 +246,6 @@ class PixelSnap(inkex.EffectExtension):
             return [x, y]
 
     def snap_path_scale(self, elem, parent_transform=None):
-
         path = elem.original_path.to_arrays()
         transform = elem.transform @ Transform(parent_transform)
         bbox = elem.bounding_box()

@@ -27,29 +27,31 @@ Provide a way to load lxml attributes with an svg API on top.
 
 import random
 import math
-import re
+from functools import cached_property
 
 from lxml import etree
 
-from ..css import ConditionalRule
 from ..interfaces.IElement import ISVGDocumentElement
 
 from ..deprecated.meta import DeprecatedSvgMixin, deprecate
 from ..units import discover_unit, parse_unit
 from ._selected import ElementList
 from ..transforms import BoundingBox
-from ..styles import StyleSheets
+from ..styles import StyleSheets, ConditionalStyle
 
-from ._base import BaseElement
-from ._meta import StyleElement
+from ._base import BaseElement, ViewboxMixin
+from ._meta import StyleElement, NamedView
+from ._utils import registerNS, addNS, splitNS
 
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 if False:  # pylint: disable=using-constant-test
     import typing  # pylint: disable=unused-import
 
 
-class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
+class SvgDocumentElement(
+    DeprecatedSvgMixin, ISVGDocumentElement, BaseElement, ViewboxMixin
+):
     """Provide access to the document level svg functionality"""
 
     # pylint: disable=too-many-public-methods
@@ -62,7 +64,24 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         self.current_layer = None
         self.view_center = (0.0, 0.0)
         self.selection = ElementList(self)
-        self.ids = {}
+
+    @cached_property
+    def ids(self):
+        result = {}
+        for el in self.iter():
+            try:
+                id = super(etree.ElementBase, el).get("id", None)
+                if id is not None:
+                    result[id] = el
+
+                el._root = self
+            except TypeError:
+                pass  # Comments
+        return result
+
+    @cached_property
+    def stylesheet_cache(self):
+        return {node: node.stylesheet() for node in self.xpath("//svg:style")}
 
     def tostring(self):
         """Convert document to string"""
@@ -70,9 +89,7 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
 
     def get_ids(self):
         """Returns a set of unique document ids"""
-        if not self.ids:
-            self.ids = set(self.xpath("//@id"))
-        return self.ids
+        return self.ids.keys()
 
     def get_unique_id(
         self,
@@ -108,22 +125,39 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         ids = self.get_ids()
         if size is None:
             size = max(math.ceil(math.log10(len(ids) or 1000)) + 1, 4)
-        if blacklist is not None:
-            ids.update(blacklist)
         new_id = None
         _from = 10**size - 1
         _to = 10**size
-        while new_id is None or new_id in ids:
+        while (
+            new_id is None
+            or new_id in ids
+            or (blacklist is not None and new_id in blacklist)
+        ):
             # Do not use randint because py2/3 incompatibility
             new_id = prefix + str(int(random.random() * _from - _to) + _to)
-        self.ids.add(new_id)
         return new_id
 
-    def get_page_bbox(self):
-        """Gets the page dimensions as a bbox"""
-        return BoundingBox(
-            (0, float(self.viewbox_width)), (0, float(self.viewbox_height))
-        )
+    def get_page_bbox(self, page=None) -> BoundingBox:
+        """Gets the page dimensions as a bbox. For single-page documents, the viewbox
+        dimensions are returned.
+
+        Args:
+            page (int, optional): Page number. Defaults to the first page.
+
+                .. versionadded:: 1.3
+
+        Raises:
+            IndexError: if the page number provided does not exist in the document.
+
+        Returns:
+            BoundingBox: the bounding box of the page
+        """
+        if page is None:
+            page = 0
+        pages = self.namedview.get_pages()
+        if 0 <= page < len(pages):
+            return pages[page].bounding_box
+        raise IndexError("Invalid page number")
 
     def get_current_layer(self):
         """Returns the currently selected layer"""
@@ -132,13 +166,41 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
             return self
         return layer
 
+    def add_namespace(self, prefix, url):
+        """Adds an xml namespace to the xml parser with the desired prefix.
+
+        If the prefix or url are already in use with different values, this
+        function will raise an error. Remove any attributes or elements using
+        this namespace before calling this function in order to rename it.
+
+        .. versionadded:: 1.3
+        """
+        if self.nsmap.get(prefix, None) == url:
+            registerNS(prefix, url)
+            return
+
+        # Attempt to clean any existing namespaces
+        if prefix in self.nsmap or url in self.nsmap.values():
+            nskeep = [k for k, v in self.nsmap.items() if k != prefix and v != url]
+            etree.cleanup_namespaces(self, keep_ns_prefixes=nskeep)
+            if prefix in self.nsmap:
+                raise KeyError("ns prefix already used with a different url")
+            if url in self.nsmap.values():
+                raise ValueError("ns url already used with a different prefix")
+
+        # These are globals, but both will overwrite previous uses.
+        registerNS(prefix, url)
+        etree.register_namespace(prefix, url)
+
+        # Set and unset an attribute to add the namespace to this root element.
+        self.set(f"{prefix}:temp", "1")
+        self.set(f"{prefix}:temp", None)
+
     def getElement(self, xpath):  # pylint: disable=invalid-name
         """Gets a single element from the given xpath or returns None"""
         return self.findone(xpath)
 
-    def getElementById(
-        self, eid: str, elm="*", literal=False
-    ):  # pylint: disable=invalid-name
+    def getElementById(self, eid: str, elm="*", literal=False):  # pylint: disable=invalid-name
         """Get an element in this svg document by it's ID attribute.
 
         Args:
@@ -156,7 +218,15 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         if eid is not None and not literal:
             eid = eid.strip()[4:-1] if eid.startswith("url(") else eid
             eid = eid.lstrip("#")
-        return self.getElement(f'//{elm}[@id="{eid}"]')
+
+        result = self.ids.get(eid, None)
+        if result is not None:
+            if elm != "*":
+                elm_with_ns = addNS(*splitNS(elm)[::-1])
+                if not super(etree.ElementBase, result).tag == elm_with_ns:
+                    return None
+            return result
+        return None
 
     def getElementByName(self, name, elm="*"):  # pylint: disable=invalid-name
         """Get an element by it's inkscape:label (aka name)"""
@@ -164,27 +234,27 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
 
     def getElementsByClass(self, class_name):  # pylint: disable=invalid-name
         """Get elements by it's class name"""
+        return ConditionalStyle(f".{class_name}").all_matches(self)
 
-        return self.xpath(ConditionalRule(f".{class_name}").to_xpath())
-
-    def getElementsByHref(
-        self, eid: str, attribute="xlink:href"
-    ):  # pylint: disable=invalid-name
+    def getElementsByHref(self, eid: str, attribute="href"):  # pylint: disable=invalid-name
         """Get elements that reference the element with id eid.
 
         Args:
             eid (str): _description_
             attribute (str, optional): Attribute to look for.
-                Valid choices: "xlink:href", "mask", "clip-path".
-                Defaults to "xlink:href".
+                Valid choices: "href", "xlink:href", "mask", "clip-path".
+                Defaults to "href".
 
                 .. versionadded:: 1.2
+
+            attribute set to "href" or "xlink:href" handles both cases.
+                .. versionchanged:: 1.3
 
         Returns:
             Any: list of elements
         """
-        if attribute == "xlink:href":
-            return self.xpath(f'//*[@xlink:href="#{eid}"]')
+        if attribute == "href" or attribute == "xlink:href":
+            return self.xpath(f'//*[@href|@xlink:href="#{eid}"]')
         elif attribute == "mask":
             return self.xpath(f'//*[@mask="url(#{eid})"]')
         elif attribute == "clip-path":
@@ -203,7 +273,7 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         return self.get("sodipodi:docname", "")
 
     @property
-    def namedview(self):
+    def namedview(self) -> NamedView:
         """Return the sp namedview meta information element"""
         return self.get_or_create("//sodipodi:namedview", prepend=True)
 
@@ -217,17 +287,9 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         """Return the svg defs meta element container"""
         return self.get_or_create("//svg:defs", prepend=True)
 
-    def get_viewbox(self):
+    def get_viewbox(self) -> List[float]:
         """Parse and return the document's viewBox attribute"""
-        try:
-            ret = [
-                float(unit) for unit in re.split(r",\s*|\s+", self.get("viewBox", "0"))
-            ]
-        except ValueError:
-            ret = ""
-        if len(ret) != 4:
-            return [0, 0, 0, 0]
-        return ret
+        return self.parse_viewbox(self.get("viewBox", "0")) or [0, 0, 0, 0]
 
     @property
     def viewbox_width(self) -> float:  # getDocumentWidth(self):
@@ -237,7 +299,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         the value of the width attribute is returned. If the height is not defined,
         returns 0.
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.get_viewbox()[2] or self.viewport_width
 
     @property
@@ -246,7 +309,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         <https://www.w3.org/TR/SVG2/coords.html#Introduction>`_ in user units, i.e. the
         width attribute of the svg element converted to px
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.to_dimensionless(self.get("width")) or self.get_viewbox()[2]
 
     @property
@@ -257,7 +321,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         value of the height attribute is returned. If the height is not defined,
         returns 0.
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.get_viewbox()[3] or self.viewport_height
 
     @property
@@ -266,7 +331,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         <https://www.w3.org/TR/SVG2/coords.html#Introduction>`_ in user units, i.e. the
         height attribute of the svg element converted to px
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.to_dimensionless(self.get("height")) or self.get_viewbox()[3]
 
     @property
@@ -276,7 +342,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         .. versionchanged:: 1.2
             Previously, the scale as shown by the document properties was computed,
             but the computation of this in core Inkscape changed in Inkscape 1.2, so
-            this was moved to :attr:`inkscape_scale`."""
+            this was moved to :attr:`inkscape_scale`.
+        """
         return self._base_scale()
 
     @property
@@ -285,7 +352,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         page width, which is displayed as "scale" in the Inkscape document
         properties.
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
 
         viewbox_unit = (
             parse_unit(self.get("width")) or parse_unit(self.get("height")) or (0, "px")
@@ -295,7 +363,8 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
     def _base_scale(self, unit="px"):
         """Returns what Inkscape shows as "user units per `unit`"
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         try:
             scale_x = (
                 self.to_dimensional(self.viewport_width, unit) / self.viewbox_width
@@ -314,16 +383,19 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         https://www.w3.org/TR/SVG2/coords.html#ComputingAViewportsTransform
         (highly simplified)
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.scale
 
     @property
     def unit(self):
         """Returns the unit used for in the SVG document.
+
         In the case the SVG document lacks an attribute that explicitly
         defines what units are used for SVG coordinates, it tries to calculate
         the unit from the SVG width and viewBox attributes.
-        Defaults to 'px' units."""
+        Defaults to 'px' units.
+        """
         if not hasattr(self, "_unit"):
             self._unit = "px"  # Default is px
             viewbox = self.get_viewbox()
@@ -335,15 +407,16 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
     def document_unit(self):
         """Returns the display unit (Inkscape-specific attribute) of the document
 
-        .. versionadded:: 1.2"""
+        .. versionadded:: 1.2
+        """
         return self.namedview.get("inkscape:document-units", "px")
 
     @property
     def stylesheets(self):
         """Get all the stylesheets, bound together to one, (for reading)"""
-        sheets = StyleSheets(self)
-        for node in self.xpath("//svg:style"):
-            sheets.append(node.stylesheet())
+        sheets = StyleSheets()
+        for value in self.stylesheet_cache.values():
+            sheets.append(value)
         return sheets
 
     @property
@@ -355,6 +428,56 @@ class SvgDocumentElement(DeprecatedSvgMixin, ISVGDocumentElement, BaseElement):
         style_node = StyleElement()
         self.defs.append(style_node)
         return style_node.stylesheet()
+
+    def add_to_tree_callback(self, element):
+        """Callback called automatically when adding an element to the tree.
+        Updates the list of stylesheets and the ID tracker with the subtree of element.
+
+        .. versionadded:: 1.4
+
+        Args:
+            element (BaseElement): element added to the tree.
+        """
+
+        for el in element.iter():
+            self._add_individual_to_tree(el)
+
+    def _add_individual_to_tree(self, element: BaseElement):
+        if isinstance(element, etree._Comment):
+            return
+        element._root = self
+        if element.TAG == "style":
+            self.stylesheet_cache[element] = element.stylesheet()
+        new_id = element.get("id", None)
+        if new_id is not None:
+            if new_id in self.ids:
+                while new_id in self.ids:
+                    new_id += "-1"
+                super(etree.ElementBase, element).set("id", new_id)  # type: ignore
+            self.ids[new_id] = element
+
+    def remove_from_tree_callback(self, element):
+        """Callback called automatically when removing an element from the tree.
+        Remove elements in the subtree of element from the the list of stylesheets
+        and the ID tracker.
+
+        .. versionadded:: 1.4
+
+        Args:
+            element (BaseElement): element added to the tree.
+        """
+        for el in element.iter():
+            self._remove_individual_from_tree(el)
+
+    def _remove_individual_from_tree(self, element):
+        if isinstance(element, etree._Comment):
+            return
+        element._root = None
+        if element.TAG == "style" and element in self.stylesheet_cache:
+            self.stylesheet_cache.remove(element)
+        old_id = element.get("id", None)
+        if old_id is not None and old_id in self.ids:
+            self.ids.pop(old_id)
 
 
 def width(self):

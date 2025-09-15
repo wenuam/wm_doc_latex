@@ -59,7 +59,6 @@ class ElementList(OrderedDict):
         return super().__contains__(self._to_key(key))
 
     def __setitem__(self, orig_key, elem):
-
         if orig_key != elem and orig_key != elem.get("id"):
             raise ValueError(f"Refusing to set bad key in ElementList {orig_key}")
         if isinstance(elem, str):
@@ -79,12 +78,10 @@ class ElementList(OrderedDict):
             raise ValueError(f"Unknown element type: {kind}")
 
     @overload
-    def _to_key(self, key: None, default: Any) -> Any:
-        ...
+    def _to_key(self, key: None, default: Any) -> Any: ...
 
     @overload
-    def _to_key(self, key: Union[int, IBaseElement, str], default: Any) -> str:
-        ...
+    def _to_key(self, key: Union[int, IBaseElement, str], default: Any) -> str: ...
 
     def _to_key(self, key, default=None) -> str:
         """Takes a key (id, element, etc) and returns an xml_path key"""
@@ -114,9 +111,11 @@ class ElementList(OrderedDict):
 
         All element objects must have an id to be correctly set.
 
-        >>> selection.set("rect123", "path456", "text789")
-        >>> selection.set(elem1, elem2, elem3)
-        >>> selection.set("//rect")
+        .. code-block:: python
+
+            selection.set("rect123", "path456", "text789")
+            selection.set(elem1, elem2, elem3)
+            selection.set("//rect")
         """
         self.clear()
         self.add(*ids)
@@ -141,7 +140,8 @@ class ElementList(OrderedDict):
         top
 
         .. versionadded:: 1.2
-            :func:`paint_order` has been renamed to :func:`rendering_order`"""
+            :func:`paint_order` has been renamed to :func:`rendering_order`
+        """
         new_list = ElementList(self.svg)
         # the elements are stored with their xpath index, so a natural sort order
         # '3' < '20' < '100' has to be applied
@@ -218,8 +218,8 @@ class ElementList(OrderedDict):
         return {eid: self[xid] for eid, xid in self.ids.items()}
 
     def bounding_box(self):
-        """
-        Gets a :class:`inkex.transforms.BoundingBox` object for the selected items.
+        """Gets a :class:`inkex.transforms.BoundingBox` object for the
+        selected items.
 
         Text objects have a bounding box without width or height that only
         reflects the coordinate of their anchor. If a text object is a part of

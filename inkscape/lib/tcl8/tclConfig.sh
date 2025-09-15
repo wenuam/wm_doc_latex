@@ -15,7 +15,7 @@ TCL_DLL_FILE="tcl86.dll"
 TCL_VERSION='8.6'
 TCL_MAJOR_VERSION='8'
 TCL_MINOR_VERSION='6'
-TCL_PATCH_LEVEL='.12'
+TCL_PATCH_LEVEL='.13'
 
 # C compiler to use for compilation.
 TCL_CC='gcc'
@@ -55,11 +55,11 @@ TCL_LIBS='-lnetapi32 -lkernel32 -luser32 -ladvapi32 -luserenv -lws2_32'
 
 # Top-level directory in which Tcl's platform-independent files are
 # installed.
-TCL_PREFIX='/mingw64'
+TCL_PREFIX='/ucrt64'
 
 # Top-level directory in which Tcl's platform-specific files (e.g.
 # executables) are installed.
-TCL_EXEC_PREFIX='/mingw64'
+TCL_EXEC_PREFIX='/ucrt64'
 
 # Flags to pass to cc when compiling the components of a shared library:
 TCL_SHLIB_CFLAGS=''
@@ -68,7 +68,7 @@ TCL_SHLIB_CFLAGS=''
 TCL_CFLAGS_WARNING='-Wall -Wpointer-arith -Wdeclaration-after-statement'
 
 # Extra flags to pass to cc:
-TCL_EXTRA_CFLAGS='-pipe'
+TCL_EXTRA_CFLAGS='-pipe -DHAVE_CPUID=1'
 
 # Base command to use for combining object files into a shared library:
 TCL_SHLIB_LD='${CC} -shared'
@@ -107,19 +107,19 @@ TCL_COMPAT_OBJS=''
 TCL_RANLIB='ranlib'
 
 # -l flag to pass to the linker to pick up the Tcl library
-TCL_LIB_FLAG=''
+TCL_LIB_FLAG='-ltcl86'
 
 # String to pass to linker to pick up the Tcl library from its
 # build directory.
-TCL_BUILD_LIB_SPEC='-Wl,/mingw64/lib/libtcl86.dll.a'
+TCL_BUILD_LIB_SPEC='-Wl,/ucrt64/lib/libtcl86.dll.a'
 
 # String to pass to linker to pick up the Tcl library from its
 # installed directory.
-TCL_LIB_SPEC='-L/mingw64/lib -ltcl86'
+TCL_LIB_SPEC='-L/ucrt64/lib -ltcl86'
 
 # String to pass to the compiler so that an extension can
 # find installed Tcl headers.
-TCL_INCLUDE_SPEC='-I/mingw64/include/tcl8.6'
+TCL_INCLUDE_SPEC='-I/ucrt64/include/tcl8.6'
 
 # Indicates whether a version numbers should be used in -l switches
 # ("ok" means it's safe to use switches like -ltcl7.5;  "nodots" means
@@ -146,12 +146,12 @@ TCL_UNSHARED_LIB_SUFFIX='${NODOT_VERSION}.a'
 # different place than the directory containing the source files, this
 # points to the location of the sources, not the location where Tcl was
 # compiled.
-TCL_SRC_DIR='/mingw64/include/tcl8.6/tcl-private'
+TCL_SRC_DIR='/ucrt64/include/tcl8.6/tcl-private'
 
 # List of standard directories in which to look for packages during
 # "package require" commands.  Contains the "prefix" directory plus also
 # the "exec_prefix" directory, if it is different.
-TCL_PACKAGE_PATH='{/mingw64/lib}'
+TCL_PACKAGE_PATH='{/ucrt64/lib}'
 
 # Tcl supports stub.
 TCL_SUPPORTS_STUBS=1
@@ -164,17 +164,17 @@ TCL_STUB_LIB_FLAG='-ltclstub86'
 
 # String to pass to linker to pick up the Tcl stub library from its
 # build directory.
-TCL_BUILD_STUB_LIB_SPEC='-Wl,/mingw64/lib/libtclstub86.a'
+TCL_BUILD_STUB_LIB_SPEC='-Wl,/ucrt64/lib/libtclstub86.a'
 
 # String to pass to linker to pick up the Tcl stub library from its
 # installed directory.
-TCL_STUB_LIB_SPEC='-L/mingw64/lib -ltclstub86'
+TCL_STUB_LIB_SPEC='-L/ucrt64/lib -ltclstub86'
 
 # Path to the Tcl stub library in the build directory.
-TCL_BUILD_STUB_LIB_PATH='/mingw64/lib'
+TCL_BUILD_STUB_LIB_PATH='/ucrt64/lib'
 
 # Path to the Tcl stub library in the install directory.
-TCL_STUB_LIB_PATH='/mingw64/lib/libtclstub86.a'
+TCL_STUB_LIB_PATH='/ucrt64/lib/libtclstub86.a'
 
 # Flag, 1: we built Tcl with threads enabled, 0 we didn't
 TCL_THREADS=1
