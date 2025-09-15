@@ -1,25 +1,26 @@
 package Math::Round;
-
+$Math::Round::VERSION = '0.08';
+use 5.006;
 use strict;
+use warnings;
+
 use POSIX ();
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-require Exporter;
+use parent 'Exporter';
 
-@ISA = qw(Exporter AutoLoader);
-@EXPORT = qw(round nearest);
-@EXPORT_OK = qw(round nearest round_even round_odd round_rand
-   nearest_ceil nearest_floor nearest_rand
-   nlowmult nhimult );
-$VERSION = '0.07';
+our @EXPORT     = qw/ round nearest /;
+our @EXPORT_OK  = qw/ round nearest round_even    round_odd    round_rand
+                      nearest_ceil  nearest_floor nearest_rand
+                      nlowmult nhimult /;
 
-%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 #--- Default value for "one-half". This is the lowest value that
 #--- gives acceptable results for test #6 in test.pl. See the pod
 #--- for more information.
 
-$Math::Round::half = 0.50000000000008;
+our $half = 0.50000000000008;
 
 sub round {
  my $x;
@@ -324,5 +325,14 @@ compiler, etc.
 
 Math::Round was written by Geoffrey Rommel E<lt>GROMMEL@cpan.orgE<gt>
 in October 2000.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Geoffrey Rommel E<lt>grommel@cpan.orgE<gt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 
 =cut

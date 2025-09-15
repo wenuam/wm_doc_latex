@@ -1,8 +1,8 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
-use Carp qw(croak);
-use Mojo::Util qw(monkey_patch);
+use Carp       qw(croak);
+use Mojo::Util qw(header_params monkey_patch);
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
@@ -100,9 +100,25 @@ sub is_limit_exceeded { !!shift->{limit} }
 
 sub leftovers { delete shift->{buffer} }
 
+sub links {
+  my ($self, $links) = @_;
+
+  return $self->link(join(', ', map {qq{<$links->{$_}>; rel="$_"}} sort keys %$links)) if $links;
+
+  my $header = $self->link // '';
+  my $data   = {};
+  while ($header =~ s/^[,\s]*<(.+?)>//) {
+    my $target = $1;
+    (my $params, $header) = header_params $header;
+    $data->{$params->{rel}} //= {%$params, link => $target} if defined $params->{rel};
+  }
+
+  return $data;
+}
+
 sub names {
   my $self = shift;
-  return [map { $NAMES{$_} || $self->{names}{$_} } keys %{$self->{headers}}];
+  return [map { $NAMES{$_} || $self->{names}{$_} } sort keys %{$self->{headers}}];
 }
 
 sub parse {
@@ -123,7 +139,7 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, [$1, $2] }
+    if ($line =~ /^(\S[^:]*):\s*(.*)$/) { push @$headers, [$1, $2] }
 
     # Multi-line
     elsif ($line =~ s/^\s+// && @$headers) { $headers->[-1][1] .= " $line" }
@@ -142,6 +158,7 @@ sub parse {
   return $self;
 }
 
+sub referer  { shift->referrer(@_) }
 sub referrer { shift->header(Referer => @_) }
 
 sub remove {
@@ -219,6 +236,126 @@ Maximum number of header lines, defaults to the value of the C<MOJO_MAX_LINES> e
 
 L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
+=head2 add
+
+  $headers = $headers->add(Foo => 'one value');
+  $headers = $headers->add(Foo => 'first value', 'second value');
+
+Add header with one or more lines.
+
+  # "Vary: Accept
+  #  Vary: Accept-Encoding"
+  $headers->add(Vary => 'Accept')->add(Vary => 'Accept-Encoding')->to_string;
+
+=head2 append
+
+  $headers = $headers->append(Vary => 'Accept-Encoding');
+
+Append value to header and flatten it if necessary.
+
+  # "Vary: Accept"
+  $headers->append(Vary => 'Accept')->to_string;
+
+  # "Vary: Accept, Accept-Encoding"
+  $headers->vary('Accept')->append(Vary => 'Accept-Encoding')->to_string;
+
+=head2 clone
+
+  my $clone = $headers->clone;
+
+Return a new L<Mojo::Headers> object cloned from these headers.
+
+=head2 dehop
+
+  $headers = $headers->dehop;
+
+Remove hop-by-hop headers that should not be retransmitted.
+
+=head2 every_header
+
+  my $all = $headers->every_header('Location');
+
+Similar to L</"header">, but returns all headers sharing the same name as an array reference.
+
+  # Get first header value
+  say $headers->every_header('Location')->[0];
+
+=head2 from_hash
+
+  $headers = $headers->from_hash({'Cookie' => 'a=b'});
+  $headers = $headers->from_hash({'Cookie' => ['a=b', 'c=d']});
+  $headers = $headers->from_hash({});
+
+Parse headers from a hash reference, an empty hash removes all headers.
+
+=head2 header
+
+  my $value = $headers->header('Foo');
+  $headers  = $headers->header(Foo => 'one value');
+  $headers  = $headers->header(Foo => 'first value', 'second value');
+
+Get or replace the current header values.
+
+=head2 is_finished
+
+  my $bool = $headers->is_finished;
+
+Check if header parser is finished.
+
+=head2 is_limit_exceeded
+
+  my $bool = $headers->is_limit_exceeded;
+
+Check if headers have exceeded L</"max_line_size"> or L</"max_lines">.
+
+=head2 leftovers
+
+  my $bytes = $headers->leftovers;
+
+Get and remove leftover data from header parser.
+
+=head2 names
+
+  my $names = $headers->names;
+
+Return an array reference with all currently defined headers.
+
+  # Names of all headers
+  say for @{$headers->names};
+
+=head2 parse
+
+  $headers = $headers->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
+
+Parse formatted headers.
+
+=head2 remove
+
+  $headers = $headers->remove('Foo');
+
+Remove a header.
+
+=head2 to_hash
+
+  my $single = $headers->to_hash;
+  my $multi  = $headers->to_hash(1);
+
+Turn headers into hash reference, array references to represent multiple headers with the same name are disabled by
+default.
+
+  say $headers->to_hash->{DNT};
+
+=head2 to_string
+
+  my $str = $headers->to_string;
+
+Turn headers into a string, suitable for HTTP messages.
+
+
+=head1 ADDITIONAL METHODS
+
+Additionally, the following shortcuts are available, for accessing and manipulating commonly-used headers:
+
 =head2 accept
 
   my $accept = $headers->accept;
@@ -262,35 +399,12 @@ Get or replace current header value, shortcut for the C<Accept-Ranges> header.
 Get or replace current header value, shortcut for the C<Access-Control-Allow-Origin> header from L<Cross-Origin
 Resource Sharing|https://www.w3.org/TR/cors/>.
 
-=head2 add
-
-  $headers = $headers->add(Foo => 'one value');
-  $headers = $headers->add(Foo => 'first value', 'second value');
-
-Add header with one or more lines.
-
-  # "Vary: Accept
-  #  Vary: Accept-Encoding"
-  $headers->add(Vary => 'Accept')->add(Vary => 'Accept-Encoding')->to_string;
-
 =head2 allow
 
   my $allow = $headers->allow;
   $headers  = $headers->allow('GET, POST');
 
 Get or replace current header value, shortcut for the C<Allow> header.
-
-=head2 append
-
-  $headers = $headers->append(Vary => 'Accept-Encoding');
-
-Append value to header and flatten it if necessary.
-
-  # "Vary: Accept"
-  $headers->append(Vary => 'Accept')->to_string;
-
-  # "Vary: Accept, Accept-Encoding"
-  $headers->vary('Accept')->append(Vary => 'Accept-Encoding')->to_string;
 
 =head2 authorization
 
@@ -305,12 +419,6 @@ Get or replace current header value, shortcut for the C<Authorization> header.
   $headers          = $headers->cache_control('max-age=1, no-cache');
 
 Get or replace current header value, shortcut for the C<Cache-Control> header.
-
-=head2 clone
-
-  my $clone = $headers->clone;
-
-Return a new L<Mojo::Headers> object cloned from these headers.
 
 =head2 connection
 
@@ -391,12 +499,6 @@ Get or replace current header value, shortcut for the C<Cookie> header from L<RF
 
 Get or replace current header value, shortcut for the C<Date> header.
 
-=head2 dehop
-
-  $headers = $headers->dehop;
-
-Remove hop-by-hop headers that should not be retransmitted.
-
 =head2 dnt
 
   my $dnt  = $headers->dnt;
@@ -412,15 +514,6 @@ is very commonly used.
 
 Get or replace current header value, shortcut for the C<ETag> header.
 
-=head2 every_header
-
-  my $all = $headers->every_header('Location');
-
-Similar to L</"header">, but returns all headers sharing the same name as an array reference.
-
-  # Get first header value
-  say $headers->every_header('Location')->[0];
-
 =head2 expect
 
   my $expect = $headers->expect;
@@ -434,22 +527,6 @@ Get or replace current header value, shortcut for the C<Expect> header.
   $headers    = $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 
 Get or replace current header value, shortcut for the C<Expires> header.
-
-=head2 from_hash
-
-  $headers = $headers->from_hash({'Cookie' => 'a=b'});
-  $headers = $headers->from_hash({'Cookie' => ['a=b', 'c=d']});
-  $headers = $headers->from_hash({});
-
-Parse headers from a hash reference, an empty hash removes all headers.
-
-=head2 header
-
-  my $value = $headers->header('Foo');
-  $headers  = $headers->header(Foo => 'one value');
-  $headers  = $headers->header(Foo => 'first value', 'second value');
-
-Get or replace the current header values.
 
 =head2 host
 
@@ -472,30 +549,12 @@ Get or replace current header value, shortcut for the C<If-Modified-Since> heade
 
 Get or replace current header value, shortcut for the C<If-None-Match> header.
 
-=head2 is_finished
-
-  my $bool = $headers->is_finished;
-
-Check if header parser is finished.
-
-=head2 is_limit_exceeded
-
-  my $bool = $headers->is_limit_exceeded;
-
-Check if headers have exceeded L</"max_line_size"> or L</"max_lines">.
-
 =head2 last_modified
 
   my $date = $headers->last_modified;
   $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Get or replace current header value, shortcut for the C<Last-Modified> header.
-
-=head2 leftovers
-
-  my $bytes = $headers->leftovers;
-
-Get and remove leftover data from header parser.
 
 =head2 link
 
@@ -505,21 +564,23 @@ Get and remove leftover data from header parser.
 Get or replace current header value, shortcut for the C<Link> header from L<RFC
 5988|https://tools.ietf.org/html/rfc5988>.
 
+=head2 links
+
+  my $links = $headers->links;
+  $headers  = $headers->links({next => 'http://example.com/foo', prev => 'http://example.com/bar'});
+
+Get or set web links from or to C<Link> header according to L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
+
+  # Extract information about next page
+  say $headers->links->{next}{link};
+  say $headers->links->{next}{title};
+
 =head2 location
 
   my $location = $headers->location;
   $headers     = $headers->location('http://127.0.0.1/foo');
 
 Get or replace current header value, shortcut for the C<Location> header.
-
-=head2 names
-
-  my $names = $headers->names;
-
-Return an array reference with all currently defined headers.
-
-  # Names of all headers
-  say for @{$headers->names};
 
 =head2 origin
 
@@ -528,12 +589,6 @@ Return an array reference with all currently defined headers.
 
 Get or replace current header value, shortcut for the C<Origin> header from L<RFC
 6454|https://tools.ietf.org/html/rfc6454>.
-
-=head2 parse
-
-  $headers = $headers->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
-
-Parse formatted headers.
 
 =head2 proxy_authenticate
 
@@ -556,6 +611,13 @@ Get or replace current header value, shortcut for the C<Proxy-Authorization> hea
 
 Get or replace current header value, shortcut for the C<Range> header.
 
+=head2 referer
+
+  my $referrer = $headers->referer;
+  $headers     = $headers->referer('http://example.com');
+
+Alias for L</"referrer">.
+
 =head2 referrer
 
   my $referrer = $headers->referrer;
@@ -563,12 +625,6 @@ Get or replace current header value, shortcut for the C<Range> header.
 
 Get or replace current header value, shortcut for the C<Referer> header, there was a typo in L<RFC
 2068|https://tools.ietf.org/html/rfc2068> which resulted in C<Referer> becoming an official header.
-
-=head2 remove
-
-  $headers = $headers->remove('Foo');
-
-Remove a header.
 
 =head2 sec_websocket_accept
 
@@ -655,22 +711,6 @@ Get or replace current header value, shortcut for the C<Strict-Transport-Securit
   $headers = $headers->te('chunked');
 
 Get or replace current header value, shortcut for the C<TE> header.
-
-=head2 to_hash
-
-  my $single = $headers->to_hash;
-  my $multi  = $headers->to_hash(1);
-
-Turn headers into hash reference, array references to represent multiple headers with the same name are disabled by
-default.
-
-  say $headers->to_hash->{DNT};
-
-=head2 to_string
-
-  my $str = $headers->to_string;
-
-Turn headers into a string, suitable for HTTP messages.
 
 =head2 trailer
 

@@ -48,6 +48,9 @@
 // Forward declarations
 //
 
+#pragma push_macro("store")
+#undef store
+
 #include <stdarg.h>
 
 
@@ -60,6 +63,8 @@
 #include <exception.h>
 #define	__DB_STD(x)	x
 #endif
+
+#pragma pop_macro("store")
 
 #include "db.h"
 

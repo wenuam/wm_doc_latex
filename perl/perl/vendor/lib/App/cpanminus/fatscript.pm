@@ -22,7 +22,7 @@ my %fatpacked;
 
 $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_CPANMINUS';
   package App::cpanminus;
-  our $VERSION = "1.7044";
+  our $VERSION = "1.7047";
   
   =encoding utf8
   
@@ -98,8 +98,7 @@ $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'A
   to be updated.
   
   You're recommended to update the software or system if you can. If
-  that is impossible or difficult, use the C<-k> option with curl or an
-  alternative URL, C<https://git.io/cpanm>
+  that is impossible or difficult, use the C<-k> option with curl.
   
   =head1 DEPENDENCIES
   
@@ -1988,28 +1987,6 @@ $fatpacked{"App/cpanminus/script.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
       return $dir;
   }
   
-  sub verify_checksums_signature {
-      my($self, $chk_file) = @_;
-  
-      require Module::Signature; # no fatpack
-  
-      $self->chat("Verifying the signature of CHECKSUMS\n");
-  
-      my $rv = eval {
-          local $SIG{__WARN__} = sub {}; # suppress warnings
-          my $v = Module::Signature::_verify($chk_file);
-          $v == Module::Signature::SIGNATURE_OK();
-      };
-      if ($rv) {
-          $self->chat("Verified OK!\n");
-      } else {
-          $self->diag_fail("Verifying CHECKSUMS signature failed: $rv\n");
-          return;
-      }
-  
-      return 1;
-  }
-  
   sub verify_archive {
       my($self, $file, $uri, $dist) = @_;
   
@@ -2031,7 +2008,6 @@ $fatpacked{"App/cpanminus/script.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
       }
   
       $self->diag_ok;
-      $self->verify_checksums_signature($chk_file) or return;
       $self->verify_checksum($file, $chk_file);
   }
   
@@ -4840,7 +4816,8 @@ CPAN_META
 
 $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'CPAN_META_CHECK';
   package CPAN::Meta::Check;
-  $CPAN::Meta::Check::VERSION = '0.012';
+  # vi:noet:sts=2:sw=2:ts=2
+  $CPAN::Meta::Check::VERSION = '0.018';
   use strict;
   use warnings;
   
@@ -4849,20 +4826,22 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   our @EXPORT_OK = qw/check_requirements requirements_for verify_dependencies/;
   our %EXPORT_TAGS = (all => [ @EXPORT, @EXPORT_OK ] );
   
-  use CPAN::Meta::Prereqs '2.132830';
+  use CPAN::Meta::Prereqs 2.132830;
   use CPAN::Meta::Requirements 2.121;
   use Module::Metadata 1.000023;
   
   sub _check_dep {
   	my ($reqs, $module, $dirs) = @_;
   
-  	$module eq 'perl' and return ($reqs->accepts_module($module, $]) ? () : sprintf "Your Perl (%s) is not in the range '%s'", $], $reqs->requirements_for_module($module));
+  	return $reqs->accepts_module($module, $]) ? () : sprintf "Your Perl (%s) is not in the range '%s'", $], $reqs->requirements_for_module($module) if $module eq 'perl';
   
   	my $metadata = Module::Metadata->new_from_module($module, inc => $dirs);
   	return "Module '$module' is not installed" if not defined $metadata;
+  
   	my $version = eval { $metadata->version };
-  	return "Missing version info for module '$module'" if $reqs->requirements_for_module($module) and not $version;
-  	return sprintf 'Installed version (%s) of %s is not in range \'%s\'', $version, $module, $reqs->requirements_for_module($module) if not $reqs->accepts_module($module, $version || 0);
+  	return sprintf 'Installed version (%s) of %s is not in range \'%s\'',
+  			(defined $version ? $version : 'undef'), $module, $reqs->requirements_for_module($module)
+  		if not $reqs->accepts_module($module, $version || 0);
   	return;
   }
   
@@ -4870,9 +4849,11 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   	my ($reqs, $module, $dirs) = @_;
   	my $metadata = Module::Metadata->new_from_module($module, inc => $dirs);
   	return if not defined $metadata;
+  
   	my $version = eval { $metadata->version };
-  	return "Missing version info for module '$module'" if not $version;
-  	return sprintf 'Installed version (%s) of %s is in range \'%s\'', $version, $module, $reqs->requirements_for_module($module) if $reqs->accepts_module($module, $version);
+  	return sprintf 'Installed version (%s) of %s is in range \'%s\'',
+  			(defined $version ? $version : 'undef'), $module, $reqs->requirements_for_module($module)
+  		if $reqs->accepts_module($module, $version);
   	return;
   }
   
@@ -4917,7 +4898,7 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   
   =head1 VERSION
   
-  version 0.012
+  version 0.018
   
   =head1 SYNOPSIS
   
@@ -4950,8 +4931,6 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   =item * L<Test::CheckDeps|Test::CheckDeps>
   
   =item * L<CPAN::Meta|CPAN::Meta>
-  
-  =for comment # vi:noet:sts=2:sw=2:ts=2
   
   =back
   
@@ -25163,8 +25142,11 @@ Defaults to false.
 
 =item --verify
 
-Verify the integrity of distribution files retrieved from PAUSE using
-CHECKSUMS and SIGNATURES (if found). Defaults to false.
+Verify the integrity of distribution files retrieved from CPAN using CHECKSUMS
+file, and SIGNATURES file (if found in the distribution). Defaults to false.
+
+Using this option does not verify the integrity of the CHECKSUMS file, and it's
+unsafe to rely on this option if you're using a CPAN mirror that you do not trust.
 
 =item --report-perl-version
 

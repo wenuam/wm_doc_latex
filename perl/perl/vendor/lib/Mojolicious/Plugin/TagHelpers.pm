@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::DOM::HTML qw(tag_to_html);
-use Scalar::Util qw(blessed);
+use Scalar::Util    qw(blessed);
 
 sub register {
   my ($self, $app) = @_;
@@ -16,7 +16,7 @@ sub register {
   $app->helper(datetime_field => sub { _input(@_, type => 'datetime-local') });
 
   my @helpers = (
-    qw(csrf_field form_for hidden_field javascript label_for link_to select_field stylesheet submit_button),
+    qw(asset_tag csrf_field form_for hidden_field javascript label_for link_to select_field stylesheet submit_button),
     qw(tag_with_error text_area)
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
@@ -24,14 +24,25 @@ sub register {
   $app->helper(button_to      => sub { _button_to(0, @_) });
   $app->helper(check_box      => sub { _input(@_, type => 'checkbox') });
   $app->helper(csrf_button_to => sub { _button_to(1, @_) });
+  $app->helper(favicon        => sub { _favicon(@_) });
   $app->helper(file_field     => sub { _empty_field('file', @_) });
-  $app->helper(image          => sub { _tag('img', src => shift->url_for(shift), @_) });
+  $app->helper(image          => sub { _tag('img', src => _file_url(shift, shift), @_) });
   $app->helper(input_tag      => sub { _input(@_) });
   $app->helper(password_field => sub { _empty_field('password', @_) });
   $app->helper(radio_button   => sub { _input(@_, type => 'radio') });
 
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
+}
+
+sub _asset_tag {
+  my ($c, $target) = (shift, shift);
+
+  my $url = $c->url_for_asset($target);
+
+  return $c->helpers->javascript($url, @_) if $target =~ /\.js$/;
+  return $c->helpers->stylesheet($url, @_) if $target =~ /\.css$/;
+  return $c->helpers->image($url, @_);
 }
 
 sub _button_to {
@@ -48,6 +59,16 @@ sub _csrf_field {
 sub _empty_field {
   my ($type, $c, $name) = (shift, shift, shift);
   return _validation($c, $name, 'input', name => $name, @_, type => $type);
+}
+
+sub _favicon {
+  my ($c, $file) = @_;
+  return _tag('link', rel => 'icon', href => _file_url($c, $file // 'favicon.ico'));
+}
+
+sub _file_url {
+  my ($c, $url) = @_;
+  return blessed $url && $url->isa('Mojo::URL') ? $url : $c->url_for_file($url);
 }
 
 sub _form_for {
@@ -93,7 +114,7 @@ sub _input {
 sub _javascript {
   my $c       = shift;
   my $content = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
-  my @src     = @_ % 2               ? (src => $c->url_for(shift))           : ();
+  my @src     = @_ % 2               ? (src => _file_url($c, shift))         : ();
   return _tag('script', @src, @_, sub {$content});
 }
 
@@ -156,7 +177,7 @@ sub _stylesheet {
   my $c       = shift;
   my $content = ref $_[-1] eq 'CODE' ? "/*<![CDATA[*/\n" . pop->() . "\n/*]]>*/" : '';
   return _tag('style', @_, sub {$content}) unless @_ % 2;
-  return _tag('link', rel => 'stylesheet', href => $c->url_for(shift), @_);
+  return _tag('link', rel => 'stylesheet', href => _file_url($c, shift), @_);
 }
 
 sub _submit_button {
@@ -232,6 +253,13 @@ See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available b
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
+
+=head2 asset_tag
+
+  %= asset_tag '/app.js'
+  %= asset_tag '/app.js', async => 'async'
+
+Generate C<script>, C<link> or C<img> tag for static asset.
 
 =head2 button_to
 
@@ -335,6 +363,16 @@ Generate C<input> tag of type C<email>. Previous input values will automatically
   <input name="notify" type="email" value="nospam@example.com">
   <input id="foo" name="notify" type="email" value="nospam@example.com">
 
+=head2 favicon
+
+  %= favicon
+  %= favicon '/favicon.ico';
+
+Generate C<link> tag for favicon, defaulting to the one that comes bundled with Mojolicious.
+
+  <link rel="icon" href="/mojo/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
 =head2 file_field
 
   %= file_field 'avatar'
@@ -428,7 +466,7 @@ Generate C<input> tag. Previous input values will automatically get picked up an
   %= javascript '/script.js'
   %= javascript '/script.js', defer => undef
   %= javascript begin
-    var a = 'b';
+    const a = 'b';
   % end
 
 Generate portable C<script> tag for JavaScript asset.
@@ -436,7 +474,7 @@ Generate portable C<script> tag for JavaScript asset.
   <script src="/path/to/script.js"></script>
   <script defer src="/path/to/script.js"></script>
   <script><![CDATA[
-    var a = 'b';
+    const a = 'b';
   ]]></script>
 
 =head2 label_for
@@ -487,6 +525,12 @@ content.
   <a href="/path/to/file.txt">File</a>
   <a href="https://mojolicious.org">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
+
+The first argument to C<link_to> is the link content, except when the
+final argument is Perl code such as a template block (created with the
+C<begin> and C<end> keywords); in that case, the link content is
+omitted at the start of the argument list, and the block will become
+the link content.
 
 =head2 month_field
 

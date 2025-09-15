@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+063a}.\N{U+0645}.",
-    "\N{U+063a}.\N{U+0648}.",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -19,6 +19,7 @@
     GyMMM => "G y MMM",
     GyMMMEd => "G y MMM d, E",
     GyMMMd => "G y MMM d",
+    GyMd => "M/d/y GGGGG",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -28,7 +29,7 @@
     MEd => "MM-dd, E",
     MMM => "LLL",
     MMMEd => "E, MMM d",
-    "MMMMW-count-one" => "\N{U+0627}\N{U+0648}\N{U+0646}\N{U+06cd}\N{U+2018} W \N{U+062f} MMMM\N{U+2018}",
+    "MMMMW-count-one" => "\N{U+0627}\N{U+0648}\N{U+0646}\N{U+06cd} W \N{U+062f} MMMM",
     "MMMMW-count-other" => "\N{U+0627}\N{U+0648}\N{U+0646}\N{U+06cd} W \N{U+062f} MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
@@ -55,7 +56,7 @@
   },
   code => "ps-AF",
   date_format_full => "EEEE \N{U+062f} y \N{U+062f} MMMM d",
-  date_format_long => "\N{U+062f} y \N{U+062f} MMMM d",
+  date_format_long => "y MMMM d",
   date_format_medium => "y MMM d",
   date_format_short => "y/M/d",
   datetime_format_full => "{1} {0}",
@@ -268,5 +269,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 38,
+  version => 44,
 }

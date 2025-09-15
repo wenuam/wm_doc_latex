@@ -5,15 +5,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.100 qw(:Status );
-use IO::Compress::Zlib::Constants 2.100 ;
+use IO::Compress::Base::Common  2.206 qw(:Status );
+use IO::Compress::Zlib::Constants 2.206 ;
 
-use IO::Uncompress::RawInflate  2.100 ;
+use IO::Uncompress::RawInflate  2.206 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $InflateError);
 
-$VERSION = '2.100';
+$VERSION = '2.206';
 $InflateError = '';
 
 @ISA    = qw(IO::Uncompress::RawInflate Exporter);
@@ -479,7 +479,7 @@ C<InputLength> option.
 
 =back
 
-=head2 Examples
+=head2 OneShot Examples
 
 To read the contents of the file C<file1.txt.1950> and write the
 uncompressed data to the file C<file1.txt>.
@@ -539,6 +539,9 @@ The format of the constructor for IO::Uncompress::Inflate is shown below
     my $z = IO::Uncompress::Inflate->new( $input [OPTS] )
         or die "IO::Uncompress::Inflate failed: $InflateError\n";
 
+The constructor takes one mandatory parameter, C<$input>, defined below, and
+zero or more C<OPTS>, defined in L<Constructor Options>.
+
 Returns an C<IO::Uncompress::Inflate> object on success and undef on failure.
 The variable C<$InflateError> will contain an error message on failure.
 
@@ -550,6 +553,20 @@ use either of these forms
 
     $line = $z->getline();
     $line = <$z>;
+
+Below is a simple exaple of using the OO interface to read the compressed file
+C<myfile.1950> and write its contents to stdout.
+
+    my $filename = "myfile.1950";
+    my $z = IO::Uncompress::Inflate->new($filename)
+        or die "IO::Uncompress::Inflate failed: $InflateError\n";
+
+    while (<$z>) {
+        print $_;
+    }
+    $z->close();
+
+See L</EXAMPLES> for further examples
 
 The mandatory parameter C<$input> is used to determine the source of the
 compressed data. This parameter can take one of three forms.
@@ -684,10 +701,6 @@ uncompressed data actually contained in the file.
 =back
 
 =back
-
-=head2 Examples
-
-TODO
 
 =head1 Methods
 
@@ -972,15 +985,18 @@ L<Archive::Tar|Archive::Tar>,
 L<IO::Zlib|IO::Zlib>
 
 For RFC 1950, 1951 and 1952 see
-L<http://www.faqs.org/rfcs/rfc1950.html>,
-L<http://www.faqs.org/rfcs/rfc1951.html> and
-L<http://www.faqs.org/rfcs/rfc1952.html>
+L<https://datatracker.ietf.org/doc/html/rfc1950>,
+L<https://datatracker.ietf.org/doc/html/rfc1951> and
+L<https://datatracker.ietf.org/doc/html/rfc1952>
 
 The I<zlib> compression library was written by Jean-loup Gailly
 C<gzip@prep.ai.mit.edu> and Mark Adler C<madler@alumni.caltech.edu>.
 
 The primary site for the I<zlib> compression library is
 L<http://www.zlib.org>.
+
+The primary site for the I<zlib-ng> compression library is
+L<https://github.com/zlib-ng/zlib-ng>.
 
 The primary site for gzip is L<http://www.gzip.org>.
 
@@ -994,7 +1010,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2023 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

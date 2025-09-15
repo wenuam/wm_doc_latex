@@ -1,51 +1,24 @@
 @rem = '--*-Perl-*--
-@echo off
-if "%OS%" == "Windows_NT" goto WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE (
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE (
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-)
-
-)
-
-goto endofperl
+@set "ErrorLevel="
+@if "%OS%" == "Windows_NT" @goto WinNT
+@perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+@set ErrorLevel=%ErrorLevel%
+@goto endofperl
 :WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S %0 %*
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S %0 %*
-) ELSE (
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S %0 %*
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S %0 %*
-) ELSE (
-perl -x -S %0 %*
-)
-
-)
-
-if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
-if %errorlevel% == 9009 echo You do not have Perl in your PATH.
-if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
-goto endofperl
+@perl -x -S %0 %*
+@set ErrorLevel=%ErrorLevel%
+@if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" @goto endofperl
+@if %ErrorLevel% == 9009 @echo You do not have Perl in your PATH.
+@goto endofperl
 @rem ';
 #!perl
-#line 43
+#line 30
     eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
+	if 0; # ^ Run only under a shell
 
-my $config_tag1 = '5.32.1 - Sun Jan 24 15:01:28 2021';
+my $config_tag1 = '5.38.2 - Mon Dec 11 17:03:18 2023';
 
-my $patchlevel_date = 1610211291;
+my $patchlevel_date = 1701173777;
 my @patches = Config::local_patches();
 my $patch_tags = join "", map /(\S+)/ ? "+$1 " : (), @patches;
 
@@ -75,7 +48,7 @@ BEGIN {
     $::HaveWrap = ($@ eq "");
 };
 
-our $VERSION = "1.42";
+our $VERSION = "1.43";
 
 #TODO:
 #       make sure failure (transmission-wise) of Mail::Send is accounted for.
@@ -609,6 +582,10 @@ generated with the help of perlbug $VERSION running under perl $perl_version.
 
 EOF
 
+    if ($report_about_module) {
+	print REP "Module: $report_about_module\n\n";
+    }
+
     if ($body) {
 	print REP $body;
     } elsif ($usefile) {
@@ -635,12 +612,25 @@ EOF
 	    print REP <<'EOF';
 
 -----------------------------------------------------------------
-[Please describe your issue here]
+<!--[Please describe your issue here]-->
+
+**Description**
+<!-- A clear and concise description of what the bug is. -->
 
 
 
-[Please do not change anything below this line]
------------------------------------------------------------------
+**Steps to Reproduce**
+<!-- A one-liner or script to reproduce the issue. -->
+
+
+
+**Expected behavior**
+<!-- A clear and concise description of what you expected to happen. -->
+
+
+
+<!--[Please do not change anything below this line]-->
+<!------------------------------------------------------------------- -->
 EOF
 	}
     }
@@ -660,26 +650,30 @@ sub Dump {
     $severity ||= 'low';
 
     print OUT <<EFF;
+
+
 ---
-Flags:
-    category=$category
-    severity=$severity
+**Flags**
+- category=$category
+- severity=$severity
 EFF
 
     if ($has_patch) {
         print OUT <<EFF;
-    Type=Patch
-    PatchStatus=HasPatch
+- Type=Patch
+- PatchStatus=HasPatch
 EFF
     }
 
     if ($report_about_module ) { 
         print OUT <<EFF;
-    module=$report_about_module
+- module=$report_about_module
 EFF
     }
     print OUT <<EFF;
 ---
+**Perl configuration**
+```
 EFF
     print OUT "This perlbug was built using Perl $config_tag1\n",
 	    "It is being executed now by  Perl $config_tag2.\n\n"
@@ -734,6 +728,7 @@ EOF
 	    print OUT "$_='$value'\n";
 	}
     }
+    print OUT "```\n";
 } # sub Dump
 
 sub Edit {
@@ -1305,9 +1300,6 @@ release of Perl, are likely to receive less attention from the
 volunteers who build and maintain Perl than reports about bugs in
 the current release.
 
-This tool isn't appropriate for reporting bugs in any version
-prior to Perl 5.0.
-
 =item Are you sure what you have is a bug?
 
 A significant number of the bug reports we get turn out to be
@@ -1557,6 +1549,6 @@ None known (guess what must have been used to report them?)
 
 =cut
 
-
 __END__
 :endofperl
+@set "ErrorLevel=" & @goto _undefined_label_ 2>NUL || @"%COMSPEC%" /d/c @exit %ErrorLevel%

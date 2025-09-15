@@ -1,31 +1,20 @@
 @rem = '--*-Perl-*--
-@echo off
-if "%OS%" == "Windows_NT" goto WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE (
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-)
-
-goto endofperl
+@set "ErrorLevel="
+@if "%OS%" == "Windows_NT" @goto WinNT
+@perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+@set ErrorLevel=%ErrorLevel%
+@goto endofperl
 :WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S %0 %*
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S %0 %*
-) ELSE (
-perl -x -S %0 %*
-)
-
-if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
-if %errorlevel% == 9009 echo You do not have Perl in your PATH.
-if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
-goto endofperl
+@perl -x -S %0 %*
+@set ErrorLevel=%ErrorLevel%
+@if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" @goto endofperl
+@if %ErrorLevel% == 9009 @echo You do not have Perl in your PATH.
+@goto endofperl
 @rem ';
-#! perl
-#line 29
+#!perl
+#line 30
+    eval 'exec perl -x -S "$0" ${1+"$@"}'
+	if 0;	# In case running under some shell
 
 require 5;
 use ExtUtils::PL2Bat;
@@ -105,7 +94,7 @@ and run.
 
 =head2 ADVANTAGES
 
-There are several alternatives to this method of running a Perl script.
+There are several alternatives to this method of running a Perl script. 
 They each have disadvantages that help you understand the motivation
 for using B<pl2bat>.
 
@@ -322,7 +311,7 @@ Show command line usage.
 
 =head1 EXAMPLES
 
-	C:\> pl2bat foo.pl bar.PM
+	C:\> pl2bat foo.pl bar.PM 
 	[..creates foo.bat, bar.PM.bat..]
 
 	C:\> pl2bat -s "/\.pl|\.pm/" foo.pl bar.PM
@@ -372,6 +361,6 @@ perl, perlwin32, runperl.bat
 
 =cut
 
-
 __END__
 :endofperl
+@set "ErrorLevel=" & @goto _undefined_label_ 2>NUL || @"%COMSPEC%" /d/c @exit %ErrorLevel%

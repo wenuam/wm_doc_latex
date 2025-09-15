@@ -1,7 +1,7 @@
 package ojo;
 use Mojo::Base -strict;
 
-use Benchmark qw(timeit timestr :hireswallclock);
+use Benchmark        qw(timeit timestr :hireswallclock);
 use Mojo::ByteStream qw(b);
 use Mojo::Collection qw(c);
 use Mojo::DOM;
@@ -155,7 +155,7 @@ Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting L<Mo
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
-  $ perl -Mojo -E 'f("hello.json")->spurt(j {hello => "world!"})'
+  $ perl -Mojo -E 'f("hello.json")->spew(j {hello => "world!"})'
 
 =head2 l
 

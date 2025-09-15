@@ -3,7 +3,7 @@
  * pg_foreign_server_d.h
  *    Macro definitions for pg_foreign_server
  *
- * Portions Copyright (c) 1996-2018, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2022, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -19,16 +19,19 @@
 #define PG_FOREIGN_SERVER_D_H
 
 #define ForeignServerRelationId 1417
+#define ForeignServerOidIndexId 113
+#define ForeignServerNameIndexId 549
 
-#define Anum_pg_foreign_server_srvname 1
-#define Anum_pg_foreign_server_srvowner 2
-#define Anum_pg_foreign_server_srvfdw 3
-#define Anum_pg_foreign_server_srvtype 4
-#define Anum_pg_foreign_server_srvversion 5
-#define Anum_pg_foreign_server_srvacl 6
-#define Anum_pg_foreign_server_srvoptions 7
+#define Anum_pg_foreign_server_oid 1
+#define Anum_pg_foreign_server_srvname 2
+#define Anum_pg_foreign_server_srvowner 3
+#define Anum_pg_foreign_server_srvfdw 4
+#define Anum_pg_foreign_server_srvtype 5
+#define Anum_pg_foreign_server_srvversion 6
+#define Anum_pg_foreign_server_srvacl 7
+#define Anum_pg_foreign_server_srvoptions 8
 
-#define Natts_pg_foreign_server 7
+#define Natts_pg_foreign_server 8
 
 
 #endif							/* PG_FOREIGN_SERVER_D_H */

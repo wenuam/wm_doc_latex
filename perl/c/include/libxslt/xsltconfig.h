@@ -20,26 +20,26 @@ extern "C" {
  *
  * the version string like "1.2.3"
  */
-#define LIBXSLT_DOTTED_VERSION "1.1.33"
+#define LIBXSLT_DOTTED_VERSION "1.1.37"
 
 /**
  * LIBXSLT_VERSION:
  *
  * the version number: 1.2.3 value is 10203
  */
-#define LIBXSLT_VERSION 10133
+#define LIBXSLT_VERSION 10137
 
 /**
  * LIBXSLT_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "10203"
  */
-#define LIBXSLT_VERSION_STRING "10133"
+#define LIBXSLT_VERSION_STRING "10137"
 
 /**
  * LIBXSLT_VERSION_EXTRA:
  *
- * extra version information, used to show a CVS compilation
+ * extra version information, used to show a Git commit description
  */
 #define	LIBXSLT_VERSION_EXTRA ""
 
@@ -86,7 +86,6 @@ extern "C" {
 #define XSLT_NEED_TRIO
 #endif
 #ifdef __VMS
-#define HAVE_MATH_H 1
 #define HAVE_SYS_STAT_H 1
 #ifndef XSLT_NEED_TRIO
 #define XSLT_NEED_TRIO
@@ -111,6 +110,19 @@ extern "C" {
 #endif
 
 /**
+ * WITH_PROFILER:
+ *
+ * Activate the compilation of the profiler. Speed penalty
+ * is insignifiant.
+ * On by default unless --without-profiler is passed to configure
+ */
+#if 1
+#ifndef WITH_PROFILER
+#define WITH_PROFILER
+#endif
+#endif
+
+/**
  * WITH_MODULES:
  *
  * Whether module support is configured into libxslt
@@ -120,7 +132,7 @@ extern "C" {
 #ifndef WITH_MODULES
 #define WITH_MODULES
 #endif
-#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/z/extlib/_2019Q2__/lib/libxslt-plugins"
+#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/z/extlib/_5034__/lib/libxslt-plugins"
 #endif
 
 /**
@@ -129,9 +141,6 @@ extern "C" {
  * This macro is used to flag unused function parameters to GCC
  */
 #ifdef __GNUC__
-#ifdef HAVE_ANSIDECL_H
-#include <ansidecl.h>
-#endif
 #ifndef ATTRIBUTE_UNUSED
 #define ATTRIBUTE_UNUSED __attribute__((unused))
 #endif

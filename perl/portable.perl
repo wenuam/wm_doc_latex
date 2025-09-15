@@ -59,7 +59,7 @@ Config:
   ld: g++.exe
   _libpthfix_part1: c/lib
   _libpthfix_part2: c/x86_64-w64-mingw32/lib
-  _libpthfix_part3: c/lib/gcc/x86_64-w64-mingw32/8.3.0
+  _libpthfix_part3: c/lib/gcc/x86_64-w64-mingw32/13.1.0
   lddlflags: '-mdll -s -L"$archlib\CORE" -L"$_libpthfix_part1"'
   ldflags: '-s -L"$archlib\CORE" -L"$_libpthfix_part1"'
   ldflags_nolargefiles: '-s -L"$archlib\CORE" -L"$_libpthfix_part1"'

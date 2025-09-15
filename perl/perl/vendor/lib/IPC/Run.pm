@@ -135,7 +135,7 @@ on NT 4.0.  See L</Win32 LIMITATIONS>.
 
 If you need pty support, IPC::Run should work well enough most of the
 time, but IO::Pty is being improved, and IPC::Run will be improved to
-use IO::Pty's new features when it is release.
+use IO::Pty's new features when it is released.
 
 The basic problem is that the pty needs to initialize itself before the
 parent writes to the master pty, or the data written gets lost.  So
@@ -413,8 +413,8 @@ to the systems' shell:
 
 or a list of commands, io operations, and/or timers/timeouts to execute.
 Consecutive commands must be separated by a pipe operator '|' or an '&'.
-External commands are passed in as array references, and, on systems
-supporting fork(), Perl code may be passed in as subs:
+External commands are passed in as array references or L<IPC::Run::Win32Process>
+objects.  On systems supporting fork(), Perl code may be passed in as subs:
 
    run \@cmd;
    run \@cmd1, '|', \@cmd2;
@@ -524,7 +524,7 @@ that variable:
    print $out;
 
 Scalars used in incremental (start()/pump()/finish()) applications are treated
-as queues: input is removed from input scalers, resulting in them dwindling
+as queues: input is removed from input scalars, resulting in them dwindling
 to '', and output is appended to output scalars.  This is not true of 
 harnesses run() in batch mode.
 
@@ -687,7 +687,7 @@ a file descriptor.  If you want to grab stderr separately, do this:
 
 Child processes harnessed to a pseudo terminal have their stdin, stdout,
 and stderr completely closed before any redirection operators take
-effect.  This casts of the bonds of the controlling terminal.  This is
+effect.  This casts off the bonds of the controlling terminal.  This is
 not done when using pipes.
 
 Right now, this affects all children in a harness that has a pty in use,
@@ -1011,11 +1011,12 @@ in their exit codes.
 =cut
 
 use strict;
+use warnings;
 use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20200505.0';
+    $VERSION = '20231003.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -1047,6 +1048,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use IPC::Run::Debug;
 use Exporter;
 use Fcntl;
@@ -1238,12 +1240,73 @@ sub _search_path {
     croak "Command '$cmd_name' not found in " . join( ", ", @searched_in );
 }
 
+# Translate a command or CODE reference (a $kid->{VAL}) to a list of strings
+# suitable for passing to _debug().
+sub _debugstrings {
+    my $operand = shift;
+    if ( !defined $operand ) {
+        return '<undef>';
+    }
+
+    my $ref = ref $operand;
+    if ( !$ref ) {
+        return length $operand < 50
+          ? "'$operand'"
+          : join( '', "'", substr( $operand, 0, 10 ), "...'" );
+    }
+    elsif ( $ref eq 'ARRAY' ) {
+        return (
+            '[ ',
+            join( " ", map /[^\w.-]/ ? "'$_'" : $_, @$operand ),
+            ' ]'
+        );
+    }
+    elsif ( UNIVERSAL::isa( $operand, 'IPC::Run::Win32Process' ) ) {
+        return "$operand";
+    }
+    return $ref;
+}
+
 sub _empty($) { !( defined $_[0] && length $_[0] ) }
 
 ## 'safe' versions of otherwise fun things to do. See also IPC::Run::Win32Helper.
 sub _close {
     confess 'undef' unless defined $_[0];
     my $fd = $_[0] =~ /^\d+$/ ? $_[0] : fileno $_[0];
+    if (Win32_MODE) {
+
+        # Perl close() or POSIX::close() on the read end of a pipe hangs if
+        # another process is in a read attempt on the same pipe
+        # (https://github.com/Perl/perl5/issues/19963).  Since IPC::Run creates
+        # pipes and shares them with user-defined kids, it's affected.  Work
+        # around that by first using dup2() to replace the FD with a non-pipe.
+        # Unfortunately, for socket FDs, dup2() closes the SOCKET with
+        # CloseHandle().  CloseHandle() documentation leaves its behavior
+        # undefined for sockets.  However, tests on Windows Server 2022 did not
+        # leak memory, leak ports, or reveal any other obvious trouble.
+        #
+        # No failure here is fatal.  (_close() has worked that way, either due
+        # to a principle or just due to a history of callers passing closed
+        # FDs.)  croak() on EMFILE would be a bad user experience.  Better to
+        # proceed and hope that $fd is not a being-read pipe.
+        #
+        # Since start() and other user-facing methods _close() many FDs, we
+        # could optimize this by opening and closing the non-pipe FD just once
+        # per method call.  The overhead of this simple approach was in the
+        # noise, however.
+        my $nul_fd = POSIX::open 'NUL';
+        if ( !defined $nul_fd ) {
+            _debug "open( NUL ) = ERROR $!" if _debugging_details;
+        }
+        else {
+            my $r = POSIX::dup2( $nul_fd, $fd );
+            _debug "dup2( $nul_fd, $fd ) = ERROR $!"
+              if _debugging_details && !defined $r;
+            $r = POSIX::close $nul_fd;
+            _debug "close( $nul_fd (NUL) ) = ERROR $!"
+              if _debugging_details && !defined $r;
+        }
+    }
     my $r = POSIX::close $fd;
     $r = $r ? '' : " ERROR $!";
     delete $fds{$fd};
@@ -1372,6 +1435,9 @@ sub _read {
 sub _spawn {
     my IPC::Run $self = shift;
     my ($kid) = @_;
+
+    croak "Can't spawn IPC::Run::Win32Process except on Win32"
+      if UNIVERSAL::isa( $kid->{VAL}, 'IPC::Run::Win32Process' );
 
     _debug "opening sync pipe ", $kid->{PID} if _debugging_details;
     my $sync_reader_fd;
@@ -1728,24 +1794,12 @@ sub harness {
         for ( shift @args ) {
             eval {
                 $first_parse = 1;
-                _debug(
-                    "parsing ",
-                    defined $_
-                    ? ref $_ eq 'ARRAY'
-                          ? ( '[ ', join( ', ', map "'$_'", @$_ ), ' ]' )
-                          : (
-                              ref $_
-                                || (
-                                  length $_ < 50
-                                  ? "'$_'"
-                                  : join( '', "'", substr( $_, 0, 10 ), "...'" )
-                                )
-                          )
-                    : '<undef>'
-                ) if _debugging;
+                _debug( "parsing ", _debugstrings($_) ) if _debugging;
 
               REPARSE:
-                if ( ref eq 'ARRAY' || ( !$cur_kid && ref eq 'CODE' ) ) {
+                if (   ref eq 'ARRAY'
+                    || UNIVERSAL::isa( $_, 'IPC::Run::Win32Process' )
+                    || ( !$cur_kid && ref eq 'CODE' ) ) {
                     croak "Process control symbol ('|', '&') missing" if $cur_kid;
                     croak "Can't spawn a subroutine on Win32"
                       if Win32_MODE && ref eq "CODE";
@@ -2075,7 +2129,7 @@ sub _open_pipes {
     ## Loop through the kids and their OPS, interpreting any that require
     ## parent-side actions.
     for my $kid ( @{ $self->{KIDS} } ) {
-        unless ( ref $kid->{VAL} eq 'CODE' ) {
+        if ( ref $kid->{VAL} eq 'ARRAY' ) {
             $kid->{PATH} = _search_path $kid->{VAL}->[0];
         }
         if ( defined $pipe_read_fd ) {
@@ -2787,14 +2841,8 @@ sub start {
         { my $ofh = select STDERR; my $of = $|; $| = 1; $| = $of; select $ofh; }
         for my $kid ( @{ $self->{KIDS} } ) {
             $kid->{RESULT} = undef;
-            _debug "child: ",
-              ref( $kid->{VAL} ) eq "CODE"
-              ? "CODE ref"
-              : (
-                "`",
-                join( " ", map /[^\w.-]/ ? "'$_'" : $_, @{ $kid->{VAL} } ),
-                "`"
-              ) if _debugging_details;
+            _debug "child: ", _debugstrings( $kid->{VAL} )
+              if _debugging_details;
             eval {
                 croak "simulated failure of fork"
                   if $self->{_simulate_fork_failure};
@@ -2805,20 +2853,28 @@ sub start {
 ## TODO: Test and debug spawning code.  Someday.
                     _debug(
                         'spawning ',
-                        join(
-                            ' ',
-                            map( "'$_'",
-                                ( $kid->{PATH}, @{ $kid->{VAL} }[ 1 .. $#{ $kid->{VAL} } ] ) )
+                        _debugstrings(
+                            [
+                                $kid->{PATH},
+                                @{ $kid->{VAL} }[ 1 .. $#{ $kid->{VAL} } ]
+                            ]
                         )
-                    ) if _debugging;
+                    ) if $kid->{PATH} && _debugging;
                     ## The external kid wouldn't know what to do with it anyway.
                     ## This is only used by the "helper" pump processes on Win32.
                     _dont_inherit( $self->{DEBUG_FD} );
                     ( $kid->{PID}, $kid->{PROCESS} ) = IPC::Run::Win32Helper::win32_spawn(
-                        [ $kid->{PATH}, @{ $kid->{VAL} }[ 1 .. $#{ $kid->{VAL} } ] ],
+                        ref( $kid->{VAL} ) eq "ARRAY"
+                        ? [ $kid->{PATH}, @{ $kid->{VAL} }[ 1 .. $#{ $kid->{VAL} } ] ]
+                        : $kid->{VAL},
                         $kid->{OPS},
                     );
                     _debug "spawn() = ", $kid->{PID} if _debugging;
+                    if ($self->{_sleep_after_win32_spawn}) {
+                      sleep $self->{_sleep_after_win32_spawn};
+                      _debug "after sleep $self->{_sleep_after_win32_spawn}"
+                          if _debugging;
+                    }
                 }
             };
             if ($@) {
@@ -3402,15 +3458,24 @@ sub reap_nb {
             _debug "kid $kid->{NUM} ($kid->{PID}) exited"
               if _debugging;
 
-            $kid->{PROCESS}->GetExitCode( $kid->{RESULT} )
+            my $native_result;
+            $kid->{PROCESS}->GetExitCode($native_result)
               or croak "$! while GetExitCode()ing for Win32 process";
 
-            unless ( defined $kid->{RESULT} ) {
+            unless ( defined $native_result ) {
                 $kid->{RESULT} = "0 but true";
                 $? = $kid->{RESULT} = 0x0F;
             }
             else {
-                $? = $kid->{RESULT} << 8;
+                my $win32_full_result = $native_result << 8;
+                if ( $win32_full_result >> 8 != $native_result ) {
+
+                    # !USE_64_BIT_INT build and exit code > 0xFFFFFF
+                    require Math::BigInt;
+                    $win32_full_result = Math::BigInt->new($native_result);
+                    $win32_full_result->blsft(8);
+                }
+                $? = $kid->{RESULT} = $win32_full_result;
             }
         }
         else {
@@ -3459,7 +3524,7 @@ be left in an unstable state, it's best to kill the harness to get rid
 of all the child processes, etc.
 
 Specifically, if a timeout expires in finish(), finish() will not
-kill all the children.  Call C<<$h->kill_kill>> in this case if you care.
+kill all the children.  Call C<< $h->kill_kill >> in this case if you care.
 This differs from the behavior of L</run>.
 
 =cut
@@ -4160,6 +4225,34 @@ High resolution timeouts.
 
 =over
 
+=item argument-passing rules are program-specific
+
+Win32 programs receive all arguments in a single "command line" string.
+IPC::Run assembles this string so programs using L<standard command line parsing
+rules|https://docs.microsoft.com/en-us/cpp/cpp/main-function-command-line-args#parsing-c-command-line-arguments>
+will see an C<argv> that matches the array reference specifying the command.
+Some programs use different rules to parse their command line.  Notable examples
+include F<cmd.exe>, F<cscript.exe>, and Cygwin programs called from non-Cygwin
+programs.  Use L<IPC::Run::Win32Process> to call these and other nonstandard
+programs.
+
+=item batch files
+
+Properly escaping a batch file argument depends on how the script will use that
+argument, because some uses experience multiple levels of caret (escape
+character) removal.  Avoid calling batch files with arguments, particularly when
+the argument values originate outside your program or contain non-alphanumeric
+characters.  Perl scripts and PowerShell scripts are sound alternatives.  If you
+do use batch file arguments, IPC::Run escapes them so the batch file can pass
+them, unquoted, to a program having standard command line parsing rules.  If the
+batch file enables delayed environment variable expansion, it must disable that
+feature before expanding its arguments.  For example, if F<foo.cmd> contains
+C<perl %*>, C<run ['foo.cmd', @list]> will create a Perl process in which
+C<@ARGV> matches C<@list>.  Prepending a C<setlocal enabledelayedexpansion> line
+would make the batch file malfunction, silently.  Another silent-malfunction
+example is C<run ['outer.bat', @list]> for F<outer.bat> containing C<foo.cmd
+%*>.
+
 =item Fails on Win9X
 
 If you want Win9X support, you'll have to debug it or fund me because I
@@ -4207,6 +4300,10 @@ be implemented one day, do chdir() and %ENV changes can be made.
 Win32 does not fully support signals.  signal() is likely to cause errors
 unless sending a signal that Perl emulates, and C<kill_kill()> is immediately
 fatal (there is no grace period).
+
+=item C<$?> cannot represent all Win32 exit codes
+
+Prefer C<full_result( ... )>, C<result( ... )>, or other IPC::Run methods.
 
 =item helper processes
 

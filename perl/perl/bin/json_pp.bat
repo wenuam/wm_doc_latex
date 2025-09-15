@@ -11,8 +11,11 @@
 @if %ErrorLevel% == 9009 @echo You do not have Perl in your PATH.
 @goto endofperl
 @rem ';
-#!/usr/bin/perl
+#!perl
 #line 30
+    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
+	if 0; # ^ Run only under a shell
+#!/usr/bin/perl
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use strict;

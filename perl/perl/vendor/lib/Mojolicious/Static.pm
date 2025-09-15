@@ -4,17 +4,26 @@ use Mojo::Base -base;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Date;
-use Mojo::File qw(curfile path);
+use Mojo::File   qw(curfile path);
 use Mojo::Loader qw(data_section file_is_binary);
-use Mojo::Util qw(encode md5_sum trim);
+use Mojo::Util   qw(encode md5_sum trim);
 
 # Bundled files
 my $PUBLIC = curfile->sibling('resources', 'public');
 my %EXTRA  = $PUBLIC->list_tree->map(sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
 
-has classes => sub { ['main'] };
-has extra   => sub { +{%EXTRA} };
-has paths   => sub { [] };
+has asset_dir => 'assets';
+has classes   => sub { ['main'] };
+has extra     => sub { +{%EXTRA} };
+has paths     => sub { [] };
+has 'prefix';
+
+sub asset_path {
+  my ($self, $asset) = @_;
+  $asset = "/$asset" unless $asset =~ /^\//;
+  my $assets = $self->{assets} //= {};
+  return $self->file_path('/' . $self->asset_dir . ($assets->{$asset} // $asset));
+}
 
 sub dispatch {
   my ($self, $c) = @_;
@@ -34,11 +43,18 @@ sub dispatch {
   my $canon_path = join '/', @parts;
   return undef if $canon_path =~ /^\.\.\/|\\/ || !$self->serve($c, $canon_path);
   $stash->{'mojo.static'} = 1;
+
+  # Development assets will be rebuilt a lot, do not let browsers cache them
+  $c->res->headers->cache_control('no-cache')
+    if $c->app->mode eq 'development' && index($canon_path, $self->asset_dir) == 0;
+
   return !!$c->rendered;
 }
 
 sub file {
   my ($self, $rel) = @_;
+
+  $self->warmup unless $self->{index};
 
   # Search all paths
   my @parts = split /\//, $rel;
@@ -53,6 +69,13 @@ sub file {
   # Search extra files
   my $extra = $self->extra;
   return exists $extra->{$rel} ? _get_file($extra->{$rel}) : undef;
+}
+
+sub file_path {
+  my ($self, $file) = @_;
+  $file = "/$file" unless $file =~ /^\//;
+  return $file unless my $prefix = $self->prefix;
+  return "$prefix$file";
 }
 
 sub is_fresh {
@@ -79,6 +102,13 @@ sub is_fresh {
 
 sub serve {
   my ($self, $c, $rel) = @_;
+
+  # Prefix
+  if (my $prefix = $self->prefix) {
+    $rel = "/$rel";
+    return undef unless $rel =~ s/^\Q$prefix\E\///;
+  }
+
   return undef unless my $asset = $self->file($rel);
   $c->app->types->content_type($c, {file => $rel});
   return !!$self->serve_asset($c, $asset);
@@ -112,9 +142,32 @@ sub serve_asset {
 }
 
 sub warmup {
-  my $self  = shift;
+  my $self = shift;
+
+  # DATA sections
   my $index = $self->{index} = {};
   for my $class (reverse @{$self->classes}) { $index->{$_} = $class for keys %{data_section $class} }
+
+  # Static assets
+  my $assets    = $self->{assets} = {};
+  my $asset_dir = $self->asset_dir;
+  for my $path (@{$self->paths}) {
+    my $asset_path = path($path, $asset_dir);
+    next unless -d $asset_path;
+
+    for my $asset_file ($asset_path->list_tree({recursive => 1})->each) {
+      my $parts    = $asset_file->to_rel($asset_path)->to_array;
+      my $filename = pop @$parts;
+      my $prefix   = join '/', @$parts;
+
+      next unless $filename =~ /^([^.]+)\.([^.]+)\.(.+)$/;
+      my $checksum = $2;
+      my $short    = $prefix eq '' ? "/$1.$3" : "/$prefix/$1.$3";
+      my $long     = '/' . join('/', @$parts, $filename);
+
+      $assets->{$short} = $long if !exists($assets->{$short}) || $checksum eq 'development';
+    }
+  }
 }
 
 sub _epoch { Mojo::Date->new(shift)->epoch }
@@ -124,8 +177,6 @@ sub _get_data_file {
 
   # Protect files without extensions and templates with two extensions
   return undef if $rel !~ /\.\w+$/ || $rel =~ /\.\w+\.\w+$/;
-
-  $self->warmup unless $self->{index};
 
   # Find file
   my @args = ($self->{index}{$rel}, $rel);
@@ -163,6 +214,13 @@ on L<RFC 7232|https://tools.ietf.org/html/rfc7232> and L<RFC 7233|https://tools.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Static> implements the following attributes.
+
+=head2 asset_dir
+
+  my $dir = $static->asset_dir;
+  $static = $static->asset_dir('assets');
+
+Subdirectory used for all static assets, defaults to C<assets>.
 
 =head2 classes
 
@@ -205,9 +263,23 @@ Directories to serve static files from, first one has the highest precedence.
   # Add another "public" directory with higher precedence
   unshift @{$static->paths}, '/home/sri/themes/blue/public';
 
+=head2 prefix
+
+  my $prefix = $static->prefix;
+  $static    = $static->prefix('/static');
+
+Prefix to use for all static files, defaults to C<undef>. This can be very useful for production deployments where the
+reverse proxy server should take over serving static files.
+
 =head1 METHODS
 
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements the following new ones.
+
+=head2 asset_path
+
+  my $path = $static->asset_path('/app.js');
+
+Get static asset path.
 
 =head2 dispatch
 
@@ -225,6 +297,12 @@ or return C<undef> if it doesn't exist. Note that this method uses a relative pa
 traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
+
+=head2 file_path
+
+  my $path = $static->file_path('/index.html');
+
+Get static file path with L</"prefix"> if it has been configured.
 
 =head2 is_fresh
 
@@ -271,9 +349,9 @@ support.
 
 =head2 warmup
 
-  $static->warmup;
+  $static->warmup();
 
-Prepare static files from L</"classes"> for future use.
+Prepare static files from L</"classes"> and static assets for future use.
 
 =head1 SEE ALSO
 

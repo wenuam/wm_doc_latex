@@ -8,6 +8,18 @@ use warnings;
 use base 'Exporter';
 use DBD::SQLite;
 our @EXPORT_OK = (
+    'DBD_SQLITE_STRING_MODE_PV',
+    'DBD_SQLITE_STRING_MODE_BYTES',
+    'DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',
+    'DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK',
+    'DBD_SQLITE_STRING_MODE_UNICODE_STRICT',
+    # allowed_return_values_from_sqlite3_txn_state
+    qw/
+      SQLITE_TXN_NONE
+      SQLITE_TXN_READ
+      SQLITE_TXN_WRITE
+    /,
+
     # authorizer_action_codes
     qw/
       SQLITE_ALTER_TABLE
@@ -75,6 +87,8 @@ our @EXPORT_OK = (
       SQLITE_DBCONFIG_MAX
       SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
       SQLITE_DBCONFIG_RESET_DATABASE
+      SQLITE_DBCONFIG_REVERSE_SCANORDER
+      SQLITE_DBCONFIG_STMT_SCANSTATUS
       SQLITE_DBCONFIG_TRIGGER_EQP
       SQLITE_DBCONFIG_TRUSTED_SCHEMA
       SQLITE_DBCONFIG_WRITABLE_SCHEMA
@@ -95,6 +109,7 @@ our @EXPORT_OK = (
       SQLITE_CANTOPEN_SYMLINK
       SQLITE_CONSTRAINT_CHECK
       SQLITE_CONSTRAINT_COMMITHOOK
+      SQLITE_CONSTRAINT_DATATYPE
       SQLITE_CONSTRAINT_FOREIGNKEY
       SQLITE_CONSTRAINT_FUNCTION
       SQLITE_CONSTRAINT_NOTNULL
@@ -118,6 +133,7 @@ our @EXPORT_OK = (
       SQLITE_IOERR_CLOSE
       SQLITE_IOERR_COMMIT_ATOMIC
       SQLITE_IOERR_CONVPATH
+      SQLITE_IOERR_CORRUPTFS
       SQLITE_IOERR_DATA
       SQLITE_IOERR_DELETE
       SQLITE_IOERR_DELETE_NOENT
@@ -144,6 +160,7 @@ our @EXPORT_OK = (
       SQLITE_IOERR_WRITE
       SQLITE_LOCKED_SHAREDCACHE
       SQLITE_LOCKED_VTAB
+      SQLITE_NOTICE_RBU
       SQLITE_NOTICE_RECOVER_ROLLBACK
       SQLITE_NOTICE_RECOVER_WAL
       SQLITE_OK_SYMLINK
@@ -159,6 +176,7 @@ our @EXPORT_OK = (
     # flags_for_file_open_operations
     qw/
       SQLITE_OPEN_CREATE
+      SQLITE_OPEN_EXRESCODE
       SQLITE_OPEN_FULLMUTEX
       SQLITE_OPEN_MEMORY
       SQLITE_OPEN_NOFOLLOW
@@ -167,6 +185,7 @@ our @EXPORT_OK = (
       SQLITE_OPEN_READONLY
       SQLITE_OPEN_READWRITE
       SQLITE_OPEN_SHAREDCACHE
+      SQLITE_OPEN_SUPER_JOURNAL
       SQLITE_OPEN_URI
     /,
 
@@ -184,6 +203,7 @@ our @EXPORT_OK = (
       SQLITE_FLOAT
       SQLITE_INTEGER
       SQLITE_NULL
+      SQLITE_TEXT
     /,
 
     # result_codes
@@ -263,6 +283,7 @@ our %EXPORT_TAGS = (
       SQLITE_CONSTRAINT
       SQLITE_CONSTRAINT_CHECK
       SQLITE_CONSTRAINT_COMMITHOOK
+      SQLITE_CONSTRAINT_DATATYPE
       SQLITE_CONSTRAINT_FOREIGNKEY
       SQLITE_CONSTRAINT_FUNCTION
       SQLITE_CONSTRAINT_NOTNULL
@@ -302,9 +323,16 @@ our %EXPORT_TAGS = (
       SQLITE_DBCONFIG_MAX
       SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
       SQLITE_DBCONFIG_RESET_DATABASE
+      SQLITE_DBCONFIG_REVERSE_SCANORDER
+      SQLITE_DBCONFIG_STMT_SCANSTATUS
       SQLITE_DBCONFIG_TRIGGER_EQP
       SQLITE_DBCONFIG_TRUSTED_SCHEMA
       SQLITE_DBCONFIG_WRITABLE_SCHEMA
+      DBD_SQLITE_STRING_MODE_BYTES
+      DBD_SQLITE_STRING_MODE_PV
+      DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK
+      DBD_SQLITE_STRING_MODE_UNICODE_NAIVE
+      DBD_SQLITE_STRING_MODE_UNICODE_STRICT
       SQLITE_DELETE
       SQLITE_DENY
       SQLITE_DETACH
@@ -344,6 +372,7 @@ our %EXPORT_TAGS = (
       SQLITE_IOERR_CLOSE
       SQLITE_IOERR_COMMIT_ATOMIC
       SQLITE_IOERR_CONVPATH
+      SQLITE_IOERR_CORRUPTFS
       SQLITE_IOERR_DATA
       SQLITE_IOERR_DELETE
       SQLITE_IOERR_DELETE_NOENT
@@ -390,12 +419,14 @@ our %EXPORT_TAGS = (
       SQLITE_NOTADB
       SQLITE_NOTFOUND
       SQLITE_NOTICE
+      SQLITE_NOTICE_RBU
       SQLITE_NOTICE_RECOVER_ROLLBACK
       SQLITE_NOTICE_RECOVER_WAL
       SQLITE_NULL
       SQLITE_OK
       SQLITE_OK_SYMLINK
       SQLITE_OPEN_CREATE
+      SQLITE_OPEN_EXRESCODE
       SQLITE_OPEN_FULLMUTEX
       SQLITE_OPEN_MEMORY
       SQLITE_OPEN_NOFOLLOW
@@ -404,6 +435,7 @@ our %EXPORT_TAGS = (
       SQLITE_OPEN_READONLY
       SQLITE_OPEN_READWRITE
       SQLITE_OPEN_SHAREDCACHE
+      SQLITE_OPEN_SUPER_JOURNAL
       SQLITE_OPEN_URI
       SQLITE_PERM
       SQLITE_PRAGMA
@@ -424,12 +456,22 @@ our %EXPORT_TAGS = (
       SQLITE_SCHEMA
       SQLITE_SELECT
       SQLITE_SUBTYPE
+      SQLITE_TEXT
       SQLITE_TOOBIG
       SQLITE_TRANSACTION
+      SQLITE_TXN_NONE
+      SQLITE_TXN_READ
+      SQLITE_TXN_WRITE
       SQLITE_UPDATE
       SQLITE_VERSION_NUMBER
       SQLITE_WARNING
       SQLITE_WARNING_AUTOINDEX
+    /],
+
+    allowed_return_values_from_sqlite3_txn_state => [qw/
+      SQLITE_TXN_NONE
+      SQLITE_TXN_READ
+      SQLITE_TXN_WRITE
     /],
 
     authorizer_action_codes => [qw/
@@ -495,9 +537,19 @@ our %EXPORT_TAGS = (
       SQLITE_DBCONFIG_MAX
       SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
       SQLITE_DBCONFIG_RESET_DATABASE
+      SQLITE_DBCONFIG_REVERSE_SCANORDER
+      SQLITE_DBCONFIG_STMT_SCANSTATUS
       SQLITE_DBCONFIG_TRIGGER_EQP
       SQLITE_DBCONFIG_TRUSTED_SCHEMA
       SQLITE_DBCONFIG_WRITABLE_SCHEMA
+    /],
+
+    dbd_sqlite_string_mode => [qw/
+      DBD_SQLITE_STRING_MODE_BYTES
+      DBD_SQLITE_STRING_MODE_PV
+      DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK
+      DBD_SQLITE_STRING_MODE_UNICODE_NAIVE
+      DBD_SQLITE_STRING_MODE_UNICODE_STRICT
     /],
 
     extended_result_codes => [qw/
@@ -514,6 +566,7 @@ our %EXPORT_TAGS = (
       SQLITE_CANTOPEN_SYMLINK
       SQLITE_CONSTRAINT_CHECK
       SQLITE_CONSTRAINT_COMMITHOOK
+      SQLITE_CONSTRAINT_DATATYPE
       SQLITE_CONSTRAINT_FOREIGNKEY
       SQLITE_CONSTRAINT_FUNCTION
       SQLITE_CONSTRAINT_NOTNULL
@@ -537,6 +590,7 @@ our %EXPORT_TAGS = (
       SQLITE_IOERR_CLOSE
       SQLITE_IOERR_COMMIT_ATOMIC
       SQLITE_IOERR_CONVPATH
+      SQLITE_IOERR_CORRUPTFS
       SQLITE_IOERR_DATA
       SQLITE_IOERR_DELETE
       SQLITE_IOERR_DELETE_NOENT
@@ -563,6 +617,7 @@ our %EXPORT_TAGS = (
       SQLITE_IOERR_WRITE
       SQLITE_LOCKED_SHAREDCACHE
       SQLITE_LOCKED_VTAB
+      SQLITE_NOTICE_RBU
       SQLITE_NOTICE_RECOVER_ROLLBACK
       SQLITE_NOTICE_RECOVER_WAL
       SQLITE_OK_SYMLINK
@@ -577,6 +632,7 @@ our %EXPORT_TAGS = (
 
     flags_for_file_open_operations => [qw/
       SQLITE_OPEN_CREATE
+      SQLITE_OPEN_EXRESCODE
       SQLITE_OPEN_FULLMUTEX
       SQLITE_OPEN_MEMORY
       SQLITE_OPEN_NOFOLLOW
@@ -585,6 +641,7 @@ our %EXPORT_TAGS = (
       SQLITE_OPEN_READONLY
       SQLITE_OPEN_READWRITE
       SQLITE_OPEN_SHAREDCACHE
+      SQLITE_OPEN_SUPER_JOURNAL
       SQLITE_OPEN_URI
     /],
 
@@ -600,6 +657,7 @@ our %EXPORT_TAGS = (
       SQLITE_FLOAT
       SQLITE_INTEGER
       SQLITE_NULL
+      SQLITE_TEXT
     /],
 
     result_codes => [qw/
@@ -672,11 +730,23 @@ DBD::SQLite::Constants - common SQLite constants
 
 =head1 DESCRIPTION
 
-You can import necessary SQLite constants from this module. Available tags are C<all>, C<authorizer_action_codes>, C<authorizer_return_codes>, C<version> (C<compile_time_library_version_numbers>), C<database_connection_configuration_options>, C<extended_result_codes>, C<file_open> (C<flags_for_file_open_operations>), C<function_flags>, C<datatypes> (C<fundamental_datatypes>), C<result_codes>, C<run_time_limit_categories>. See L<http://sqlite.org/c3ref/constlist.html> for the complete list of constants.
+You can import necessary SQLite constants from this module. Available tags are C<all>, C<allowed_return_values_from_sqlite3_txn_state>, C<authorizer_action_codes>, C<authorizer_return_codes>, C<version> (C<compile_time_library_version_numbers>), C<database_connection_configuration_options>, C<dbd_sqlite_string_mode>, C<extended_result_codes>, C<file_open> (C<flags_for_file_open_operations>), C<function_flags>, C<datatypes> (C<fundamental_datatypes>), C<result_codes>, C<run_time_limit_categories>. See L<http://sqlite.org/c3ref/constlist.html> for the complete list of constants.
 
 This module does not export anything by default.
 
 =head1 CONSTANTS
+
+=head2 allowed_return_values_from_sqlite3_txn_state
+
+=over 4
+
+=item SQLITE_TXN_NONE
+
+=item SQLITE_TXN_READ
+
+=item SQLITE_TXN_WRITE
+
+=back
 
 =head2 authorizer_action_codes
 
@@ -811,6 +881,26 @@ This module does not export anything by default.
 =item SQLITE_DBCONFIG_LEGACY_FILE_FORMAT
 
 =item SQLITE_DBCONFIG_TRUSTED_SCHEMA
+
+=item SQLITE_DBCONFIG_STMT_SCANSTATUS
+
+=item SQLITE_DBCONFIG_REVERSE_SCANORDER
+
+=back
+
+=head2 dbd_sqlite_string_mode
+
+=over 4
+
+=item DBD_SQLITE_STRING_MODE_PV
+
+=item DBD_SQLITE_STRING_MODE_BYTES
+
+=item DBD_SQLITE_STRING_MODE_UNICODE_NAIVE
+
+=item DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK
+
+=item DBD_SQLITE_STRING_MODE_UNICODE_STRICT
 
 =back
 
@@ -962,6 +1052,12 @@ This module does not export anything by default.
 
 =item SQLITE_CORRUPT_INDEX
 
+=item SQLITE_IOERR_CORRUPTFS
+
+=item SQLITE_CONSTRAINT_DATATYPE
+
+=item SQLITE_NOTICE_RBU
+
 =back
 
 =head2 file_open (flags_for_file_open_operations)
@@ -987,6 +1083,10 @@ This module does not export anything by default.
 =item SQLITE_OPEN_MEMORY
 
 =item SQLITE_OPEN_NOFOLLOW
+
+=item SQLITE_OPEN_SUPER_JOURNAL
+
+=item SQLITE_OPEN_EXRESCODE
 
 =back
 
@@ -1015,6 +1115,8 @@ This module does not export anything by default.
 =item SQLITE_BLOB
 
 =item SQLITE_NULL
+
+=item SQLITE_TEXT
 
 =back
 

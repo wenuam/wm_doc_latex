@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2023 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -9,12 +9,9 @@ package Text::CSV_XS;
 
 # HISTORY
 #
-# 0.24 -
-#    H.Merijn Brand (h.m.brand@xs4all.nl)
-# 0.10 - 0.23
-#    Jochen Wiedmann <joe@ispsoft.de>
-# Based on (the original) Text::CSV by:
-#    Alan Citterman <alan@mfgrtl.com>
+# 0.24 -      H.Merijn Brand <perl5@tux.freedom.nl>
+# 0.10 - 0.23 Jochen Wiedmann <joe@ispsoft.de>
+# Based on (the original) Text::CSV by Alan Citterman <alan@mfgrtl.com>
 
 require 5.006001;
 
@@ -25,15 +22,33 @@ require Exporter;
 use XSLoader;
 use Carp;
 
-use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.45";
-@ISA       = qw( Exporter );
-@EXPORT_OK = qw( csv );
+use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
+$VERSION = "1.53";
+@ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
-sub PV { 0 }
-sub IV { 1 }
-sub NV { 2 }
+sub PV { 0 } sub CSV_TYPE_PV { PV }
+sub IV { 1 } sub CSV_TYPE_IV { IV }
+sub NV { 2 } sub CSV_TYPE_NV { NV }
+
+sub CSV_FLAGS_IS_QUOTED		{ 0x0001 }
+sub CSV_FLAGS_IS_BINARY		{ 0x0002 }
+sub CSV_FLAGS_ERROR_IN_FIELD	{ 0x0004 }
+sub CSV_FLAGS_IS_MISSING	{ 0x0010 }
+
+%EXPORT_TAGS = (
+    CONSTANTS	=> [qw( 
+	CSV_FLAGS_IS_QUOTED
+	CSV_FLAGS_IS_BINARY
+	CSV_FLAGS_ERROR_IN_FIELD
+	CSV_FLAGS_IS_MISSING
+
+	CSV_TYPE_PV
+	CSV_TYPE_IV
+	CSV_TYPE_NV
+	)],
+    );
+@EXPORT_OK = (qw( csv PV IV NV ), @{$EXPORT_TAGS{'CONSTANTS'}});
 
 if ($] < 5.008002) {
     no warnings "redefine";
@@ -78,7 +93,9 @@ my %def_attr = (
     'keep_meta_info'		=> 0,
     'verbatim'			=> 0,
     'formula'			=> 0,
+    'skip_empty_rows'		=> 0,
     'undef_str'			=> undef,
+    'comment_str'		=> undef,
     'types'			=> undef,
     'callbacks'			=> undef,
 
@@ -93,6 +110,7 @@ my %def_attr = (
     '_BOUND_COLUMNS'		=> undef,
     '_AHEAD'			=> undef,
     '_FORMULA_CB'		=> undef,
+    '_EMPTROW_CB'		=> undef,
 
     'ENCODING'			=> undef,
     );
@@ -101,9 +119,11 @@ my %attr_alias = (
     'verbose_diag'		=> "diag_verbose",
     'quote_null'		=> "escape_null",
     'escape'			=> "escape_char",
+    'comment'			=> "comment_str",
     );
 my $last_new_err = Text::CSV_XS->SetDiag (0);
 my $ebcdic       = ord ("A") == 0xC1;	# Faster than $Config{'ebcdic'}
+my @internal_kh;
 
 # NOT a method: is also used before bless
 sub _unhealthy_whitespace {
@@ -233,8 +253,9 @@ sub new {
     $last_new_err = Text::CSV_XS->SetDiag (0);
     defined $\ && !exists $attr{'eol'} and $self->{'eol'} = $\;
     bless $self, $class;
-    defined $self->{'types'} and $self->types ($self->{'types'});
-    defined $attr_formula  and $self->{'formula'} = _supported_formula ($self, $attr_formula);
+    defined $self->{'types'}           and $self->types ($self->{'types'});
+    defined $self->{'skip_empty_rows'} and $self->{'skip_empty_rows'} = _supported_skip_empty_rows ($self, $self->{'skip_empty_rows'});
+    defined $attr_formula              and $self->{'formula'}         = _supported_formula         ($self, $attr_formula);
     $self;
     } # new
 
@@ -268,8 +289,10 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     '_is_bound'			=> 26,	# 26 .. 29
     'formula'			=> 38,
     'strict'			=> 42,
+    'skip_empty_rows'		=> 43,
     'undef_str'			=> 46,
-    'types'			=> 50,
+    'comment_str'		=> 54,
+    'types'			=> 62,
     );
 
 # A `character'
@@ -431,7 +454,36 @@ sub strict {
     my $self = shift;
     @_ and $self->_set_attr_X ("strict", shift);
     $self->{'strict'};
-    } # always_quote
+    } # strict
+
+sub _supported_skip_empty_rows {
+    my ($self, $f) = @_;
+    defined $f or return 0;
+    if ($self && $f && ref $f && ref $f eq "CODE") {
+	$self->{'_EMPTROW_CB'} = $f;
+	return 6;
+	}
+    $f =~ m/^(?: 0 | undef         )$/xi ? 0 :
+    $f =~ m/^(?: 1 | skip          )$/xi ? 1 :
+    $f =~ m/^(?: 2 | eof   | stop  )$/xi ? 2 :
+    $f =~ m/^(?: 3 | die           )$/xi ? 3 :
+    $f =~ m/^(?: 4 | croak         )$/xi ? 4 :
+    $f =~ m/^(?: 5 | error         )$/xi ? 5 :
+    $f =~ m/^(?: 6 | cb            )$/xi ? 6 : do {
+	$self ||= "Text::CSV_XS";
+	croak ($self->_SetDiagInfo (1500, "skip_empty_rows '$f' is not supported"));
+	};
+    } # _supported_skip_empty_rows
+
+sub skip_empty_rows {
+    my $self = shift;
+    @_ and $self->_set_attr_N ("skip_empty_rows", _supported_skip_empty_rows ($self, shift));
+    my $ser = $self->{'skip_empty_rows'};
+    $ser == 6 or $self->{'_EMPTROW_CB'} = undef;
+    $ser <= 1 ? $ser : $ser == 2 ? "eof"   : $ser == 3 ? "die"   :
+		       $ser == 4 ? "croak" : $ser == 5 ? "error" :
+		       $self->{'_EMPTROW_CB'};
+    } # skip_empty_rows
 
 sub _SetDiagInfo {
     my ($self, $err, $msg) = @_;
@@ -466,7 +518,8 @@ sub formula {
     @_ and $self->_set_attr_N ("formula", _supported_formula ($self, shift));
     $self->{'formula'} == 6 or $self->{'_FORMULA_CB'} = undef;
     [qw( none die croak diag empty undef cb )]->[_supported_formula ($self, $self->{'formula'})];
-    } # always_quote
+    } # formula
+
 sub formula_handling {
     my $self = shift;
     $self->formula (@_);
@@ -546,6 +599,16 @@ sub undef_str {
     $self->{'undef_str'};
     } # undef_str
 
+sub comment_str {
+    my $self = shift;
+    if (@_) {
+	my $v = shift;
+	$self->{'comment_str'} = defined $v ? "$v" : undef;
+	$self->_cache_set ($_cache_id{'comment_str'}, $self->{'comment_str'});
+	}
+    $self->{'comment_str'};
+    } # comment_str
+
 sub auto_diag {
     my $self = shift;
     if (@_) {
@@ -581,7 +644,7 @@ sub status {
 sub eof {
     my $self = shift;
     return $self->{'_EOF'};
-    } # status
+    } # eof
 
 sub types {
     my $self = shift;
@@ -736,21 +799,21 @@ sub is_quoted {
     my ($self, $idx) = @_;
     ref $self->{'_FFLAGS'} &&
 	$idx >= 0 && $idx < @{$self->{'_FFLAGS'}} or return;
-    $self->{'_FFLAGS'}[$idx] & 0x0001 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_QUOTED  () ? 1 : 0;
     } # is_quoted
 
 sub is_binary {
     my ($self, $idx) = @_;
     ref $self->{'_FFLAGS'} &&
 	$idx >= 0 && $idx < @{$self->{'_FFLAGS'}} or return;
-    $self->{'_FFLAGS'}[$idx] & 0x0002 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_BINARY  () ? 1 : 0;
     } # is_binary
 
 sub is_missing {
     my ($self, $idx) = @_;
     $idx < 0 || !ref $self->{'_FFLAGS'} and return;
     $idx >= @{$self->{'_FFLAGS'}} and return 1;
-    $self->{'_FFLAGS'}[$idx] & 0x0010 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_MISSING () ? 1 : 0;
     } # is_missing
 
 # combine
@@ -858,10 +921,10 @@ sub header {
     $self->{'_COLUMN_NAMES'}	= undef if $args{'set_column_names'};
     $self->{'_BOUND_COLUMNS'}	= undef if $args{'set_column_names'};
 
-    if (defined $args{'sep_set'}) {
-	ref $args{'sep_set'} eq "ARRAY" or
+    if (defined   $args{'sep_set'}) {
+	ref       $args{'sep_set'} eq "ARRAY" or
 	    croak ($self->_SetDiagInfo (1500, "sep_set should be an array ref"));
-	@seps =  @{$args{'sep_set'}};
+	@seps = @{$args{'sep_set'}};
 	}
 
     $^O eq "MSWin32" and binmode $fh;
@@ -956,7 +1019,7 @@ sub header {
     ref $args{'munge_column_names'} eq "HASH" and
 	@hdr = map { $args{'munge_column_names'}->{$_} || $_ } @hdr;
     my %hdr; $hdr{$_}++ for @hdr;
-    exists $hdr{""} and croak ($self->SetDiag (1012));
+    exists $hdr{''} and croak ($self->SetDiag (1012));
     unless (keys %hdr == @hdr) {
 	croak ($self->_SetDiagInfo (1013, join ", " =>
 	    map { "$_ ($hdr{$_})" } grep { $hdr{$_} > 1 } keys %hdr));
@@ -991,10 +1054,10 @@ sub getline_hr {
     $self->{'_COLUMN_NAMES'} or croak ($self->SetDiag (3002));
     my $fr = $self->getline (@args) or return;
     if (ref $self->{'_FFLAGS'}) { # missing
-	$self->{'_FFLAGS'}[$_] = 0x0010
+	$self->{'_FFLAGS'}[$_] = CSV_FLAGS_IS_MISSING ()
 	    for (@{$fr} ? $#{$fr} + 1 : 0) .. $#{$self->{'_COLUMN_NAMES'}};
 	@{$fr} == 1 && (!defined $fr->[0] || $fr->[0] eq "") and
-	    $self->{'_FFLAGS'}[0] ||= 0x0010;
+	    $self->{'_FFLAGS'}[0] ||= CSV_FLAGS_IS_MISSING ();
 	}
     @hr{@{$self->{'_COLUMN_NAMES'}}} = @{$fr};
     \%hr;
@@ -1254,6 +1317,9 @@ sub _csv_attr {
 	or croak ($last_new_err);
     defined $form and $csv->formula ($form);
 
+    $kh && !ref $kh && $kh =~ m/^(?:1|yes|true|internal|auto)$/i and
+	$kh = \@internal_kh;
+
     return {
 	'csv'  => $csv,
 	'attr' => { %attr },
@@ -1293,6 +1359,9 @@ sub csv {
 	}
 
     if ($c->{'out'} && !$c->{'sink'}) {
+	!$hdrs && ref $c->{'kh'} && $c->{'kh'} == \@internal_kh and
+	    $hdrs = $c->{'kh'};
+
 	if (ref $in eq "CODE") {
 	    my $hdr = 1;
 	    while (my $row = $in->($csv)) {
@@ -1310,7 +1379,7 @@ sub csv {
 		    }
 		}
 	    }
-	elsif (ref $in->[0] eq "ARRAY") { # aoa
+	elsif (@{$in} == 0 or ref $in->[0] eq "ARRAY") { # aoa
 	    ref $hdrs and $csv->print ($fh, $hdrs);
 	    for (@{$in}) {
 		$c->{'cboi'} and $c->{'cboi'}->($csv, $_);
@@ -1321,7 +1390,7 @@ sub csv {
 	else { # aoh
 	    my @hdrs = ref $hdrs ? @{$hdrs} : keys %{$in->[0]};
 	    defined $hdrs or $hdrs = "auto";
-	    ref $hdrs || $hdrs eq "auto" and
+	    ref $hdrs || $hdrs eq "auto" and @hdrs and
 		$csv->print ($fh, [ map { $hdr{$_} || $_ } @hdrs ]);
 	    for (@{$in}) {
 		local %_;
@@ -1339,16 +1408,21 @@ sub csv {
     my @row1;
     if (defined $c->{'hd_s'} || defined $c->{'hd_b'} || defined $c->{'hd_m'} || defined $c->{'hd_c'}) {
 	my %harg;
-	defined $c->{'hd_s'} and $harg{'set_set'}            = $c->{'hd_s'};
-	defined $c->{'hd_d'} and $harg{'detect_bom'}         = $c->{'hd_b'};
-	defined $c->{'hd_m'} and $harg{'munge_column_names'} = $hdrs ? "none" : $c->{'hd_m'};
-	defined $c->{'hd_c'} and $harg{'set_column_names'}   = $hdrs ? 0      : $c->{'hd_c'};
+	!defined $c->{'hd_s'} &&  $c->{'attr'}{'sep_char'} and
+	         $c->{'hd_s'} = [ $c->{'attr'}{'sep_char'} ];
+	!defined $c->{'hd_s'} &&  $c->{'attr'}{'sep'} and
+	         $c->{'hd_s'} = [ $c->{'attr'}{'sep'} ];
+	defined  $c->{'hd_s'} and $harg{'sep_set'}            = $c->{'hd_s'};
+	defined  $c->{'hd_b'} and $harg{'detect_bom'}         = $c->{'hd_b'};
+	defined  $c->{'hd_m'} and $harg{'munge_column_names'} = $hdrs ? "none" : $c->{'hd_m'};
+	defined  $c->{'hd_c'} and $harg{'set_column_names'}   = $hdrs ? 0      : $c->{'hd_c'};
 	@row1 = $csv->header ($fh, \%harg);
 	my @hdr = $csv->column_names ();
 	@hdr and $hdrs ||= \@hdr;
 	}
 
     if ($c->{'kh'}) {
+	@internal_kh = ();
 	ref $c->{'kh'} eq "ARRAY" or croak ($csv->SetDiag (1501));
 	$hdrs ||= "auto";
 	}
@@ -1360,33 +1434,38 @@ sub csv {
 	}
     my $val = $c->{'val'};
     if ($val) {
-	$key					      or croak ($csv->SetDiag (1502));
+	$key						or croak ($csv->SetDiag (1502));
 	!ref $val or ref $val eq "ARRAY" && @{$val} > 0 or croak ($csv->SetDiag (1503));
 	}
 
     $c->{'fltr'} && grep m/\D/ => keys %{$c->{'fltr'}} and $hdrs ||= "auto";
     if (defined $hdrs) {
-	if (!ref $hdrs) {
-	    if ($hdrs eq "skip") {
-		$csv->getline ($fh); # discard;
+	if (!ref $hdrs or ref $hdrs eq "CODE") {
+	    my $h = $c->{'hd_b'}
+		? [ $csv->column_names () ]
+		:   $csv->getline ($fh);
+	    my $has_h = $h && @$h;
+
+	    if (ref $hdrs) {
+		$has_h or return;
+		my $cr = $hdrs;
+		$hdrs  = [ map {  $cr->($hdr{$_} || $_) } @{$h} ];
+		}
+	    elsif ($hdrs eq "skip") {
+		# discard;
 		}
 	    elsif ($hdrs eq "auto") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map {      $hdr{$_} || $_ } @{$h} ];
 		}
 	    elsif ($hdrs eq "lc") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map { lc ($hdr{$_} || $_) } @{$h} ];
 		}
 	    elsif ($hdrs eq "uc") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map { uc ($hdr{$_} || $_) } @{$h} ];
 		}
-	    }
-	elsif (ref $hdrs eq "CODE") {
-	    my $h  = $csv->getline ($fh) or return;
-	    my $cr = $hdrs;
-	    $hdrs  = [ map {  $cr->($hdr{$_} || $_) } @{$h} ];
 	    }
 	$c->{'kh'} and $hdrs and @{$c->{'kh'}} = @{$hdrs};
 	}
@@ -1419,7 +1498,7 @@ sub csv {
 	  do {
 	    my @h = $csv->column_names ($hdrs);
 	    my %h; $h{$_}++ for @h;
-	    exists $h{""} and croak ($csv->SetDiag (1012));
+	    exists $h{''} and croak ($csv->SetDiag (1012));
 	    unless (keys %h == @h) {
 		croak ($csv->_SetDiagInfo (1013, join ", " =>
 		    map { "$_ ($h{$_})" } grep { $h{$_} > 1 } keys %h));
@@ -1519,7 +1598,7 @@ Text::CSV_XS - comma-separated values manipulation routines
                 headers => "auto");   # as array of hash
 
  # Write array of arrays as csv file
- csv (in => $aoa, out => "file.csv", sep_char=> ";");
+ csv (in => $aoa, out => "file.csv", sep_char => ";");
 
  # Only show lines where "code" is odd
  csv (in => "data.csv", filter => { code => sub { $_ % 2 }});
@@ -1655,19 +1734,19 @@ meaning of possible present BOM.
 
 =head1 SPECIFICATION
 
-While no formal specification for CSV exists, L<RFC 4180|http://tools.ietf.org/html/rfc4180>
+While no formal specification for CSV exists, L<RFC 4180|https://datatracker.ietf.org/doc/html/rfc4180>
 (I<1>) describes the common format and establishes  C<text/csv> as the MIME
-type registered with the IANA. L<RFC 7111|http://tools.ietf.org/html/rfc7111>
+type registered with the IANA. L<RFC 7111|https://datatracker.ietf.org/doc/html/rfc7111>
 (I<2>) adds fragments to CSV.
 
 Many informal documents exist that describe the C<CSV> format.   L<"How To:
-The Comma Separated Value (CSV) File Format"|http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm>
+The Comma Separated Value (CSV) File Format"|http://creativyst.com/Doc/Articles/CSV/CSV01.shtml>
 (I<3>)  provides an overview of the  C<CSV>  format in the most widely used
 applications and explains how it can best be used and supported.
 
- 1) http://tools.ietf.org/html/rfc4180
- 2) http://tools.ietf.org/html/rfc7111
- 3) http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm
+ 1) https://datatracker.ietf.org/doc/html/rfc4180
+ 2) https://datatracker.ietf.org/doc/html/rfc7111
+ 3) http://creativyst.com/Doc/Articles/CSV/CSV01.shtml
 
 The basic rules are as follows:
 
@@ -1870,7 +1949,7 @@ If instead you want to escape the  L<C<quote_char>|/quote_char> by doubling
 it you will need to also change the  C<escape_char>  to be the same as what
 you have changed the L<C<quote_char>|/quote_char> to.
 
-Setting C<escape_char> to <undef> or C<""> will disable escaping completely
+Setting C<escape_char> to C<undef> or C<""> will completely disable escapes
 and is greatly discouraged. This will also disable C<escape_null>.
 
 The escape character can not be equal to the separation character.
@@ -1901,10 +1980,93 @@ X<strict>
 If this attribute is set to C<1>, any row that parses to a different number
 of fields than the previous row will cause the parser to throw error 2014.
 
+=head3 skip_empty_rows
+X<skip_empty_rows>
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 1 });
+         $csv->skip_empty_rows ("eof");
+ my $f = $csv->skip_empty_rows;
+
+This attribute defines the behavior for empty rows:  an L</eol> immediately
+following the start of line. Default behavior is to return one single empty
+field.
+
+This attribute is only used in parsing.  This attribute is ineffective when
+using L</parse> and L</fields>.
+
+Possible values for this attribute are
+
+=over 2
+
+=item 0 | undef
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 0 });
+ $csv->skip_empty_rows (undef);
+
+No special action is taken. The result will be one single empty field.
+
+=item 1 | "skip"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 1 });
+ $csv->skip_empty_rows ("skip");
+
+The row will be skipped.
+
+=item 2 | "eof" | "stop"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 2 });
+ $csv->skip_empty_rows ("eof");
+
+The parsing will stop as if an L</eof> was detected.
+
+=item 3 | "die"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 3 });
+ $csv->skip_empty_rows ("die");
+
+The parsing will stop.  The internal error code will be set to 2015 and the
+parser will C<die>.
+
+=item 4 | "croak"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 4 });
+ $csv->skip_empty_rows ("croak");
+
+The parsing will stop.  The internal error code will be set to 2015 and the
+parser will C<croak>.
+
+=item 5 | "error"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 5 });
+ $csv->skip_empty_rows ("error");
+
+The parsing will fail.  The internal error code will be set to 2015.
+
+=item callback
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => sub { [] } });
+ $csv->skip_empty_rows (sub { [ 42, $., undef, "empty" ] });
+
+The callback is invoked and its result used instead.  If you want the parse
+to stop after the callback, make sure to return a false value.
+
+The returned value from the callback should be an array-ref. Any other type
+will cause the parse to stop, so these are equivalent in behavior:
+
+ csv (in => $fh, skip_empty_rows => "stop");
+ csv (in => $fh. skip_empty_rows => sub { 0; });
+
+=back
+
+Without arguments, the current value is returned: C<0>, C<1>, C<eof>, C<die>,
+C<croak> or the callback.
+
 =head3 formula_handling
+X<formula_handling>
+
+Alias for L</formula>
 
 =head3 formula
-X<formula_handling>
 X<formula>
 
  my $csv = Text::CSV_XS->new ({ formula => "none" });
@@ -2232,7 +2394,7 @@ X<quote_binary>
 
 By default,  all "unsafe" bytes inside a string cause the combined field to
 be quoted.  By setting this attribute to C<0>, you can disable that trigger
-for bytes >= C<0x7F>.
+for bytes C<< >= 0x7F >>.
 
 =head3 escape_null
 X<escape_null>
@@ -2311,6 +2473,25 @@ This attribute is useful when exporting  CSV data  to be imported in custom
 loaders, like for MySQL, that recognize special sequences for C<NULL> data.
 
 This attribute has no meaning when parsing CSV data.
+
+=head3 comment_str
+X<comment_str>
+
+ my $csv = Text::CSV_XS->new ({ comment_str => "#" });
+         $csv->comment_str (undef);
+ my $s = $csv->comment_str;
+
+This attribute optionally defines a string to be recognized as comment.  If
+this attribute is defined,   all lines starting with this sequence will not
+be parsed as CSV but skipped as comment.
+
+This attribute has no meaning when generating CSV.
+
+Comment strings that start with any of the special characters/sequences are
+not supported (so it cannot start with any of L</sep_char>, L</quote_char>,
+L</escape_char>, L</sep>, L</quote>, or L</eol>).
+
+For convenience, C<comment> is an alias for C<comment_str>.
 
 =head3 verbatim
 X<verbatim>
@@ -2391,9 +2572,11 @@ is equivalent to
      quote_binary          => 1,
      keep_meta_info        => 0,
      strict                => 0,
+     skip_empty_rows       => 0,
      formula               => 0,
      verbatim              => 0,
      undef_str             => undef,
+     comment_str           => undef,
      types                 => undef,
      callbacks             => undef,
      });
@@ -2525,7 +2708,8 @@ X<getline_all>
 This will return a reference to a list of L<getline ($fh)|/getline> results.
 In this call, C<keep_meta_info> is disabled.  If C<$offset> is negative, as
 with C<splice>, only the last  C<abs ($offset)> records of C<$fh> are taken
-into consideration.
+into consideration. Parameters C<$offset> and C<$length> are expected to be
+integers. Non-integer values are interpreted as integer without check.
 
 Given a CSV file with 10 lines:
 
@@ -2611,7 +2795,7 @@ supposed to croak and set error 1500.
 X<fragment>
 
 This function tries to implement RFC7111  (URI Fragment Identifiers for the
-text/csv Media Type) - http://tools.ietf.org/html/rfc7111
+text/csv Media Type) - https://datatracker.ietf.org/doc/html/rfc7111
 
  my $AoA = $csv->fragment ($fh, $spec);
 
@@ -2694,7 +2878,7 @@ C<cell=1,1-3,3;2,2-4,4;2,3;4,2> will return:
 
 =back
 
-L<RFC7111|http://tools.ietf.org/html/rfc7111> does  B<not>  allow different
+L<RFC7111|https://datatracker.ietf.org/doc/html/rfc7111> does  B<not>  allow different
 types of specs to be combined   (either C<row> I<or> C<col> I<or> C<cell>).
 Passing an invalid fragment specification will croak and set error 2013.
 
@@ -3023,15 +3207,24 @@ or fetch the current type settings with
 =item IV
 X<IV>
 
+=item CSV_TYPE_IV
+X<CSV_TYPE_IV>
+
 Set field type to integer.
 
 =item NV
 X<NV>
 
+=item CSV_TYPE_NV
+X<CSV_TYPE_NV>
+
 Set field type to numeric/float.
 
 =item PV
 X<PV>
+
+=item CSV_TYPE_PV
+X<CSV_TYPE_PV>
 
 Set field type to string.
 
@@ -3063,13 +3256,35 @@ L</combine> method. The flags are bit-wise-C<or>'d like:
 
 =over 2
 
-=item C< >0x0001
+=item C<0x0001>
+
+=item C<CSV_FLAGS_IS_QUOTED>
+X<CSV_FLAGS_IS_QUOTED>
 
 The field was quoted.
 
-=item C< >0x0002
+=item C<0x0002>
+
+=item C<CSV_FLAGS_IS_BINARY>
+X<CSV_FLAGS_IS_BINARY>
 
 The field was binary.
+
+=item C<0x0004>
+
+=item C<CSV_FLAGS_ERROR_IN_FIELD>
+X<CSV_FLAGS_ERROR_IN_FIELD>
+
+The field was invalid.
+
+Currently only used when C<allow_loose_quotes> is active.
+
+=item C<0x0010>
+
+=item C<CSV_FLAGS_IS_MISSING>
+X<CSV_FLAGS_IS_MISSING>
+
+The field was missing.
 
 =back
 
@@ -3203,6 +3418,30 @@ X<SetDiag>
  $csv->SetDiag (0);
 
 Use to reset the diagnostics if you are dealing with errors.
+
+=head1 IMPORTS/EXPORTS
+
+By default none of these are exported.
+
+=over 2
+
+=item csv
+
+ use Text::CSV_XS qw( csv );
+
+Import the function L</csv> function. See below.
+
+=item :CONSTANTS
+
+ use Text::CSV_XS qw( :CONSTANTS );
+
+Import module constants  L</CSV_FLAGS_IS_QUOTED>,  L</CSV_FLAGS_IS_BINARY>,
+L</CSV_FLAGS_ERROR_IN_FIELD>,  L</CSV_FLAGS_IS_MISSING>,   L</CSV_TYPE_PV>,
+L</CSV_TYPE_IV>, and L</CSV_TYPE_NV>. Each can be imported alone
+
+ use Text::CSV_XS qw( CSV_FLAS_IS_BINARY CSV_TYPE_NV );
+
+=back
 
 =head1 FUNCTIONS
 
@@ -3347,7 +3586,7 @@ If the C<in> argument point to something to parse, and the C<out> is set to
 a reference to an C<ARRAY> or a C<HASH>, the output is appended to the data
 in the existing reference. The result of the parse should match what exists
 in the reference passed. This might come handy when you have to parse a set
-of files with similar content (like data stored per period) and you want to 
+of files with similar content (like data stored per period) and you want to
 collect that into a single data structure:
 
  my %hash;
@@ -3419,6 +3658,8 @@ X<skip>
 When C<skip> is used, the header will not be included in the output.
 
  my $aoa = csv (in => $fh, headers => "skip");
+
+C<skip> is invalid/ignored in combinations with L<C<detect_bom>|/detect_bom>.
 
 =item auto
 X<auto>
@@ -3660,6 +3901,21 @@ This attribute can be abbreviated to C<kh> or passed as C<keep_column_names>.
 
 This attribute implies a default of C<auto> for the C<headers> attribute.
 
+X<stable header order>
+X<internal headers>
+The headers can also be kept internally to keep stable header order:
+
+ csv (in      => csv (in => "file.csv", kh => "internal"),
+      out     => "new.csv",
+      kh      => "internal");
+
+where C<internal> can also be C<1>, C<yes>, or C<true>. This is similar to
+
+ my @h;
+ csv (in      => csv (in => "file.csv", kh => \@h),
+      out     => "new.csv",
+      headers => \@h);
+
 =head3 fragment
 X<fragment>
 
@@ -3685,7 +3941,9 @@ X<seps>
 If C<sep_set> is set, the method L</header> is invoked on the opened stream
 to detect and set L<C<sep_char>|/sep_char> with the given set.
 
-C<sep_set> can be abbreviated to C<seps>.
+C<sep_set> can be abbreviated to C<seps>. If neither C<sep_set> not C<seps>
+is given, but C<sep> is defined, C<sep_set> defaults to C<[ sep ]>. This is
+only supported for perl version 5.10 and up.
 
 Note that as the  L</header> method is invoked,  its default is to also set
 the headers.
@@ -4285,6 +4543,19 @@ CSV generated like this, but map and filter are your friends again
  csv (in => "foo.csv", filter => { 1 => sub {
      $sth->execute (map { $_ eq "\\N" ? undef : $_ } @{$_[1]}); 0; }});
 
+=head2 Converting CSV to JSON
+
+ use Text::CSV_XS qw( csv );
+ use JSON; # or Cpanel::JSON::XS for better performance
+
+ # AoA (no header interpretation)
+ say encode_json (csv (in => "file.csv"));
+
+ # AoH (convert to structures)
+ say encode_json (csv (in => "file.csv", bom => 1));
+
+Yes, it is that simple.
+
 =head2 The examples folder
 
 For more extended examples, see the F<examples/> C<1>. sub-directory in the
@@ -4433,6 +4704,18 @@ return flags. L</getline_all> returns all rows for an open stream, but this
 will not return flags either.  L</fragment>  can reduce the  required  rows
 I<or> columns, but cannot combine them.
 
+=item provider
+
+ csv (in => $fh) vs csv (provider => sub { get_line });
+
+Whatever the attribute name might end up to be,  this should make it easier
+to add input providers for parsing.   Currently most special variations for
+the C<in> attribute are aimed at CSV generation: e.g. a callback is defined
+to return a reference to a record. This new attribute should enable passing
+data to parse, like getline.
+
+Suggested by Johan Vromans.
+
 =item Cookbook
 
 Write a document that has recipes for  most known  non-standard  (and maybe
@@ -4447,11 +4730,12 @@ Requirements|http://w3c.github.io/csvw/use-cases-and-requirements/index.html>
 Steal good new ideas and features from L<PapaParse|http://papaparse.com> or
 L<csvkit|http://csvkit.readthedocs.org>.
 
-=item Perl6 support
+=item Raku support
 
-I'm already working on perl6 support L<here|https://github.com/Tux/CSV>. No
-promises yet on when it is finished (or fast). Trying to keep the API alike
-as much as possible.
+Raku support can be found L<here|https://github.com/Tux/CSV>. The interface
+is richer in support than the Perl5 API, as Raku supports more types.
+
+The Raku version does not (yet) support pure binary CSV datasets.
 
 =back
 
@@ -4707,6 +4991,12 @@ X<2014>
 Inconsistent number of fields under strict parsing.
 
 =item *
+2015 "ERW - Empty row"
+X<2015>
+
+An empty row was not allowed.
+
+=item *
 2021 "EIQ - NL char inside quotes, binary off"
 X<2021>
 
@@ -4838,8 +5128,8 @@ L<IO::File>,  L<IO::Handle>,  L<IO::Wrap>,  L<Text::CSV>,  L<Text::CSV_PP>,
 L<Text::CSV::Encoded>,     L<Text::CSV::Separator>,    L<Text::CSV::Slurp>,
 L<Spreadsheet::CSV> and L<Spreadsheet::Read>, and of course L<perl>.
 
-If you are using perl6,  you can have a look at  C<Text::CSV>  in the perl6
-ecosystem, offering the same features.
+If you are using Raku,  have a look at C<Text::CSV> in the Raku ecosystem,
+offering the same features.
 
 =head3 non-perl
 
@@ -4859,14 +5149,14 @@ C by implementing a simple finite-state machine.   He added variable quote,
 escape and separator characters, the binary mode and the print and getline
 methods. See F<ChangeLog> releases 0.10 through 0.23.
 
-H.Merijn Brand F<E<lt>h.m.brand@xs4all.nlE<gt>> cleaned up the code,  added
+H.Merijn Brand F<E<lt>hmbrand@cpan.orgE<gt>> cleaned up the code,  added
 the field flags methods,  wrote the major part of the test suite, completed
 the documentation,   fixed most RT bugs,  added all the allow flags and the
 L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2020 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2023 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

@@ -39,7 +39,7 @@ extern "C" {
 /**
  * XML_CATALOG_PI:
  *
- * The specific XML Catalog Processing Instuction name.
+ * The specific XML Catalog Processing Instruction name.
  */
 #define XML_CATALOG_PI						\
     (const xmlChar *) "oasis-xml-catalog"
@@ -174,19 +174,6 @@ XMLPUBFUN const xmlChar * XMLCALL
 		xmlCatalogGetSystem	(const xmlChar *sysID);
 XMLPUBFUN const xmlChar * XMLCALL
 		xmlCatalogGetPublic	(const xmlChar *pubID);
-
-/* Location of the default catalog*/
-#if !defined(XML_XML_DEFAULT_CATALOG)
-	#if !defined(_WIN32)
-		#define XML_XML_DEFAULT_CATALOG "file:///etc/xml/catalog"
-	#elif defined(_WIN32) && defined(_MSC_VER)
-		static char XML_XML_DEFAULT_CATALOG[256] = "file:///etc/xml/catalog";
-	#elif defined(__MINGW32__) && !defined(__MINGW64__)
-		#define XML_XML_DEFAULT_CATALOG "/mingw32/etc/xml/catalog"
-	#elif defined(__MINGW64__)
-		#define XML_XML_DEFAULT_CATALOG "/mingw64/etc/xml/catalog"
-	#endif 
-#endif //!defined(XML_XML_DEFAULT_CATALOG)
 
 #ifdef __cplusplus
 }

@@ -1,8 +1,8 @@
 package Mojolicious::Command;
 use Mojo::Base -base;
 
-use Carp qw(croak);
-use Mojo::File qw(path);
+use Carp         qw(croak);
+use Mojo::File   qw(path);
 use Mojo::Loader qw(data_section);
 use Mojo::Server;
 use Mojo::Template;
@@ -59,7 +59,7 @@ sub write_file {
   my ($self, $path, $data) = @_;
   return $self->_loud("  [exist] $path") if -f $path;
   $self->create_dir(path($path)->dirname);
-  path($path)->spurt($data);
+  path($path)->spew($data);
   return $self->_loud("  [write] $path");
 }
 

@@ -3,7 +3,7 @@
  * pg_proc_d.h
  *    Macro definitions for pg_proc
  *
- * Portions Copyright (c) 1996-2018, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2022, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -20,37 +20,41 @@
 
 #define ProcedureRelationId 1255
 #define ProcedureRelation_Rowtype_Id 81
+#define ProcedureOidIndexId 2690
+#define ProcedureNameArgsNspIndexId 2691
 
-#define Anum_pg_proc_proname 1
-#define Anum_pg_proc_pronamespace 2
-#define Anum_pg_proc_proowner 3
-#define Anum_pg_proc_prolang 4
-#define Anum_pg_proc_procost 5
-#define Anum_pg_proc_prorows 6
-#define Anum_pg_proc_provariadic 7
-#define Anum_pg_proc_protransform 8
-#define Anum_pg_proc_prokind 9
-#define Anum_pg_proc_prosecdef 10
-#define Anum_pg_proc_proleakproof 11
-#define Anum_pg_proc_proisstrict 12
-#define Anum_pg_proc_proretset 13
-#define Anum_pg_proc_provolatile 14
-#define Anum_pg_proc_proparallel 15
-#define Anum_pg_proc_pronargs 16
-#define Anum_pg_proc_pronargdefaults 17
-#define Anum_pg_proc_prorettype 18
-#define Anum_pg_proc_proargtypes 19
-#define Anum_pg_proc_proallargtypes 20
-#define Anum_pg_proc_proargmodes 21
-#define Anum_pg_proc_proargnames 22
-#define Anum_pg_proc_proargdefaults 23
-#define Anum_pg_proc_protrftypes 24
-#define Anum_pg_proc_prosrc 25
-#define Anum_pg_proc_probin 26
-#define Anum_pg_proc_proconfig 27
-#define Anum_pg_proc_proacl 28
+#define Anum_pg_proc_oid 1
+#define Anum_pg_proc_proname 2
+#define Anum_pg_proc_pronamespace 3
+#define Anum_pg_proc_proowner 4
+#define Anum_pg_proc_prolang 5
+#define Anum_pg_proc_procost 6
+#define Anum_pg_proc_prorows 7
+#define Anum_pg_proc_provariadic 8
+#define Anum_pg_proc_prosupport 9
+#define Anum_pg_proc_prokind 10
+#define Anum_pg_proc_prosecdef 11
+#define Anum_pg_proc_proleakproof 12
+#define Anum_pg_proc_proisstrict 13
+#define Anum_pg_proc_proretset 14
+#define Anum_pg_proc_provolatile 15
+#define Anum_pg_proc_proparallel 16
+#define Anum_pg_proc_pronargs 17
+#define Anum_pg_proc_pronargdefaults 18
+#define Anum_pg_proc_prorettype 19
+#define Anum_pg_proc_proargtypes 20
+#define Anum_pg_proc_proallargtypes 21
+#define Anum_pg_proc_proargmodes 22
+#define Anum_pg_proc_proargnames 23
+#define Anum_pg_proc_proargdefaults 24
+#define Anum_pg_proc_protrftypes 25
+#define Anum_pg_proc_prosrc 26
+#define Anum_pg_proc_probin 27
+#define Anum_pg_proc_prosqlbody 28
+#define Anum_pg_proc_proconfig 29
+#define Anum_pg_proc_proacl 30
 
-#define Natts_pg_proc 28
+#define Natts_pg_proc 30
 
 
 /*
@@ -76,10 +80,10 @@
 /*
  * Symbolic values for proparallel column: these indicate whether a function
  * can be safely be run in a parallel backend, during parallelism but
- * necessarily in the master, or only in non-parallel mode.
+ * necessarily in the leader, or only in non-parallel mode.
  */
-#define PROPARALLEL_SAFE		's' /* can run in worker or master */
-#define PROPARALLEL_RESTRICTED	'r' /* can run in parallel master only */
+#define PROPARALLEL_SAFE		's' /* can run in worker or leader */
+#define PROPARALLEL_RESTRICTED	'r' /* can run in parallel leader only */
 #define PROPARALLEL_UNSAFE		'u' /* banned while in parallel mode */
 
 /*

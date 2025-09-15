@@ -63,6 +63,7 @@ out of Perl, this class I<no longer> uses the fields pragma.
 ## at some point.  Don't know how far how fast.
 
 use strict;
+use warnings;
 use Carp;
 use Fcntl;
 use Symbol;
@@ -73,7 +74,7 @@ use IPC::Run qw( Win32_MODE );
 use vars qw{$VERSION};
 
 BEGIN {
-    $VERSION = '20200505.0';
+    $VERSION = '20231003.0';
     if (Win32_MODE) {
         eval "use IPC::Run::Win32Helper; require IPC::Run::Win32IO; 1"
           or ( $@ && die )
@@ -136,7 +137,7 @@ sub _new_internal {
     my ( $type, $kfd, $pty_id, $internal, $binmode, @filters ) = @_;
 
     # Older perls (<=5.00503, at least) don't do list assign to
-    # psuedo-hashes well.
+    # pseudo-hashes well.
     $self->{TYPE}   = $type;
     $self->{KFD}    = $kfd;
     $self->{PTY_ID} = $pty_id;

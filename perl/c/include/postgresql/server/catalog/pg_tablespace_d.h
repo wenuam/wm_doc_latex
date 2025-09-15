@@ -3,7 +3,7 @@
  * pg_tablespace_d.h
  *    Macro definitions for pg_tablespace
  *
- * Portions Copyright (c) 1996-2018, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2022, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -19,13 +19,18 @@
 #define PG_TABLESPACE_D_H
 
 #define TableSpaceRelationId 1213
+#define PgTablespaceToastTable 4185
+#define PgTablespaceToastIndex 4186
+#define TablespaceOidIndexId 2697
+#define TablespaceNameIndexId 2698
 
-#define Anum_pg_tablespace_spcname 1
-#define Anum_pg_tablespace_spcowner 2
-#define Anum_pg_tablespace_spcacl 3
-#define Anum_pg_tablespace_spcoptions 4
+#define Anum_pg_tablespace_oid 1
+#define Anum_pg_tablespace_spcname 2
+#define Anum_pg_tablespace_spcowner 3
+#define Anum_pg_tablespace_spcacl 4
+#define Anum_pg_tablespace_spcoptions 5
 
-#define Natts_pg_tablespace 4
+#define Natts_pg_tablespace 5
 
 #define DEFAULTTABLESPACE_OID 1663
 #define GLOBALTABLESPACE_OID 1664

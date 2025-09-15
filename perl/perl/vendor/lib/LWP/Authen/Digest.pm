@@ -1,9 +1,9 @@
 package LWP::Authen::Digest;
 
 use strict;
-use base 'LWP::Authen::Basic';
+use parent 'LWP::Authen::Basic';
 
-our $VERSION = '6.52';
+our $VERSION = '6.72';
 
 require Digest::MD5;
 

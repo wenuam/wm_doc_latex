@@ -18,11 +18,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 3.42
+Version 3.48
 
 =cut
 
-our $VERSION = '3.42';
+our $VERSION = '3.48';
 
 =head1 DESCRIPTION
 
@@ -344,13 +344,13 @@ sub _get_args {
     # Handle verbose, quiet, really_quiet flags
     my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
 
-    my @verb_adj = grep {$_} map { $self->$_() ? $verb_map{$_} : 0 }
+    my @verb_adj = map { $self->$_() ? $verb_map{$_} : () }
       keys %verb_map;
 
     die "Only one of verbose, quiet or really_quiet should be specified\n"
       if @verb_adj > 1;
 
-    $args{verbosity} = shift @verb_adj || 0;
+    $args{verbosity} = shift @verb_adj if @verb_adj;
 
     for my $a (qw( merge failures comments timer directives normalize )) {
         $args{$a} = 1 if $self->$a();
@@ -412,7 +412,6 @@ sub _load_extension {
     }
 
     if ( my $class = $self->_find_module( $name, @search ) ) {
-        $class->import(@args);
         if ( $class->can('load') ) {
             $class->load( { app_prove => $self, args => [@args] } );
         }
@@ -771,17 +770,6 @@ along with a reference to the C<App::Prove> object that is invoking your plugin:
       $p->{app_prove}->do_something;
       ...
   }
-
-Note that the user's arguments are also passed to your plugin's C<import()>
-function as a list, eg:
-
-  sub import {
-      my ($class, @args) = @_;
-      # @args will contain ( 'foo', 'bar', 'baz' )
-      ...
-  }
-
-This is for backwards compatibility, and may be deprecated in the future.
 
 =head2 Sample Plugin
 

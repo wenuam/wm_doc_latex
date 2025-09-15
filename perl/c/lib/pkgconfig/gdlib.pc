@@ -1,11 +1,13 @@
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=${pcfiledir}/../..
 exec_prefix=${prefix}
-libdir=${prefix}/lib
-includedir=${prefix}/include/
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
 
 Name: gd
 Description: GD graphics library
-Version: @GD_VERSION_STRING@
+Version: 2.3.2
+Requires:
+Requires.private:   zlib  libpng  libjpeg  xpm
 Cflags: -I${includedir}
-Libs.private: @PRIVLIBLIST@
+Libs.private:    -ltiff ${pcfiledir}/../../lib/libiconv.a
 Libs: -L${libdir} -lgd

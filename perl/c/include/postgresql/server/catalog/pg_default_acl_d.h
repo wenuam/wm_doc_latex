@@ -3,7 +3,7 @@
  * pg_default_acl_d.h
  *    Macro definitions for pg_default_acl
  *
- * Portions Copyright (c) 1996-2018, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2022, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -19,13 +19,16 @@
 #define PG_DEFAULT_ACL_D_H
 
 #define DefaultAclRelationId 826
+#define DefaultAclRoleNspObjIndexId 827
+#define DefaultAclOidIndexId 828
 
-#define Anum_pg_default_acl_defaclrole 1
-#define Anum_pg_default_acl_defaclnamespace 2
-#define Anum_pg_default_acl_defaclobjtype 3
-#define Anum_pg_default_acl_defaclacl 4
+#define Anum_pg_default_acl_oid 1
+#define Anum_pg_default_acl_defaclrole 2
+#define Anum_pg_default_acl_defaclnamespace 3
+#define Anum_pg_default_acl_defaclobjtype 4
+#define Anum_pg_default_acl_defaclacl 5
 
-#define Natts_pg_default_acl 4
+#define Natts_pg_default_acl 5
 
 
 /*

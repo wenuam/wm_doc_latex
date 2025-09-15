@@ -1,34 +1,18 @@
 @rem = '--*-Perl-*--
-@echo off
-if "%OS%" == "Windows_NT" goto WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) ELSE (
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
-)
-
-goto endofperl
+@set "ErrorLevel="
+@if "%OS%" == "Windows_NT" @goto WinNT
+@perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+@set ErrorLevel=%ErrorLevel%
+@goto endofperl
 :WinNT
-IF EXIST "%~dp0perl.exe" (
-"%~dp0perl.exe" -x -S %0 %*
-) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
-"%~dp0..\..\bin\perl.exe" -x -S %0 %*
-) ELSE (
-perl -x -S %0 %*
-)
-
-if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
-if %errorlevel% == 9009 echo You do not have Perl in your PATH.
-if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
-goto endofperl
+@perl -x -S %0 %*
+@set ErrorLevel=%ErrorLevel%
+@if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" @goto endofperl
+@if %ErrorLevel% == 9009 @echo You do not have Perl in your PATH.
+@goto endofperl
 @rem ';
-#!perl
-#line 29
-    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
 #!/usr/bin/perl -w
+#line 30
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use strict;
@@ -53,7 +37,7 @@ prove - Run tests through a TAP harness.
 
 Boolean options:
 
- -v,  --verbose         Print all test lines.
+ -v,  --verbose         Print all test lines.  Also sets TEST_VERBOSE
  -l,  --lib             Add 'lib' to the path for your tests (-Ilib).
  -b,  --blib            Add 'blib/lib' and 'blib/arch' to the path for
                         your tests
@@ -237,7 +221,7 @@ new problems have been introduced.
 
 =item C<all>
 
-Run all tests in normal order. Multple options may be specified, so to
+Run all tests in normal order. Multiple options may be specified, so to
 run all tests with the failures from last time first:
 
     $ prove -b --state=failed,all,save
@@ -426,7 +410,7 @@ Please check individual plugin documentation for more details.
 
 For an up-to-date list of plugins available, please check CPAN:
 
-L<http://search.cpan.org/search?query=App%3A%3AProve+Plugin>
+L<https://metacpan.org/search?q=App%3A%3AProve+Plugin>
 
 =head2 Writing Plugins
 
@@ -435,6 +419,6 @@ Please see L<App::Prove/PLUGINS>.
 =cut
 
 # vim:ts=4:sw=4:et:sta
-
 __END__
 :endofperl
+@set "ErrorLevel=" & @goto _undefined_label_ 2>NUL || @"%COMSPEC%" /d/c @exit %ErrorLevel%

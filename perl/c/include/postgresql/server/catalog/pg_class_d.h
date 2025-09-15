@@ -3,7 +3,7 @@
  * pg_class_d.h
  *    Macro definitions for pg_class
  *
- * Portions Copyright (c) 1996-2018, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2022, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -20,26 +20,29 @@
 
 #define RelationRelationId 1259
 #define RelationRelation_Rowtype_Id 83
+#define ClassOidIndexId 2662
+#define ClassNameNspIndexId 2663
+#define ClassTblspcRelfilenodeIndexId 3455
 
-#define Anum_pg_class_relname 1
-#define Anum_pg_class_relnamespace 2
-#define Anum_pg_class_reltype 3
-#define Anum_pg_class_reloftype 4
-#define Anum_pg_class_relowner 5
-#define Anum_pg_class_relam 6
-#define Anum_pg_class_relfilenode 7
-#define Anum_pg_class_reltablespace 8
-#define Anum_pg_class_relpages 9
-#define Anum_pg_class_reltuples 10
-#define Anum_pg_class_relallvisible 11
-#define Anum_pg_class_reltoastrelid 12
-#define Anum_pg_class_relhasindex 13
-#define Anum_pg_class_relisshared 14
-#define Anum_pg_class_relpersistence 15
-#define Anum_pg_class_relkind 16
-#define Anum_pg_class_relnatts 17
-#define Anum_pg_class_relchecks 18
-#define Anum_pg_class_relhasoids 19
+#define Anum_pg_class_oid 1
+#define Anum_pg_class_relname 2
+#define Anum_pg_class_relnamespace 3
+#define Anum_pg_class_reltype 4
+#define Anum_pg_class_reloftype 5
+#define Anum_pg_class_relowner 6
+#define Anum_pg_class_relam 7
+#define Anum_pg_class_relfilenode 8
+#define Anum_pg_class_reltablespace 9
+#define Anum_pg_class_relpages 10
+#define Anum_pg_class_reltuples 11
+#define Anum_pg_class_relallvisible 12
+#define Anum_pg_class_reltoastrelid 13
+#define Anum_pg_class_relhasindex 14
+#define Anum_pg_class_relisshared 15
+#define Anum_pg_class_relpersistence 16
+#define Anum_pg_class_relkind 17
+#define Anum_pg_class_relnatts 18
+#define Anum_pg_class_relchecks 19
 #define Anum_pg_class_relhasrules 20
 #define Anum_pg_class_relhastriggers 21
 #define Anum_pg_class_relhassubclass 22
@@ -82,9 +85,48 @@
 /*
  * an explicitly chosen candidate key's columns are used as replica identity.
  * Note this will still be set if the index has been dropped; in that case it
- * has the same meaning as 'd'.
+ * has the same meaning as 'n'.
  */
 #define		  REPLICA_IDENTITY_INDEX	'i'
+
+/*
+ * Relation kinds that have physical storage. These relations normally have
+ * relfilenode set to non-zero, but it can also be zero if the relation is
+ * mapped.
+ */
+#define RELKIND_HAS_STORAGE(relkind) \
+	((relkind) == RELKIND_RELATION || \
+	 (relkind) == RELKIND_INDEX || \
+	 (relkind) == RELKIND_SEQUENCE || \
+	 (relkind) == RELKIND_TOASTVALUE || \
+	 (relkind) == RELKIND_MATVIEW)
+
+#define RELKIND_HAS_PARTITIONS(relkind) \
+	((relkind) == RELKIND_PARTITIONED_TABLE || \
+	 (relkind) == RELKIND_PARTITIONED_INDEX)
+
+/*
+ * Relation kinds that support tablespaces: All relation kinds with storage
+ * support tablespaces, except that we don't support moving sequences around
+ * into different tablespaces.  Partitioned tables and indexes don't have
+ * physical storage, but they have a tablespace settings so that their
+ * children can inherit it.
+ */
+#define RELKIND_HAS_TABLESPACE(relkind) \
+	((RELKIND_HAS_STORAGE(relkind) || RELKIND_HAS_PARTITIONS(relkind)) \
+	 && (relkind) != RELKIND_SEQUENCE)
+
+/*
+ * Relation kinds with a table access method (rd_tableam).  Although sequences
+ * use the heap table AM, they are enough of a special case in most uses that
+ * they are not included here.
+ */
+#define RELKIND_HAS_TABLE_AM(relkind) \
+	((relkind) == RELKIND_RELATION || \
+	 (relkind) == RELKIND_TOASTVALUE || \
+	 (relkind) == RELKIND_MATVIEW)
+
+extern int	errdetail_relkind_not_supported(char relkind);
 
 
 #endif							/* PG_CLASS_D_H */

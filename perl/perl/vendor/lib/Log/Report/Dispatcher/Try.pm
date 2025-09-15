@@ -1,14 +1,14 @@
-# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Log-Report. Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Dispatcher::Try;
 use vars '$VERSION';
-$VERSION = '1.31';
+$VERSION = '1.36';
 
 use base 'Log::Report::Dispatcher';
 
@@ -84,9 +84,6 @@ sub log($$$$)
 
     push @{$self->{exceptions}}, $e;
 
-#    $self->{died} ||=
-#        exists $opts->{is_fatal} ? $opts->{is_fatal} : $e->isFatal;
-
     $self;
 }
 
@@ -96,18 +93,18 @@ sub reportAll(@)   { $_->throw(@_) for shift->exceptions }
 
 #-----------------
 
-sub failed()  {   defined shift->{died}}
-sub success() { ! defined shift->{died}}
+sub failed()  {   defined shift->{died} }
+sub success() { ! defined shift->{died} }
 
 
 sub wasFatal(@)
 {   my ($self, %args) = @_;
     defined $self->{died} or return ();
 
-    # An (hidden) eval between LR::try()s may add more messages
     my $ex = first { $_->isFatal } @{$self->{exceptions}}
         or return ();
 
+    # There can only be one fatal exception.  Is it in the class?
     (!$args{class} || $ex->inClass($args{class})) ? $ex : ();
 }
 

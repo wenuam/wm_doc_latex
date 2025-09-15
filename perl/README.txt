@@ -1,14 +1,14 @@
-=== Strawberry Perl (64-bit) Portable 5.32.1.1-64bit README ===
+=== Strawberry Perl (64-bit) Portable 5.38.2.2-64bit README ===
 
 What is Strawberry Perl Portable?
 ---------------------------------
 
 * 'Perl' is a programming language suitable for writing simple scripts as well
-  as complex applications. See http://perldoc.perl.org/perlintro.html
+  as complex applications. See https://perldoc.perl.org/perlintro.html
 
 * 'Strawberry Perl' is a perl environment for Microsoft Windows containing all
   you need to run and develop perl applications. It is designed to be as close
-  as possible to perl environment on UNIX systems. See http://strawberryperl.com/
+  as possible to perl environment on UNIX systems. See https://strawberryperl.com/
 
 * 'Strawberry Perl Portable' is Strawberry Perl that you do not need to install,
   you do not need admin privileges, you just extract provided ZIP on your disk.
@@ -27,9 +27,9 @@ How to use Strawberry Perl Portable?
   
      c:\> perl c:\path\to\script.pl
 
-  2. install additional perl modules (libraries) from http://www.cpan.org/ by
+  2. install additional perl modules (libraries) from https://www.metacpan.org/ by
 
-     c:\> cpan Module::Name
+     c:\> cpanm Module::Name
   
   3. run other tools included in strawberry like: perldoc, gcc, gmake ...
 
