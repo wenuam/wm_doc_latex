@@ -61,11 +61,13 @@ echo Recompose 'pandoc' dependencies...
 cd "pandoc"
 if exist "pandoc.exe.001" (
 rem	if not exist "pandoc.exe" (
-		copy /y /b "pandoc.exe.001"+"pandoc.exe.002"+"pandoc.exe.003" "pandoc.exe"
+		copy /y /b "pandoc.exe.001"+"pandoc.exe.002"+"pandoc.exe.003"+"pandoc.exe.004"+"pandoc.exe.005" "pandoc.exe"
 rem	)
 
 	del "pandoc.exe.001" /q 1>nul 2>nul
 	del "pandoc.exe.002" /q 1>nul 2>nul
 	del "pandoc.exe.003" /q 1>nul 2>nul
+	del "pandoc.exe.004" /q 1>nul 2>nul
+	del "pandoc.exe.005" /q 1>nul 2>nul
 )
 cd /d "%sd%"
