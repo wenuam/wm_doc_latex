@@ -1,1 +1,1 @@
-msc-generator (8.2 / 220811)
+msc-generator (8.6.3 / 250908)

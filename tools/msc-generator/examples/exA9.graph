@@ -13,7 +13,7 @@ graph {
                style=filled,
                shape=box,
                style=rounded];
-    a->b::\iFormatted\i\n\bLabel;
+    a->b::\iFormatted\i\n\bLabel\nwith \L(http://wiki.com)link;
     c>>d::Color [color=green];
     e>f [arrowhead=onormal];
 };

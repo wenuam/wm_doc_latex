@@ -1,0 +1,25 @@
+##Symbols positioned in reference to other elements
+##symbol above below leftof rightof around rectangle oval circle shapes adjust refname transparent
+##Demonstrates how to position a symbol besides or around other chart elements. You can use the refname of the other element, or simply specify the symbol afterwards with no refname. Use 'align' to position the symbol, 'distance' to make it further/closer and adjust to adjust its edges one-by-one.
+compress=yes;
+Backend, Server, Client;
+Client<-: Hit;
+Client=>Server;
+symbol shape above [shape=def.actor, size=0.2, color=blue];
+symbol ... below;
+Server>>Backend: Query [refname=query];
+Server<<Backend: Response;
+symbol rectangle around [line.radius=2, fill.color=yellow,50, 
+                         distance=5];
+Client<=Server: Reply;
+symbol cross rightof [align=centerline, color=red];
+
+symbol arc leftof query [align=bottom, size=big, distance=-18, 
+                         offset=3, fill.color=teal,50];
+note: this [ fill.color=teal,50];
+symbol rectangle around query [fill.color=violet,50, 
+                               line.radius=2, 
+                               adjust=-30,2,2,-2];
+
+symbol rectangle around [fill.color=aqua,50, line.radius=2, 
+                         adjust=-30,2,2,2];

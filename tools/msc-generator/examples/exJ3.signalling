@@ -1,0 +1,27 @@
+##Include another chart
+##inline chart include entire language block diagram graph
+##Using 'symbol <language>' you can insert an entire chart of any language msc-generator supports. Specify its position/size as for any other symbol and enclose the text of the included chart between '<<<' and '>>>' tokens.
+Client1, Client2, Server, Backend1, Backend2;
+
+{
+    defstyle arrow [color=green-50];
+    Client1->Server;  Server->Backend1;
+    Server<-Backend1; Client1<-Server;
+} {
+    defstyle arrow [color=blue];
+    Client2->Server;  Server->Backend2;
+    Server<-Backend2; Client2<-Server;
+} {    
+    symbol block left at Client1+ right at Client2- <<<
+        background.color=lgray+40;
+        col { box Client1, Client2;}
+        box [line.type=dotted, fill.color=lgray] {
+            box Server;
+            col { box Backend1, Backend2;}
+        }
+        arrows use color=green-50;
+        Client1->Server->Backend1;
+        arrows use color=blue;
+        Client2->Server->Backend2;
+    >>>;
+};

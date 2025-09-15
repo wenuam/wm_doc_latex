@@ -1,0 +1,30 @@
+##Include another chart
+##inline chart include entire language block diagram graph signalling
+##Using 'chart <language> [<name>]' you can insert an entire chart of any language msc-generator supports as a block. Enclose the text of the included chart between '<<<' and '>>>' tokens. You can specify its size/location as for any other block.
+box Client [line.radius=3, line.corner=bevel, line.width=2];
+space;
+box Processing [fill.color=aqua+80, line.radius=5] {
+    chart signalling <<<
+        background.color=none;
+        hscale=auto;
+        Server, LB [show=no], Backend1, Backend2;
+        ->Server;
+        show LB;
+        Server->LB;
+        LB->Backend2;
+        hide LB;
+        Backend2--Backend2:Proc;
+        join <->:external\nreq;
+        Server<-Backend2;
+        <-Server;
+    >>>;
+};
+space;
+box zone: zone nw [line.type=dotted] {
+    *def.db db [size=40, line.width=2, middle=Client];
+    *def.db [size=40, line.width=2];
+}
+below +30 *def.actor op [size=20, color=orange];
+below -10 text: \-Operator;
+Client<=>Processing<=>db;
+op=>zone: config [label.pos=middle];
