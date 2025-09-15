@@ -10,7 +10,7 @@
 %% 1995-2001 Sebastian Rahtz, with portions written by David Carlisle and Heiko Oberdiek
 %% 2001-2015 Heiko Oberdiek
 %% 2016-2019 Oberdiek Package Support Group
-%% 2019-2024 LaTeX Project
+%% 2019-2025 LaTeX Project
 %%      https://github.com/latex3/hyperref/issues
 %% 
 %% This file is part of the `Hyperref Bundle'.
@@ -33,7 +33,7 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hdvipdfm.def}
-  [2024-07-10 v7.01j %
+  [2025-07-12 v7.01o %
   Hyperref driver for dvipdfm]
 \Hy@VersionCheck{hdvipdfm.def}
 \special{pdf:majorversion \Hy@pdf@majorversion}
@@ -271,9 +271,9 @@
       >>%
     >>%
   }%
-  \AtBeginShipout{%
-    \setbox\AtBeginShipoutBox=\hbox{%
-      \copy\AtBeginShipoutBox
+  \AddToHook{shipout/before}{%
+    \setbox\ShipoutBox=\hbox{%
+      \copy\ShipoutBox
       \@pdfm@mark{%
         put @resources <<%
           /Properties<<%
@@ -373,6 +373,7 @@
 }
 \def\hyper@linkfile#1#2#3{%
   \leavevmode
+  \begingroup
   \Hy@BeginAnnot{%
     \def\Hy@pstringF{#2}%
     \Hy@CleanupFile\Hy@pstringF
@@ -408,6 +409,7 @@
   }%
   #1\Hy@xspace@end
   \Hy@EndAnnot
+  \endgroup
 }
 \def\@hyper@launch run:#1\\#2#3{% filename, anchor text linkname
   \leavevmode
@@ -629,7 +631,7 @@
   \hyper@pagetransition
   \hyper@pageduration
 }
-\AtBeginShipoutFirst{%
+\AddToHook{shipout/firstpage}{%
   \ifHy@setpagesize
     \begingroup
      \ifnum\mag=\@m

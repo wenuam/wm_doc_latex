@@ -7,8 +7,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
     name          = "luaotfload-diagnostics",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload-tool submodule / diagnostics",
     license       = "GPL v2.0"
 }
@@ -252,11 +252,12 @@ end
 
 local function init_desired_permissions ()
     local paths = config.luaotfload.paths
+    local compress_db = config.luaotfload.db.compress
     return {
         { "d", {"r","w"}, function () return caches.getwritablepath ("", "") end },
         { "d", {"r","w"}, paths.prefix },
-        { "f", {"r","w"}, paths.index_path_lua .. ".gz" },
-        { "f", {"r","w"}, paths.index_path_luc },
+        { "f", {"r","w"}, paths.index_path_lua .. (compress_db and ".gz" or "") },
+        { "f", {"r","w"}, paths.index_path_luc .. (compress_db and ".gz" or "") },
         { "f", {"r","w"}, paths.lookup_path_lua },
         { "f", {"r","w"}, paths.lookup_path_luc },
     }

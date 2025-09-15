@@ -20,8 +20,8 @@ local authors = "\z
 -- version number is used below!
 local ProvidesLuaModule = { 
     name          = "luaotfload",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "Lua based OpenType font support",
     author        = authors,
     copyright     = authors,
@@ -118,7 +118,7 @@ end
     \identifier{luatexbase} when this file is processed. In some cases
     it is possible to trick it by putting dummies into place and
     restoring the behavior from \identifier{luatexbase} after
-    initilization. Other cases such as attribute allocation require
+    initialization. Other cases such as attribute allocation require
     that we hook the functionality from \identifier{luatexbase} into
     locations where they normally wouldn’t be.
 
@@ -244,7 +244,7 @@ local function context_loader (name, path)
             modpath = file.join (path, modname)
         else
             luaotfload.log.report ("both", 0, "load",
-                                   "Non-existant path %q specified, ignoring.",
+                                   "Non-existent path %q specified, ignoring.",
                                    path)
         end
     end

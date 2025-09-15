@@ -6,8 +6,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") {
     name          = "luaotfload-auxiliary",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / auxiliary functions",
     license       = "GPL v2.0"
 }
@@ -486,6 +486,7 @@ function aux.provides_script(font_id, asked_script)
     end
     return false
   else
+    local fontname = tfmdata.fontname
     local features = get_features (tfmdata)
     if features == false then
       logreport ("log", 1, "aux", "font no %d lacks a features table", font_id)
@@ -495,14 +496,14 @@ function aux.provides_script(font_id, asked_script)
       --- where method: "gpos" | "gsub"
       for feature, data in next, featuredata do
         if data[asked_script] then
-          logreport ("log", 1, "aux",
+          logreport ("log", 2, "aux",
                      "font no %d (%s) defines feature %s for script %s",
                      font_id, fontname, feature, asked_script)
           return true
         end
       end
     end
-    logreport ("log", 0, "aux",
+    logreport ("log", 2, "aux",
                "font no %d (%s) defines no feature for script %s",
                font_id, fontname, asked_script)
   end
@@ -556,6 +557,7 @@ function aux.provides_language(font_id, asked_script, asked_language)
     asked_language  = stringlower(asked_language)
     local tfmdata = identifiers[font_id]
     if not tfmdata then return false end
+    local fontname = tfmdata.fontname
     local features = get_features (tfmdata)
     if features == false then
       logreport ("log", 1, "aux", "font no %d lacks a features table", font_id)
@@ -566,7 +568,7 @@ function aux.provides_language(font_id, asked_script, asked_language)
       for feature, data in next, featuredata do
         local scriptdata = data[asked_script]
         if scriptdata and scriptdata[asked_language] then
-          logreport ("log", 1, "aux",
+          logreport ("log", 2, "aux",
                      "font no %d (%s) defines feature %s "
                      .. "for script %s with language %s",
                      font_id, fontname, feature,
@@ -575,7 +577,7 @@ function aux.provides_language(font_id, asked_script, asked_language)
         end
       end
     end
-    logreport ("log", 0, "aux",
+    logreport ("log", 2, "aux",
                "font no %d (%s) defines no feature "
                .. "for script %s with language %s",
                font_id, fontname, asked_script, asked_language)
@@ -584,7 +586,7 @@ function aux.provides_language(font_id, asked_script, asked_language)
 end
 
 --[[doc--
-A function to check if a font is a variabe font with a given axis.
+A function to check if a font is a variable font with a given axis.
 --doc]]--
 
 function aux.provides_axis(font_id, asked_axis)
@@ -712,6 +714,7 @@ function aux.provides_feature(font_id,        asked_script,
     end
     return false
   else
+    local fontname = tfmdata.fontname
     asked_language  = stringlower(asked_language)
     local features = get_features (tfmdata)
     if features == false then
@@ -724,7 +727,7 @@ function aux.provides_feature(font_id,        asked_script,
       if feature then
         local scriptdata = feature[asked_script]
         if scriptdata and scriptdata[asked_language] then
-          logreport ("log", 1, "aux",
+          logreport ("log", 2, "aux",
                      "font no %d (%s) defines feature %s "
                      .. "for script %s with language %s",
                      font_id, fontname, asked_feature,
@@ -733,7 +736,7 @@ function aux.provides_feature(font_id,        asked_script,
         end
       end
     end
-    logreport ("log", 0, "aux",
+    logreport ("log", 2, "aux",
                "font no %d (%s) does not define feature %s for script %s with language %s",
                font_id, fontname, asked_feature, asked_script, asked_language)
   end

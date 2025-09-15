@@ -75,8 +75,11 @@ local parse_idx = function(content)
     if line:match("^\\beforeentry") then
       -- increment index entry number
       current_entry = current_entry + 1
-      local file, dest = line:match("\\beforeentry%s*{(.-)}{(.-)}")
-      map[current_entry] = {file = file, dest = dest}
+      local file, dest, locator = line:match("\\beforeentry%s*{(.-)}{(.-)}{(.-)}")
+      -- if the third argument to \beforeentry is not empty, 
+      -- use it as a index entry locator instead of the index counter
+      if locator and locator == "" then locator = nil end
+      map[current_entry] = {file = file, dest = dest, locator = locator}
     elseif line:match("^\\indexentry") then
       -- replace the page number with the current
       -- index entry number
@@ -90,26 +93,86 @@ local parse_idx = function(content)
   return {map = map, idx = table.concat(buffer, "\n")}
 end
 
+
+local previous
+-- replace numbers in .ind file with links back to text
+local function replace_index_pages(rest, entries)
+  -- keep track of the previous page number
+  local count = 0
+  local delete_coma = false
+  return rest:gsub("(%s*%-*%s*)(,?%s*)(%{?)(%[?)(%d+)(%]?)(%}?)", function(dash, coma, lbrace, lbracket, page, rbracket, rbrace)
+    if lbracket == "[" and rbracket == "]" then
+      -- don't process numbers in brackets, they are not page numbers
+      return nil
+    end
+    local entry = entries[tonumber(page)]
+    count = count + 1
+    if entry then
+      page = entry.locator or page
+      if delete_coma then
+        -- if the coma was marked for deletion, remove it. this may happen after line breaks in the index
+        coma = ""
+      end
+      -- if the page number is the same as the previous one, don't create a link
+      -- this can happen when we use section numbers as locators. for example, 
+      -- we could get 1.1 -- 1.1, 1.1, so we want to keep only the first one
+      if page == previous then
+        previous = page
+        -- if the first page number on a line is the same as the previous one, we need to delete the coma,
+        -- otherwise the coma will be left in the output
+        if count == 1 then
+          delete_coma = true
+        end
+        return ""
+      else
+        previous = page
+        -- don't forget to reset the delete_coma flag after page change
+        delete_coma = false
+        -- construct link to the index entry
+        return dash .. coma.. lbrace ..  "\\Link[" .. entry.file .."]{".. entry.dest .."}{}" ..  page .."\\EndLink{}" .. rbrace
+      end
+    else
+      return dash .. coma .. lbrace .. lbracket .. page .. rbracket .. rbrace
+    end
+ end)
+end
+
+local function fix_subitems(start, rest)
+  -- in xindex, subentries start with a comma, so if the subentry itself is number, it would be mistaken for the page number
+  -- the start should contain just \subitem -\
+  if start:match("%s*\\subitem %-\\$") then
+    -- the keyword in this case is the first item in the rest
+    local keyword, newrest = rest:match("(,?[^,]+,)(.+)")
+    if keyword and newrest then
+      -- join the extracted keyword with the start, newrest should contain only actual page numbers
+      return start .. keyword, newrest
+    end
+  end
+  return start, rest
+end
+
 -- replace page numbers in the ind file with hyperlinks
 local fix_idx_pages = function(content, idxobj)
   local buffer = {}
   local entries = idxobj.map
   for  line in content:gmatch("([^\n]+)")  do
-    local line = line:gsub("(%s*\\%a+.-%,)(.+)$", function(start,rest)
+    local line, count = line:gsub("(%s*\\%a+[^%[^,]+)(.+)$", function(start,rest)
+      -- reset the previous page number
+      previous = nil
+      start, rest = fix_subitems(start, rest)
       -- there is a problem when index term itself contains numbers, like Bible verses (1:2),
       -- because they will be detected as page numbers too. I cannot find a good solution 
       -- that wouldn't break something else.
-      return start .. rest:gsub("(%d+)", function(page)
-        local entry = entries[tonumber(page)]
-        if entry then
-          -- construct link to the index entry
-          return "\\Link[" .. entry.file .."]{".. entry.dest .."}{}" .. page .."\\EndLink{}" 
-        else
-          return page
-        end
+      -- There can be also commands with numbers in braces. These numbers in braces will be ignored, 
+      -- as they may be not page numbers
+      return start .. replace_index_pages(rest, entries)    end)
+    -- longer index entries may be broken over several lines, in that case, we need to process only numbers
+    if count == 0 then
+      line = line:gsub("(%s*%d+.+)", function(rest)
+        return replace_index_pages(rest, entries)
       end)
-    end)
-    buffer[#buffer+1] = line 
+    end
+    buffer[#buffer+1] = line
   end
   return table.concat(buffer, "\n")
 end

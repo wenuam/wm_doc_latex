@@ -5,8 +5,8 @@
 do -- block to avoid to many local variables error
  assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
      name          = "luaotfload-harf-define",
-     version       = "3.28",       --TAGVERSION
-     date          = "2024-02-14", --TAGDATE
+     version       = "3.29",       --TAGVERSION
+     date          = "2024-12-03", --TAGDATE
      description   = "luaotfload submodule / HarfBuzz font loading",
      license       = "GPL v2.0",
      author        = "Khaled Hosny, Marcel Krüger",
@@ -18,6 +18,8 @@ local unpack = string.unpack
 local stringlower = string.lower
 local stringupper = string.upper
 local gsub = string.gsub
+local find = string.find
+local format = string.format
 
 local hb = luaotfload.harfbuzz
 local scriptlang_to_harfbuzz = require'luaotfload-scripts'.to_harfbuzz
@@ -56,7 +58,8 @@ local get_designsize do
   --   local first, second = string.byte(s)
   --   return (first << 8) | second
   -- end
-  local factor = 6578.176 -- =803/125*2^10=7227/7200/10*2^16
+  -- local factor = 6578.176 -- =803/125*2^10=7227/7200/10*2^16
+  local factor = 6553.6 -- =2^16/10
   function get_designsize(face)
     local buf = face:get_table(gpostag):get_data()
     if #buf == 0 then return 655360 end
@@ -79,7 +82,6 @@ end
 local keyhash do
   local formatstring = string.rep('%02x', 256/8)
   local sha256 = sha2.digest256
-  local format = string.format
   local byte = string.byte
   keyhash = setmetatable({}, {__index = function(t, k)
     local h = format(formatstring, byte(sha256(k), 1, -1))
@@ -105,7 +107,7 @@ end
 local function loadfont(spec)
   local path, sub = spec.resolved, spec.sub or 1
 
-  local key = string.format("%s:%d:%s", path, sub, instance)
+  local key = format("%s:%d:%s", path, sub, instance)
 
   local attributes = lfs.attributes(path)
   if not attributes then return end
@@ -426,8 +428,13 @@ local function scalefont(data, spec)
     end
   end
 
+  local texname = spec.specification
+  if find(texname, ' ') then
+    texname = format('"%s"', texname) -- Not %q since we do not want escape sequences inside the string
+  end
+
   local tfmdata = {
-    name = spec.specification,
+    name = texname,
     filename = 'harfloaded:' .. spec.resolved,
     subfont = spec.sub or 1,
     designsize = data.designsize,

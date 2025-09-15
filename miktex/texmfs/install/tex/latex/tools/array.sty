@@ -13,7 +13,7 @@
 %% (but please observe conditions on bug reports sent to that address!)
 %% 
 %% 
-%% Copyright (C) 1993-2024
+%% Copyright (C) 1993-2025
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 %% 
@@ -47,7 +47,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2024/06/01]
 \ProvidesPackage{array}
-         [2024/06/14 v2.6d Tabular extension package (FMi)]
+         [2025/06/08 v2.6j Tabular extension package (FMi)]
 %%
 
 \ExplSyntaxOn
@@ -96,15 +96,16 @@
 \def\save@decl{\toks\count@ \expandafter{\@nextchar}}
 \def\insert@column{%
   \UseTaggingSocket{tbl/cell/begin}%
-   \the@toks \the \@tempcnta
-   \ignorespaces \@sharp \textonly@unskip
+   \@protected@firstofone { \the@toks \the \@tempcnta \ignorespaces }
+   \@sharp \textonly@unskip
    \the@toks \the \count@ \relax
    \UseTaggingSocket{tbl/cell/end}%
 }
 \protected\def\textonly@unskip{\ifhmode\unskip\fi}
+\protected\long\def\@protected@firstofone#1{#1}
 \def\insert@pcolumn{%
    \UseTaggingSocket{tbl/pcell/begin}%
-   \the@toks \the \@tempcnta
+   \the@toks \the \@tempcnta \relax
    \ignorespaces \@sharp \unskip
    \the@toks \the \count@ \relax
    \UseTaggingSocket{tbl/pcell/end}%
@@ -128,6 +129,14 @@
   \@acol \@firstampfalse \or
   \@addamp
   \fi}
+\str_if_exist:cF { l__socket_tagsupport/math/luamml/array/save_plug_str }
+ {
+   \NewSocket{tagsupport/math/luamml/array/save}{0}
+   \NewSocket{tagsupport/math/luamml/array/finalize}{0}
+   \NewSocket{tagsupport/math/luamml/array/initcol}{0}
+   \NewSocket{tagsupport/math/luamml/array/finalizecol}{1}
+   \AssignSocketPlug{tagsupport/math/luamml/array/finalizecol}{noop}
+ }
 \def\@classz{\@classx
    \@tempcnta \count@
    \prepnext@tok
@@ -136,9 +145,12 @@
       \hskip1sp%
       \d@llarbegin
       \insert@column
-      \d@llarend \do@row@strut \hfil \or
-      \hskip1sp\d@llarbegin \insert@column \d@llarend \do@row@strut \hfil \or
-      \hfil\hskip1sp\d@llarbegin \insert@column \d@llarend \do@row@strut \or
+      \d@llarend
+      \do@row@strut \hfil \or
+      \hskip1sp\d@llarbegin\insert@column\d@llarend
+      \do@row@strut \hfil \or
+      \hfil\hskip1sp\d@llarbegin\insert@column\d@llarend
+      \do@row@strut \or
     \setbox\ar@mcellbox\vbox
     \@startpbox{\@nextchar}\insert@pcolumn \@endpbox
     \ar@align@mcell
@@ -181,7 +193,17 @@
       \vrule \@height \ht\@arstrutbox \@width \z@
       \everypar{}}%
    }
+\let\@startpbox@action\@startpbox
 \def\@endpbox{\@finalstrut\@arstrutbox \par \color@endgroup \egroup\hfil}
+\def\@finalstrut#1{%
+  \unskip
+  \ifhmode \nobreak
+  \else
+    \ifnum\lastnodetype>\m@ne
+      \vskip-\baselineskip
+    \fi
+  \fi
+  \vrule\@width\z@\@height\z@\@depth\dp#1}
 \def\@array[#1]#2{
   \@tempdima \ht \strutbox
   \advance \@tempdima by\extrarowheight
@@ -257,23 +279,39 @@
 \let\d@llarbegin\begingroup
 \let\d@llarend\endgroup
 \def\array{\col@sep\arraycolsep
-  \def\d@llarbegin{$}\let\d@llarend\d@llarbegin\def\@halignto{}%
+  \def\d@llarbegin{$\tag_socket_use:n { math/luamml/array/initcol }}
+  \def\d@llarend
+   {
+     \tag_socket_use:nn { math/luamml/save/nn }{{}{mtd}}
+     $
+     \tag_socket_use:nn { math/luamml/array/finalizecol}{\the\@chnum}
+   }
+  \def\@halignto{}%
   \@tabarray}
 \def\tabular{\def\@halignto{}\@tabular}
 \expandafter\def\csname tabular*\endcsname#1{%
        \setlength\dimen@{#1}%
        \edef\@halignto{to\the\dimen@}\@tabular}
+\providecommand\MathCollectTrue{}
+\providecommand\MathCollectFalse{}
+\providecommand\@kernel@tabular@init{}
 \def\@tabular{%
   \leavevmode
   \UseTaggingSocket{tbl/hmode/begin}%
-  \hbox \bgroup $\col@sep\tabcolsep \let\d@llarbegin\begingroup
+  \hbox \bgroup
+    \MathCollectFalse$\MathCollectTrue
+    \col@sep\tabcolsep \let\d@llarbegin\begingroup
                                     \let\d@llarend\endgroup
+   \@kernel@tabular@init
   \@tabarray}
 \def\endarray {
-  \tbl_crcr:n{endarray} \egroup
-  \UseTaggingSocket{tbl/finalize}
+  \tbl_crcr:n{endarray}
+  \tag_socket_use_expandable:n { math/luamml/array/save }
+  \egroup
+  \tag_socket_use:n { tbl/finalize }
   \tbl_restore_outer_cell_data:
   \egroup
+  \tag_socket_use:n { math/luamml/array/finalize }
   \@arrayright \gdef\@preamble{}%
 }
 \def\endtabular{\endarray\m@th $\egroup
@@ -347,7 +385,9 @@
 \def\@mkpream#1{\gdef\@preamble{}\@lastchclass 4 \@firstamptrue
    \let\@sharp\relax
    \def\@startpbox##1{\unexpanded\expandafter{\expandafter
-                      \@startpbox\expandafter{##1}}}\let\@endpbox\relax
+                      \@startpbox@action\expandafter{##1}}}%
+   \def\@startpbox@action##1{\unexpanded{\@startpbox@action{##1}}}%
+   \let\@endpbox\relax
    \let\do@row@strut\relax
    \let\ar@align@mcell\relax
    \@temptokena{#1}\@tempswatrue
@@ -432,6 +472,23 @@
    <{\d@llarend\end{lrbox}%
    \let\hss\hfil
    \makebox[#2][#1]{\unhbox\ar@cellbox}}}
+\ExplSyntaxOn
+\def\@cline#1-#2\@nil{
+  \omit
+  \@multicnt#1
+  \advance\@multispan\m@ne
+  \ifnum\@multicnt=\@ne\@firstofone{&\omit}\fi
+  \@multicnt#2
+  \advance\@multicnt-#1
+  \advance\@multispan\@ne
+  \UseTaggingSocket{tbl/leaders/begin}
+  \leaders\hrule\@height\arrayrulewidth\hfill
+  \UseTaggingSocket{tbl/leaders/end}
+  \tbl_gdecr_row_count:
+  \cr
+  \noalign{\vskip-\arrayrulewidth}
+}
+\ExplSyntaxOff
 \ExplSyntaxOff
 \endinput
 %%

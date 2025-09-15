@@ -16,8 +16,8 @@
 %% Send comments and ideas on the package, error reports and additional
 %% programming languages to Jobst Hoffmann at <j.hoffmann@fh-aachen.de>.
 %%
-\def\filedate{2024/05/25}
-\def\fileversion{1.10b}
+\def\filedate{2024/09/23}
+\def\fileversion{1.10c}
 \NeedsTeXFormat{LaTeX2e}
 \AtEndOfPackage{\ProvidesPackage{listings}
              [\filedate\space\fileversion\space(Carsten Heinz)]}
@@ -920,6 +920,8 @@
     \def#2{#6}}
 \def\lst@UM#1{\csname\@lst @um#1@\endcsname}
 \lst@CCPutMacro
+    \lst@ProcessOther {"22}{\lst@ifupquote \textquotedbl
+                                     \else \char34\relax \fi}
     \lst@ProcessOther {"23}\#
     \lst@ProcessLetter{"24}\textdollar
     \lst@ProcessOther {"25}\%
@@ -1435,28 +1437,29 @@
   \def\lst@linerange{#2}\lst@GLI@#1--\@nil%
 }
 \def\lst@GLI@#1-#2-#3\@nil{%
+
   \lst@IfNumber{#1}%
   {%
     \ifx\@empty#1\@empty
         \let\lst@firstline\@ne
     \else
-        \def\lst@firstline{#1\relax}%
+        \def\lst@firstline{#1\relax}
     \fi
-    \ifx\@empty#3\@empty%
-        \def\lst@lastline{9999999\relax}%
+    \ifx\@empty#3\@empty
+        \def\lst@lastline{9999999\relax}
         \ifx\@empty#2\@empty
-            \let\lst@lastline\lst@firstline%
+            \let\lst@lastline\lst@firstline
         \fi
     \else%
         \ifx\@empty#2\@empty
             \def\lst@lastline{9999999\relax}
         \else % doesn't happen(?)
-            \def\lst@lastline{#2\relax}%
+            \def\lst@lastline{#2\relax}
         \fi
     \fi
   }%
   {%
-    \def\lst@firstline{9999999\relax}%
+    \def\lst@firstline{9999999\relax}
     \let\lst@lastline\lst@firstline
     \let\lst@rangebegin\lst@rangebeginprefix
     \lst@AddTo\lst@rangebegin{#1}%
@@ -1506,10 +1509,10 @@
         \ifnum\@tempcnta=\z@ \else
             \lst@nololtrue
             \advance\@tempcnta\lst@advancenumber
-            \edef\lst@firstnumber{\the\@tempcnta\relax}%
-        \fi%
-    \fi%
-  }%
+            \edef\lst@firstnumber{\the\@tempcnta\relax}
+        \fi
+    \fi
+  }
 }
 \def\lst@InitLstNumber{%
   \global\c@lstnumber\lst@firstnumber
@@ -1681,14 +1684,17 @@
   \def\lst@maketitle{\caption@startrue\@makecaption\@empty}}%
 }
 \def\lst@HRefStepCounter#1{%
-    \begingroup
-    \c@lstlisting\lst@neglisting
-    \advance\c@lstlisting\m@ne \xdef\lst@neglisting{\the\c@lstlisting}%
-    \ifx\hyper@refstepcounter\@undefined\else
-        \hyper@refstepcounter{#1}%
-    \fi
-    \endgroup}
-\gdef\lst@neglisting{\z@}% init
+  \begingroup
+  \c@lstlisting\lst@neglisting
+  \advance\c@lstlisting\m@ne \xdef\lst@neglisting{\the\c@lstlisting}%
+  \ifx\hyper@refstepcounter\@undefined\else
+      \hyper@refstepcounter{#1}%
+  \fi
+  \endgroup
+}
+\gdef\lst@neglisting{\z@}% init, \z@ can be used both for 0pt and 0,
+                         % remember: _neg_ative number, but no
+                         % counter!
 \lst@Key{boxpos}{c}{\def\lst@boxpos{#1}}
 \def\lst@boxtrue{\let\lst@ifbox\iftrue}
 \let\lst@ifbox\iffalse

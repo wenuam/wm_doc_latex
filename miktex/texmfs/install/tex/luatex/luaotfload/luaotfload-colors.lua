@@ -5,8 +5,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
     name          = "luaotfload-colors",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / color",
     license       = "GPL v2.0",
     author        = "Khaled Hosny, Elie Roux, Philipp Gesang, Dohyun Kim, David Carlisle",
@@ -155,7 +155,7 @@ local function sanitize_color_expression (digits)
 end
 
 local color_stack = 0
--- Beside maybe allowing {transpareny} package compatibility at some
+-- Beside maybe allowing {transparency} package compatibility at some
 -- point, this ensures that the stack is only created if it is actually
 -- needed. Especially important because it adds /TransGs1 gs to every page
 local function transparent_stack()

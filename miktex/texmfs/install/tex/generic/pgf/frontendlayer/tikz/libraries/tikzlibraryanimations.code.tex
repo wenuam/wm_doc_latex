@@ -296,7 +296,7 @@
 
 \def\tikz@anim@path@parse#1{%
   {%
-    \setbox0=\hbox{{% protext against side effects
+    \setbox0=\hbox{{% protect against side effects
         \pgfinterruptpath%
         \expandafter\tikz@scan@next@command#1\pgf@stop%
         \pgfsyssoftpath@getcurrentpath\tikz@anim@result%
@@ -484,7 +484,7 @@
   begin/.code=\tikz@anim@add@once{\pgfanimationset{begin={#1}}},
   end/.code=\tikz@anim@add@once{\pgfanimationset{end={#1}}},
   begin on/.code=\tikz@anim@event{begin}{#1},
-  end on/.code=\tikz@anim@event{begin}{#1},
+  end on/.code=\tikz@anim@event{end}{#1},
   begin snapshot/.code=\tikz@anim@add{\pgfanimationset{begin snapshot={#1}}},
   origin/.code=\tikz@anim@parse@origin{#1},
   transform/.code=\tikz@anim@add{\pgfanimationset{transform={\let\tikz@transform\relax\tikzset{#1}}}},

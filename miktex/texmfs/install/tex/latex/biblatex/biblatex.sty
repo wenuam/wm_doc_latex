@@ -12,8 +12,8 @@
 % particular purpose.
 
 % Set up the version strings here
-\def\abx@date{2024/03/21}
-\def\abx@version{3.20}
+\def\abx@date{2025/07/10}
+\def\abx@version{3.21}
 \def\abx@bbxid{\abx@date\space v\abx@version\space biblatex bibliography style (PK/MW)}
 \def\abx@cbxid{\abx@date\space v\abx@version\space biblatex citation style (PK/MW)}
 \def\abx@lbxid{\abx@date\space v\abx@version\space biblatex localization (PK/MW)}
@@ -345,7 +345,14 @@
     {\blx@contentssafe@citecommands
      \let}
     {}
-    {\blx@err@patch{\string\addtocontents}}%
+    {% revtex
+     % (which defines \robustify@contents to make commands safe
+     % in this context, so we check if we can have that)
+     \ifundef\robustify@contents
+       {\@secondoftwo}
+       {\ifpatchable\addtocontents{\robustify@contents}}
+       {\appto\robustify@contents{\blx@contentssafe@citecommands}}
+       {\blx@err@patch{\string\addtocontents}}}%
   % patch footnote
   \toggletrue{blx@tempa}%
   \def\do#1{%
@@ -555,6 +562,9 @@
     {\ifundef\xpg@ifdefined
        {}
        {\def\blx@ifhyphenationundef#1#2#3{\xpg@ifdefined{#1}{#3}{#2}}}%
+     \ifundef\pghyphenation
+       {}
+       {\def\blx@hyphexcept#1#2{\pghyphenation{#1}{#2}}}%
      % This is required for languages which are never explicitly selected
      % \xpg@bloaded is not defined in polyglossia < v1.45
      \ifundef\xpg@bloaded
@@ -782,7 +792,7 @@
 
 % {<string>}{<strip>}{<result>}
 % <result> will contain the bit of <string>
-% before the last occurence of <strip>
+% before the last occurrence of <strip>
 \protected\def\blx@stripfromendinto#1#2#3{%
   \begingroup
   \edef\blx@tempa{\endgroup
@@ -793,7 +803,7 @@
 
 %% Allocation
 
-% Counter to track nested tabularx environemnts so we don't
+% Counter to track nested tabularx environments so we don't
 % try to patch the commands more than once below as this undefs some
 % macros and an error is thrown
 \newcounter{tabx@nest}
@@ -957,6 +967,10 @@
 \newtoggle{blx@noroman}
 \newtoggle{blx@nohashothers}
 \newtoggle{blx@nosortothers}
+\newtoggle{blx@pagecomp}
+\newtoggle{blx@pagesq}
+\newtoggle{blx@allpagesq}
+\newtoggle{blx@twopagesq}
 \newtoggle{blx@singletitle}
 \newtoggle{blx@uniquebaretitle}
 \newtoggle{blx@uniqueprimaryauthor}
@@ -1693,7 +1707,7 @@
 % 1007/3001  exclamation mark
 % 1008/3002  question mark
 % 1009       suppress punctuation
-% 1010       new paragaph
+% 1010       new paragraph
 
 \mathchardef\blx@sf@prefixchar=1001% e.g. apostrophe or equivalent for prefix handling
 \mathchardef\blx@sf@dot=1002
@@ -3734,6 +3748,118 @@
   \fi}
 
 % <*>[<postpro>]{<string>}
+\newrobustcmd*{\mkseqrange}{%
+  \begingroup
+  \@ifstar
+    {\blx@range@aux\blx@seqrange@ii}
+    {\blx@range@aux\blx@seqrange@i}}
+
+\def\blx@seqrange@i[#1][#2]#3{%
+  \let\blx@tempa\@empty
+  \protected\def\blx@range@out@value{\appto\blx@tempa}%
+  \def\blx@range@out@item@process{#2}%
+  \let\blx@range@out@delim\blx@range@out@value
+  \let\blx@range@split\blx@genrange@split
+  \let\blx@range@process\blx@seqrange@check
+  \blx@range@chunk{#3}%
+  \begingroup
+  \edef\blx@tempa{\endgroup
+    \unexpanded{#1}{\expandonce\blx@tempa}}%
+  \blx@tempa
+  \endgroup}
+
+\def\blx@seqrange@ii[#1][#2]#3{%
+  \protected\def\blx@range@out@value{#1}%
+  \def\blx@range@out@item@process{#2}%
+  \let\blx@range@out@delim\@firstofone
+  \let\blx@range@split\blx@genrange@split
+  \let\blx@range@process\blx@seqrange@check
+  \blx@range@chunk{#3}%
+  \endgroup}
+
+\def\blx@seqrange@check#1#2{%
+  \blx@imc@ifinteger{#1}
+    {\blx@imc@ifinteger{#2}
+       {\@firstoftwo}
+       {\@secondoftwo}}
+    {\@secondoftwo}
+    {\blx@seqrange@comp{#1}{#2}}
+    {\begingroup
+     \protected@edef\blx@tempc{\endgroup
+       \blx@range@out@value{%
+         \blx@range@out@item@process{\unexpanded{#1}}%
+         \noexpand\bibrangedash
+         \blx@range@out@item@process{\unexpanded{#2}}}}%
+     \blx@tempc}}
+
+\def\blx@seqrange@comp#1#2{%
+  \def\blx@tempb{#1}%
+  \def\blx@tempc{#2}%
+  \expandafter\blx@seqrange@comp@div
+}
+
+\def\blx@seqrange@end{%
+  \numdef\blx@tempb\blx@tempb
+  \numdef\blx@tempc\blx@tempc
+  \begingroup
+  \protected@edef\blx@tempb{\endgroup
+    \blx@range@out@value{%
+      \blx@range@out@item@process{\blx@tempb}%
+      \noexpand\bibrangedash
+      \blx@range@out@item@process{\blx@tempc}}}%
+  \blx@tempb}
+
+\def\blx@seqrange@psq{%
+  \numdef\blx@tempb\blx@tempb
+  \begingroup
+  \protected@edef\blx@tempb{\endgroup
+    \blx@range@out@value{%
+      \blx@range@out@item@process{\blx@tempb}%
+      \noexpand\psq}}%
+  \blx@tempb}
+
+\def\blx@seqrange@psqq{%
+  \numdef\blx@tempb\blx@tempb
+  \begingroup
+  \protected@edef\blx@tempb{\endgroup
+    \blx@range@out@value{%
+      \blx@range@out@item@process{\blx@tempb}%
+      \noexpand\psqq}}%
+  \blx@tempb}
+
+\def\blx@seqrange@comp@div{%
+  \blx@tempcnta\blx@tempb\relax
+  \blx@tempcntb\blx@tempc\relax
+  \advance\blx@tempcntb-\blx@tempcnta
+  \ifnum\blx@tempcntb=1
+    \expandafter\blx@seqrange@psq
+  \else
+     \iftoggle{blx@twopagesq}{%
+        \expandafter\blx@seqrange@end
+     }{%
+       \iftoggle{blx@allpagesq}{%
+          \expandafter\blx@seqrange@psqq
+       }{%
+         \ifnum\blx@tempcntb=2
+            \expandafter\blx@seqrange@psqq
+         \else
+            \expandafter\blx@seqrange@end
+         \fi
+       }%
+     }%
+  \fi}
+
+% <*>[<postpro>]{<string>}
+\newrobustcmd*{\mkautorange}{%
+  \iftoggle{blx@pagesq}%
+      {\mkseqrange}
+      {\iftoggle{blx@pagecomp}%
+         {\mkcomprange}
+         {\mknormrange}%
+      }%
+}
+
+% <*>[<postpro>]{<string>}
 \newrobustcmd*{\mkfirstpage}{%
   \begingroup
   \@ifstar
@@ -3910,7 +4036,7 @@
     {\blx@declaredelimalias@omom[{#1}]{#2}}
     {\blx@declaredelimalias@omm[{#1}]{#2}}}
 
-% hrmpf ... remember that \docsvlist doesn't do anthing for empty
+% hrmpf ... remember that \docsvlist doesn't do anything for empty
 % lists/list items
 \def\blx@declaredelimalias@omom[#1]#2[#3]#4{%
   \ifstrequal{#1}{*}
@@ -4272,7 +4398,7 @@
 % Then, \blx@defformat@d is defined by calling
 % \def\blx@defformat@d#1{format body}
 
-% [<entrytype>]{<name>}{<definiton>}
+% [<entrytype>]{<name>}{<definition>}
 \newrobustcmd*{\DeclareNameFormat}{%
   \@ifstar
     {\blx@defformat\blx@defnameformat{nfd}*}
@@ -6633,11 +6759,11 @@
   \stripzeros \forcezerosy \forcezerosmdt
   \mkyearzeros \mkmonthzeros \mkdayzeros \mktimezeros}
 
-% User macro for retrieving currrent language
+% User macro for retrieving current language
 \def\currentlang{\blx@languagename}
 
 % We need to be able to prefix \providetoggle with \global,
-% plus we don't need the testing from \providetoggle anway.
+% plus we don't need the testing from \providetoggle anyway.
 % This uses internal implementation details of etoolbox's
 % toggles, so is a bit meh, but it's better than rolling our own
 % version of toggles just for that.
@@ -6740,6 +6866,13 @@
     {\def\blx@beglang{%
        \blx@clearlang
        \begingroup
+       \def\blx@endlang{\endgroup}%
+       \iftoggle{blx@autolangbib}
+         {\let\blx@endlangbib\blx@endlang}
+         {}%
+       \iftoggle{blx@autolangcite}
+         {\let\blx@endlangcite\blx@endlang}
+         {}%
        % track outer language (i.e. language not selected by biblatex)
        \ifundef\blx@outer@language@set
          {\let\blx@outer@language\blx@languagename
@@ -6817,6 +6950,13 @@
      {\def\blx@beglang{%
         \blx@clearlang
         \begingroup
+        \def\blx@endlang{\endgroup}%
+        \iftoggle{blx@autolangbib}
+          {\let\blx@endlangbib\blx@endlang}
+          {}%
+        \iftoggle{blx@autolangcite}
+          {\let\blx@endlangcite\blx@endlang}
+          {}%
         % track outer language (i.e. language not selected by biblatex)
         \ifundef\blx@outer@language@set
           {\let\blx@outer@language\blx@languagename
@@ -7191,7 +7331,7 @@
   \listxadd\blx@datetypes{\blx@datetype}}
 \abx@dodates
 % main date field has an empty prefix (''date) which can't be added to a list
-% and so do it explicity
+% and so do it explicitly
 % This is one of the few (only?) hard-coded datamodel assumptions but it is
 % very unlikely that anyone would *remove* the main date field in a custom application ...
 \def\abx@dodatetypes{\do{}\dolistloop\blx@datetypes}
@@ -8134,7 +8274,7 @@
   \ifblank{#1}
     {\def\blx@tempa{default}}
     {\def\blx@tempa{#1}}%
-  \def\blx@tempb{#1}%
+  \def\blx@tempb{#2}%
   \ifcsundef{abx@field@\blx@tempb source}
     {}%
     {\letcs\blx@tempb{abx@field@\blx@tempb source}%
@@ -8309,7 +8449,7 @@
 
 \def\blx@adjustyears{%
   % All dates by default are output from biber in astronomical era with a year 0
-  % So, if we are ouputting BCE/BC era, we need to adjust the years by +1
+  % So, if we are outputting BCE/BC era, we need to adjust the years by +1
   \def\do##1{%
     \ifdefstring\blx@dateera{astronomical}
       {}
@@ -9051,11 +9191,6 @@
     {}%
   % Write out missing languages we still need to load
   \forlistloop{\blx@lbx@writeloaderequest}{\blx@lbx@loadlist}%
-  % Issue rerun warning if we need to load a language babel/polyglossia
-  % hasn't told us about and that we are not loading it already from previous
-  % runs.
-  \def\do#1{\xifinlist{#1}{\blx@lbx@auxloadlist}{}{\blx@rerun@latex\listbreak}}%
-  \dolistloop\blx@lbx@loadlist
   % Write md5 hash of .bbl to .aux if we need a Biber rerun.
   % This needs to happen here and not in \blx@check@rerun together with
   % the other rerun stuff, because \AfterEndDocument would be too
@@ -10096,23 +10231,21 @@
   \def\abx@aux@page#1#2{\blx@addpagesum{#1}{#2}}%
   \def\abx@aux@fnpage#1#2{\blx@addpagesum{#1}{#2}}}
 
-% hyperref interface
-\appto\blx@mkhyperref{%
-  \let\blx@anchors\@empty
-  \ifundef\hyper@natanchorstart
-    {\protected\def\blx@anchor{%
-       \xifinlist{\the\c@refsection @\abx@field@entrykey}{\blx@anchors}
-         {}
-         {\listxadd\blx@anchors{\the\c@refsection @\abx@field@entrykey}%
-          \hypertarget{cite.\the\c@refsection @\abx@field@entrykey}{}}}}
-    {\protected\def\blx@anchor{%
-       \xifinlist{\the\c@refsection @\abx@field@entrykey}{\blx@anchors}
-         {}
-         {\listxadd\blx@anchors{\the\c@refsection @\abx@field@entrykey}%
-          \hyper@natanchorstart{\the\c@refsection @\abx@field@entrykey}%
-          \hyper@natanchorend}}}}
 
-\appto\blx@mknohyperref{\let\blx@anchor\relax}
+% hyperref interface
+% see https://github.com/plk/biblatex/issues/1366
+\let\blx@anchors\@empty
+
+\protected\def\blx@anchor{%
+  \xifinlist{\the\c@refsection @\abx@field@entrykey}{\blx@anchors}
+    {}
+    {\listxadd\blx@anchors{\the\c@refsection @\abx@field@entrykey}%
+     \hyper@natanchorstart{\the\c@refsection @\abx@field@entrykey}%
+     \hyper@natanchorend}}
+
+% fallback defs
+\providecommand\hyper@natanchorstart[1]{}%
+\providecommand\hyper@natanchorend{}%
 
 \blx@kv@defkey{blx@biblist2}{driver}{\blx@key@driver{#1}}
 \blx@kv@defkey{blx@biblist1}{driver}{}
@@ -12145,51 +12278,46 @@
     \expandafter\@secondoftwo
   \fi}
 
-%  hyperref interface
-\appto\blx@mkhyperref{%
-  \protected\def\blx@imc@bibhyperref{%
-    \@ifnextchar[%]
-      {\blx@bibhyperref}
-      {\blx@bibhyperref[\abx@field@entrykey]}}%
-  \ifundef\hyper@natanchorstart
-    {\long\def\blx@bibhyperref[#1]#2{%
-       \blx@sfsave\hyperlink{cite.\the\c@refsection @#1}{\blx@sfrest
-         #2%
-       \blx@sfsave}\blx@sfrest}%
-     \protected\long\def\blx@imc@bibhyperlink#1#2{%
-       \blx@sfsave\hyperlink{cite.\the\c@refsection:#1}{\blx@sfrest
-         #2%
-       \blx@sfsave}\blx@sfrest}%
-     \protected\long\def\blx@imc@bibhypertarget#1#2{%
-       \blx@sfsave\hypertarget{cite.\the\c@refsection:#1}{\blx@sfrest
-         #2%
-       \blx@sfsave}\blx@sfrest}}%
-    {\long\def\blx@bibhyperref[#1]#2{%
-       \blx@sfsave\hyper@natlinkstart{\the\c@refsection @#1}\blx@sfrest
-       #2%
-       \blx@sfsave\hyper@natlinkend\blx@sfrest}%
-     \protected\long\def\blx@imc@bibhyperlink#1#2{%
-       \blx@sfsave\hyper@natlinkstart{\the\c@refsection:#1}\blx@sfrest
-       #2%
-       \blx@sfsave\hyper@natlinkend\blx@sfrest}%
-     \protected\long\def\blx@imc@bibhypertarget#1#2{%
-       \blx@sfsave\hyper@natanchorstart{\the\c@refsection:#1}\blx@sfrest
-       #2%
-       \blx@sfsave\hyper@natanchorend\blx@sfrest}}
-  \let\blx@imc@ifhyperref\@firstoftwo
-  \def\blx@sf{\spacefactor}%
-  \def\blx@sfsave{%
-    \blx@leavevmode
-    \numgdef\blx@sf{\spacefactor}}%
-  \def\blx@sfrest{%
-    \ifhmode\spacefactor\blx@sf\relax\fi
-    \gdef\blx@sf{\spacefactor}}}
+% hyperref support (we use fallbacks if hyperref is not loaded,
+% see https://github.com/plk/biblatex/issues/1366)
+\protected\def\blx@imc@bibhyperref{%
+  \@ifnextchar[%]
+    {\blx@bibhyperref}
+    {\blx@bibhyperref[\abx@field@entrykey]}}%
 
+\long\def\blx@bibhyperref[#1]#2{%
+  \blx@sfsave\hyper@natlinkstart{\the\c@refsection @#1}\blx@sfrest
+  #2%
+  \blx@sfsave\hyper@natlinkend\blx@sfrest}%
+
+\protected\long\def\blx@imc@bibhyperlink#1#2{%
+  \blx@sfsave\hyper@natlinkstart{\the\c@refsection:#1}\blx@sfrest
+  #2%
+  \blx@sfsave\hyper@natlinkend\blx@sfrest}%
+
+\protected\long\def\blx@imc@bibhypertarget#1#2{%
+  \blx@sfsave\hyper@natanchorstart{\the\c@refsection:#1}\blx@sfrest
+  #2%
+  \blx@sfsave\hyper@natanchorend\blx@sfrest}%
+
+\def\blx@sf{\spacefactor}%
+\def\blx@sfsave{%
+  \blx@leavevmode
+  \numgdef\blx@sf{\spacefactor}}%
+\def\blx@sfrest{%
+  \ifhmode\spacefactor\blx@sf\relax\fi
+  \gdef\blx@sf{\spacefactor}}
+
+
+\appto\blx@mkhyperref{%
+  \let\blx@imc@ifhyperref\@firstoftwo
+}
+
+% fallback defs
 \appto\blx@mknohyperref{%
-  \protected\def\blx@imc@bibhyperref{\@ifnextchar[\blx@nohyperref\@firstofone}%
+  \providecommand\hyper@natlinkstart[1]{}%
+  \providecommand\hyper@natlinkend{}%
   \def\blx@nohyperref[#1]#2{#2}%
-  \let\blx@imc@bibhyperlink\@secondoftwo
-  \let\blx@imc@bibhypertarget\@secondoftwo
   \let\blx@imc@ifhyperref\@secondoftwo}
 
 \blx@regimcs{%
@@ -14858,7 +14986,7 @@
   \endgroup}
 \@onlypreamble\DeclareExtradateContext
 \blx@DeclareBackendOption{global,type}[xml]{extradatecontext}
-  
+
 \newrobustcmd*{\DeclareLabelname}[2][]{%
   \begingroup
   \let\blx@tempa\@empty
@@ -15035,6 +15163,27 @@
     \def\blx@minxrefs{#1}%
   \fi}
 \def\blx@minxrefs{2}
+
+\DeclareBibliographyOption[string]{citepagerange}{%
+  \togglefalse{blx@pagecomp}%
+  \togglefalse{blx@pagesq}%
+  \togglefalse{blx@allpagesq}%
+  \togglefalse{blx@twopagesq}%
+  \ifstrequal{#1}{allsqq}
+    {\toggletrue{blx@pagesq}\toggletrue{blx@allpagesq}}% allsqq
+    {\ifstrequal{#1}{3sqq}
+       {\toggletrue{blx@pagesq}}% 3sqq
+       {\ifstrequal{#1}{2sq}
+          {\toggletrue{blx@pagesq}\toggletrue{blx@twopagesq}}% 2sq
+          {\ifstrequal{#1}{compressed}% compressed
+             {\toggletrue{blx@pagecomp}}%
+             {\ifstrequal{#1}{normalized}{}{% normalized
+                 \blx@warning{Invalid citepagerange value `#1'\MessageBreak
+                              Falling back to default.}}}%
+          }%
+       }%
+    }%
+}
 
 \DeclareBibliographyOption[string]{texencoding}{%
   \ifstrequal{#1}{auto}
@@ -15954,7 +16103,7 @@
 
 \DeclareBiblatexOption{global}[boolean]{pluralothers}[true]{%
   \settoggle{blx@pluralothers}{#1}}
-  
+
 \blx@DeclareBackendOption{entry,namelist}[string]{uniquelist}
 
 \DeclareBiblatexOption{global,type}[boolean]{nohashothers}[true]{%

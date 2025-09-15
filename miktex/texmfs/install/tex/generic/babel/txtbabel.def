@@ -7,7 +7,7 @@
 %% babel.dtx  (with options: `texxet')
 %% 
 %%
-%% Copyright (C) 2012-2024 Javier Bezos and Johannes L. Braams.
+%% Copyright (C) 2012-2025 Javier Bezos and Johannes L. Braams.
 %% Copyright (C) 1989-2012 Johannes L. Braams and
 %%           any individual authors listed elsewhere in this file.
 %% All rights reserved.
@@ -32,32 +32,34 @@
 %% and covered by LPPL is defined by the unpacking scripts (with
 %% extension |.ins|) which are part of the distribution.
 %%
-
 \providecommand\bbl@provide@intraspace{}
 \bbl@trace{Redefinitions for bidi layout}
-\def\bbl@sspre@caption{%  TODO: Unused!
-  \bbl@exp{\everyhbox{\\\bbl@textdir\bbl@cs{wdir@\bbl@main@language}}}}
 \ifx\bbl@opt@layout\@nnil\else % if layout=..
+\IfBabelLayout{nopars}
+  {}
+  {\edef\bbl@opt@layout{\bbl@opt@layout.pars.}}%
 \def\bbl@startskip{\ifcase\bbl@thepardir\leftskip\else\rightskip\fi}
 \def\bbl@endskip{\ifcase\bbl@thepardir\rightskip\else\leftskip\fi}
-\ifnum\bbl@bidimode>\z@  % TODO: always?
-  \def\@hangfrom#1{%
-    \setbox\@tempboxa\hbox{{#1}}%
-    \hangindent\ifcase\bbl@thepardir\wd\@tempboxa\else-\wd\@tempboxa\fi
-    \noindent\box\@tempboxa}
-  \def\raggedright{%
-    \let\\\@centercr
-    \bbl@startskip\z@skip
-    \@rightskip\@flushglue
-    \bbl@endskip\@rightskip
-    \parindent\z@
-    \parfillskip\bbl@startskip}
-  \def\raggedleft{%
-    \let\\\@centercr
-    \bbl@startskip\@flushglue
-    \bbl@endskip\z@skip
-    \parindent\z@
-    \parfillskip\bbl@endskip}
+\ifnum\bbl@bidimode>\z@
+\IfBabelLayout{pars}
+  {\def\@hangfrom#1{%
+     \setbox\@tempboxa\hbox{{#1}}%
+     \hangindent\ifcase\bbl@thepardir\wd\@tempboxa\else-\wd\@tempboxa\fi
+     \noindent\box\@tempboxa}
+   \def\raggedright{%
+     \let\\\@centercr
+     \bbl@startskip\z@skip
+     \@rightskip\@flushglue
+     \bbl@endskip\@rightskip
+     \parindent\z@
+     \parfillskip\bbl@startskip}
+   \def\raggedleft{%
+     \let\\\@centercr
+     \bbl@startskip\@flushglue
+     \bbl@endskip\z@skip
+     \parindent\z@
+     \parfillskip\bbl@endskip}}
+  {}
 \fi
 \IfBabelLayout{lists}
   {\bbl@sreplace\list
@@ -93,56 +95,6 @@
        \hb@xt@\columnwidth{\box\@outputbox \hss}%
        \hskip\columnsep
        \hskip\columnwidth}}}%
-  {}
-\bbl@trace{Bidi footnotes}
-\ifnum\bbl@bidimode>\z@ % Any bidi=
-  \def\bbl@footnote#1#2#3{%
-    \@ifnextchar[%
-      {\bbl@footnote@o{#1}{#2}{#3}}%
-      {\bbl@footnote@x{#1}{#2}{#3}}}
-  \long\def\bbl@footnote@x#1#2#3#4{%
-    \bgroup
-      \select@language@x{\bbl@main@language}%
-      \bbl@fn@footnote{#2#1{\ignorespaces#4}#3}%
-    \egroup}
-  \long\def\bbl@footnote@o#1#2#3[#4]#5{%
-    \bgroup
-      \select@language@x{\bbl@main@language}%
-      \bbl@fn@footnote[#4]{#2#1{\ignorespaces#5}#3}%
-    \egroup}
-  \def\bbl@footnotetext#1#2#3{%
-    \@ifnextchar[%
-      {\bbl@footnotetext@o{#1}{#2}{#3}}%
-      {\bbl@footnotetext@x{#1}{#2}{#3}}}
-  \long\def\bbl@footnotetext@x#1#2#3#4{%
-    \bgroup
-      \select@language@x{\bbl@main@language}%
-      \bbl@fn@footnotetext{#2#1{\ignorespaces#4}#3}%
-    \egroup}
-  \long\def\bbl@footnotetext@o#1#2#3[#4]#5{%
-    \bgroup
-      \select@language@x{\bbl@main@language}%
-      \bbl@fn@footnotetext[#4]{#2#1{\ignorespaces#5}#3}%
-    \egroup}
-  \def\BabelFootnote#1#2#3#4{%
-    \ifx\bbl@fn@footnote\@undefined
-      \let\bbl@fn@footnote\footnote
-    \fi
-    \ifx\bbl@fn@footnotetext\@undefined
-      \let\bbl@fn@footnotetext\footnotetext
-    \fi
-    \bbl@ifblank{#2}%
-      {\def#1{\bbl@footnote{\@firstofone}{#3}{#4}}
-       \@namedef{\bbl@stripslash#1text}%
-         {\bbl@footnotetext{\@firstofone}{#3}{#4}}}%
-      {\def#1{\bbl@exp{\\\bbl@footnote{\\\foreignlanguage{#2}}}{#3}{#4}}%
-       \@namedef{\bbl@stripslash#1text}%
-         {\bbl@exp{\\\bbl@footnotetext{\\\foreignlanguage{#2}}}{#3}{#4}}}}
-\fi
-\IfBabelLayout{footnotes}%
-  {\BabelFootnote\footnote\languagename{}{}%
-   \BabelFootnote\localfootnote\languagename{}{}%
-   \BabelFootnote\mainfootnote{}{}{}}
   {}
 \IfBabelLayout{counters*}%
   {\bbl@add\bbl@opt@layout{.counters.}%

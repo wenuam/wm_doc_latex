@@ -97,7 +97,7 @@
 % ATTENTION: \pgfkeysfiltered can't be nested (yet). Use the
 % \pgfkeyspredicateAND if you need multiple predicates at once.
 % Nesting would produce unexpected results because the current filter
-% state can't be stored/restored without TeX-groups, therefor it is
+% state can't be stored/restored without TeX-groups, therefore it is
 % disabled.
 %
 % ATTENTION: you can't filter error messages.
@@ -472,14 +472,14 @@
 
 \pgfkeys{%
     /errors/family unknown/.code=\pgfkeys@error{%
-        Sorry, I do not know family '#1' and can't work with any assoicated family handling. Perhaps you misspelled it?},
+        Sorry, I do not know family '#1' and can't work with any associated family handling. Perhaps you misspelled it?},
     /errors/no such key filter/.code 2 args=\pgfkeys@error{Sorry, there is no such key filter '#1'.},
     /errors/no such key filter handler/.code 2 args=\pgfkeys@error{Sorry, there is no such key filter handler '#1'.},
     % HANDLERS:
     %
     % .is family should
     %  1. '.cd' into the families' path,
-    %  2. define booleans to activate/deactive the family
+    %  2. define booleans to activate/deactivate the family
     %     (see \pgfkeysisfamilyactive)
     %  3. make sure that \pgfkeyshasactivefamily returns true for
     %     the family itself.

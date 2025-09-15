@@ -7,7 +7,7 @@
 -- babel.dtx  (with options: `basic-r')
 -- 
 --
--- Copyright (C) 2012-2024 Javier Bezos and Johannes L. Braams.
+-- Copyright (C) 2012-2025 Javier Bezos and Johannes L. Braams.
 -- Copyright (C) 1989-2012 Johannes L. Braams and
 --           any individual authors listed elsewhere in this file.
 -- All rights reserved.
@@ -32,9 +32,6 @@
 -- and covered by LPPL is defined by the unpacking scripts (with
 -- extension |.ins|) which are part of the distribution.
 --
-
-Babel = Babel or {}
-
 Babel.bidi_enabled = true
 
 require('babel-data-bidi.lua')
@@ -45,7 +42,7 @@ local ranges = Babel.ranges
 local DIR = node.id("dir")
 
 local function dir_mark(head, from, to, outer)
-  dir = (outer == 'r') and 'TLT' or 'TRT' -- ie, reverse
+  dir = (outer == 'r') and 'TLT' or 'TRT' -- i.e., reverse
   local d = node.new(DIR)
   d.dir = '+' .. dir
   node.insert_before(head, from, d)
@@ -162,7 +159,7 @@ function Babel.bidi(head, ispar)
       elseif first_d and dir ~= strong_lr then
         dir_mark(head, first_d, last_d, outer)
         first_d, last_d = nil, nil
-     end
+      end
     end
     if dir and not last_lr and dir ~= 'l' and outer == 'r' then
       item.char = characters[item.char] and

@@ -12,7 +12,7 @@
 %% reports for it can be opened at https://latex-project.org/bugs/
 %% (but please observe conditions on bug reports sent to that address!)
 %% 
-%% Copyright (C) 1993-2024
+%% Copyright (C) 1993-2025
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 %% 
@@ -43,7 +43,7 @@
 \DeclareCurrentRelease{}{2020-02-07}
 
 \ProvidesPackage{longtable}
-          [2024-04-26 v4.20 Multi-page Table package (DPC)]
+          [2024-12-18 v4.23 Multi-page Table package (DPC)]
 \def\LT@err{\PackageError{longtable}}
 \def\LT@warn{\PackageWarning{longtable}}
 \def\LT@final@warn{%
@@ -65,6 +65,7 @@
 \newcount\LTchunksize \LTchunksize=200
 \let\c@LTchunksize\LTchunksize
 \newdimen\LTcapwidth  \LTcapwidth=4in
+\providecommand\LTcaptype{table}
 \newbox\LT@head
 \newbox\LT@firsthead
 \newbox\LT@foot
@@ -73,6 +74,7 @@
 \newcount\LT@cols
 \newcount\LT@rows
 \newcounter{LT@tables}
+\providecommand\theHLT@tables{\theLT@tables}
 \newcounter{LT@chunks}[LT@tables]
 \ifx\c@table\undefined
   \newcounter{table}
@@ -105,8 +107,14 @@
 \ExplSyntaxOn
 \def\LT@array[#1]#2{%
   \UseTaggingSocket{tbl/init}
-  \@kernel@refstepcounter{table}\stepcounter{LT@tables}
-  \tl_gset:Ne \@currentHref {table.\cs_if_exist_use:N\theHtable}
+  \tl_if_empty:eTF { \LTcaptype }
+    {
+      \tl_gset:Ne \@currentHref {LT@tables.\theHLT@tables}
+    }
+    {
+      \@kernel@refstepcounter{\LTcaptype}\stepcounter{LT@tables}
+      \tl_gset:Ne \@currentHref {\LTcaptype.\cs_if_exist_use:c {theH\LTcaptype}}
+    }
   \tbl_gzero_row_count:
   \UseTaggingSocket{tbl/longtable/init}
   \if l#1%
@@ -140,7 +148,8 @@
   \else
     \advance\@tempdima\extrarowheight
     \col@sep\tabcolsep
-    \let\@startpbox\LT@startpbox\let\LT@LL@FM@cr\@arraycr
+    \let\@startpbox@action\LT@startpbox
+    \let\LT@LL@FM@cr\@arraycr
   \fi
   \setbox\@arstrutbox\hbox{\vrule
     \@height \arraystretch \@tempdima
@@ -220,7 +229,13 @@
     \dimen@\pagegoal\advance\dimen@-\ht\LT@foot\pagegoal\dimen@
     \maxdepth\z@
   \fi
-  \MakeLinkTarget{table}
+  \tl_if_empty:eTF{\LTcaptype}
+    {
+      \MakeLinkTarget{LT@tables}
+    }
+    {
+      \MakeLinkTarget{\LTcaptype}
+    }
   \ifvoid\LT@firsthead\copy\LT@head\else\box\LT@firsthead\fi\nobreak
   \UseTaggingSocket{tbl/longtable/head}
   \output{\LT@output}}
@@ -245,14 +260,20 @@
   \ifx\LT@save@row\LT@@save@row
   \else
     \LT@warn{Column~ widths~ have~ changed\MessageBreak
-             in~ table~ \thetable}%
+             in~
+               \tl_if_empty:eTF{\LTcaptype}
+                 {longtable~ \theLT@tables}
+                 {\LTcaptype\c_space_tl\use:c{the\LTcaptype}}
+             }
     \LT@final@warn
   \fi
   \endgraf\penalty -\LT@end@pen
   \ifvoid\LT@foot\else
     \global\advance\vsize\ht\LT@foot
     \global\advance\@colroom\ht\LT@foot
-    \dimen@\pagegoal\advance\dimen@\ht\LT@foot\pagegoal\dimen@
+    \ifdim\pagegoal<\maxdimen
+      \dimen@\pagegoal\advance\dimen@\ht\LT@foot\pagegoal\dimen@
+    \fi
   \fi
   \endgroup
   \global\@mparbottom\z@
@@ -431,17 +452,22 @@
     \tbl_gdecr_row_count:
     \penalty\@M}
   \@gtempa}
-\ExplSyntaxOff
 \def\LT@caption{%
   \noalign\bgroup
     \@ifnextchar[{\egroup\LT@c@ption\@firstofone}\LT@capti@n}
-\def\LT@c@ption#1[#2]#3{%
-  \LT@makecaption#1\fnum@table{#3}%
-  \def\@tempa{#2}%
-  \ifx\@tempa\@empty\else
-     {\let\\\space
-     \addcontentsline{\ext@table}{table}{\protect\numberline{\thetable}{#2}}}%
-  \fi}
+\def\LT@c@ption#1[#2]#3{
+  \tl_if_empty:eTF{\LTcaptype}
+    {\LT@makecaption\@gobble{}{#3}}
+    {\LT@makecaption#1{\csname fnum@\LTcaptype\endcsname}{#3}
+    \def\@tempa{#2}
+    \ifx\@tempa\@empty\else
+      {\let\\\space
+      \addcontentsline
+        {\@nameuse{ext@\LTcaptype}}
+        {\LTcaptype}
+        {\protect\numberline{\@nameuse{the\LTcaptype}}{#2}}}
+    \fi}}
+\ExplSyntaxOff
 \def\LT@capti@n{%
   \@ifstar
     {\egroup\LT@c@ption\@gobble[]}%
@@ -506,6 +532,13 @@
      {
        \crcr
        \noalign{
+       \int_step_inline:nn
+         { \LT@rows }
+         {
+           \seq_gput_left:ce
+             {g__tbl_\cs_to_str:N #1 _rows_seq }
+             { \int_eval:n {\g__tbl_row_int - ##1 } }
+         }
          \tbl_gdecr_row_count:         % undo the increment
          \int_gset:Nn \LT@rows { \LTchunksize }
        }

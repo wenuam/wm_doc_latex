@@ -52,6 +52,19 @@ return function(dom)
       hr:remove_node()
     end
   end
+  local longtable_last_row = function(tbl)
+    -- longtable contains last row of empty cells
+    local rows= tbl:query_selector("tr")
+    local last_row = rows[#rows]
+    if not last_row or last_row:get_attribute("class") == "hline" then return end
+    for _, cell in ipairs(last_row:query_selector("td")) do
+      -- loop over cells in the last row a and detect that they are empty. break processing if they are not.
+      if has_child_elements(cell) or not cell:get_text():match("^%s*$") then
+        return 
+      end
+    end
+    last_row:remove_node()
+  end
   local load_css_files = function()
     -- the empty rows can be styled using CSS, for example configuration for 
     -- Booktabs does that. We shouldn't remove such rows.
@@ -72,11 +85,14 @@ return function(dom)
   local css = load_css_files()
   for _, tbl in ipairs(dom:query_selector("table")) do
     -- find the empty rows
-    for _, row in ipairs(tbl:query_selector("tr")) do
+    local rows = tbl:query_selector("tr")
+    for count, row in ipairs(rows) do
       if is_empty_row(row) and is_not_styled(row, css) then row:remove_node() end
       hline_hr(row)
     end
-
+    if tbl:get_attribute("class") and tbl:get_attribute("class"):match("longtable") then
+      longtable_last_row(tbl)
+    end
   end
   return dom
 end

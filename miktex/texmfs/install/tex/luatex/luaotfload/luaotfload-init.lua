@@ -7,8 +7,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") {
     name          = "luaotfload-init",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / initialization",
     license       = "GPL v2.0"
 }
@@ -206,7 +206,7 @@ local function verify_context_dir (pth)
     end
   end
   logreport("both", 0, "init", "A directory name has been passed as \z
-    fontloader name but this directory does not acutally seem to contain \z
+    fontloader name but this directory does not actually seem to contain \z
     a font loader. I will try to interpret your fontloader name in another \z
     way for now, but please fix your settings.")
   return false

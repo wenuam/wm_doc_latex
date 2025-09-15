@@ -7,8 +7,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
     name          = "luaotfload-configuration",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / config file reader",
     license       = "GPL v2.0"
 }
@@ -224,7 +224,8 @@ local default_config = {
     log_level          = 0,
     color_callback     = "post_linebreak_filter",
     fontloader         = default_fontloader (),
-    default_dvi_driver = "dvisvgm"
+    default_dvi_driver = "dvisvgm",
+    live               = true,
   },
   misc = {
     bisect         = false,
@@ -270,6 +271,7 @@ local default_config = {
 
     hang = feature_presets.hang,
   },
+  status = luaotfloadstatus,
 }
 
 -------------------------------------------------------------------------------
@@ -990,7 +992,6 @@ local function apply (old, new)
       end
     end
   end
-  result.status = luaotfloadstatus
   return result
 end
 

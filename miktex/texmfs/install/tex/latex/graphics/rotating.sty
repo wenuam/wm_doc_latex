@@ -13,12 +13,12 @@
 %% 
 %% Copyright (C) 1995-1999 Sebastian Rahtz and Leonor Barroca
 %% Copyright (C) 2001-2003,2007-2009 Robin Fairbairns
-%% Copyright (C) 2016-2024 LaTeX Project
+%% Copyright (C) 2016-2025 LaTeX Project
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{rotating}%
-    [2016/08/11 v2.16d
+    [2025/01/14 v2.16e
   rotated objects in LaTeX%
         ]
 \DeclareOption{clockwise}{%
@@ -67,6 +67,7 @@
 \newskip\rotFPtop \rotFPtop=\@fptop
 \newskip\rotFPbot \rotFPbot=\@fpbot
 \def\sideways{%
+  \leavevmode
   \Grot@setangle{90}%
   \setbox\z@\color@hbox\ignorespaces}
 \def\endsideways{%
@@ -76,6 +77,7 @@
   \Grot@box
 }
 \def\turn#1{%
+  \leavevmode
   \Grot@setangle{#1}%
   \setbox\z@\color@hbox\ignorespaces}
 \def\endturn{%
@@ -85,6 +87,7 @@
   \Grot@box
 }
 \def\rotate#1{%
+  \leavevmode
   \Grot@setangle{#1}%
   \setbox\z@\color@hbox\ignorespaces}
 \def\endrotate{%
@@ -95,6 +98,7 @@
   \Grot@box
 }
 \def\turnbox#1#2{%
+  \leavevmode
   \Grot@setangle{#1}%
   \setbox\z@\hbox{{#2}}%
   \Grot@x\z@\Grot@y\z@
@@ -110,10 +114,16 @@
 \def\@xrotfloat#1[#2]{%
   \@float{#1}[#2]%
   \begin{lrbox}\rot@float@box
+  \SuspendTagging{\minipage}%
   \begin{minipage}\textheight
+  \ResumeTagging{\minipage}%
+  \UseTaggingSocket{para/restore}%
  }
 \def\end@rotfloat{%
-   \end{minipage}\end{lrbox}%
+   \par\SuspendTagging{\minipage}%
+   \end{minipage}%
+   \ResumeTagging{\minipage}%
+   \end{lrbox}%
    \stepcounter{r@tfl@t}%
    \rot@label{RF\ther@tfl@t}%
    \rot@pageref{RF\ther@tfl@t}{\R@@page}%

@@ -5,8 +5,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") {
     name          = "luaotfload-unicode",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / Unicode helpers",
     license       = "CC0 1.0 Universal",
     author        = "Marcel Krüger"
@@ -239,7 +239,7 @@ uppercase[0x00DF]['de-alt'] = uppercase[0x00DF]['de-x-eszett']
 
 -- Special handling for Eastern Armenian based on Unicode document L2/20-143.
 uppercase[0x0587]['hy'] = { _ = { 0x0535, 0x054E } }
--- Resore Unicode behavior. This entry is redundant, but we have to be aware of it
+-- Restore Unicode behavior. This entry is redundant, but we have to be aware of it
 -- if we later start to ignore unknown private use tags
 uppercase[0x0587]['hy-x-yiwn'] = { _ = uppercase[0x0587]._ }
 

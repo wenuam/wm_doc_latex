@@ -30,7 +30,7 @@
 % ProvidesPackage declaration in LaTeX
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname ProvidesPackage\endcsname\relax\else
-  \ProvidesPackage{iftex}[2022/02/03 v1.0f TeX engine tests]
+  \ProvidesPackage{iftex}[2024/12/12 v1.0g TeX engine tests]
 \fi
 
 % Save @ catcode, to restore at end, not needed in LaTeX.
@@ -80,6 +80,7 @@
 \IFTEX@protected\def\RequireXeTeX{\IFTEX@Require\ifxetex{XeTeX}\fi}
 \IFTEX@protected\def\RequireLuaTeX{\IFTEX@Require\ifluatex{LuaTeX}\fi}
 \IFTEX@protected\def\RequireLuaHBTeX{\IFTEX@Require\ifluahbtex{LuaHBTeX}\fi}
+\IFTEX@protected\def\RequireLuaMetaTeX{\IFTEX@Require\ifluahbtex{LuaMetaTeX}\fi}
 \IFTEX@protected\def\RequirepTeX{\IFTEX@Require\ifptex{pTeX}\fi}
 \IFTEX@protected\def\RequireupTeX{\IFTEX@Require\ifuptex{upTeX}\fi}
 \IFTEX@protected\def\RequirepTeXng{\IFTEX@Require\ifptexng{pTeX-ng}\fi}
@@ -92,6 +93,8 @@
 \IFTEX@protected\def\RequireTexpadTeX{\IFTEX@Require\iftexpadtex{TexpadTeX}\fi}
 % HiTeX/HINT
 \IFTEX@protected\def\RequireHINT{\IFTEX@Require\ifhint{HINT}\fi}
+% Prote
+\IFTEX@protected\def\RequireProte{\IFTEX@Require\ifprote{Prote}\fi}
 
 % As a matter of policy over-write any existing \if*tex macro and set
 % by the tests here.
@@ -130,7 +133,7 @@
 \IFTEX@let{XeTeX}{xetex}
 
 
-% luatex (including luahbtex)
+% luatex (including luahbtex and luametatex)
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname directlua\endcsname\relax
   \IFTEX@let{luatex}{false}
@@ -157,7 +160,21 @@
 \IFTEX@let{LuaHBTeX}{luahbtex}
 
 
-% ptex (including all variants)
+% luametatex
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname directlua\endcsname\relax
+  \IFTEX@let{luametatex}{false}
+\else
+  \ifnum\luatexversion<200
+    \IFTEX@let{luametatex}{false}
+  \else
+    \IFTEX@let{luametatex}{true}
+  \fi
+\fi
+\IFTEX@let{LuaMetaTeX}{luametatex}
+
+
+% ptex (including all variants) (note that the ptex command uses uptex in current releases)
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname kanjiskip\endcsname\relax
   \IFTEX@let{ptex}{false}
@@ -237,6 +254,15 @@
 \fi
 \IFTEX@let{HINT}{hint}
 
+% Prote
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname Proteversion\endcsname\relax
+  \IFTEX@let{prote}{false}
+\else
+  \IFTEX@let{prote}{true}
+\fi
+\IFTEX@let{Prote}{prote}
+ 
 
 % Output mode
 % declare as if with \newif

@@ -7,7 +7,7 @@
 -- babel.dtx  (with options: `basic')
 -- 
 --
--- Copyright (C) 2012-2024 Javier Bezos and Johannes L. Braams.
+-- Copyright (C) 2012-2025 Javier Bezos and Johannes L. Braams.
 -- Copyright (C) 1989-2012 Johannes L. Braams and
 --           any individual authors listed elsewhere in this file.
 -- All rights reserved.
@@ -32,10 +32,7 @@
 -- and covered by LPPL is defined by the unpacking scripts (with
 -- extension |.ins|) which are part of the distribution.
 --
-
-Babel = Babel or {}
-
--- eg, Babel.fontmap[1][<prefontid>]=<dirfontid>
+-- e.g., Babel.fontmap[1][<prefontid>]=<dirfontid>
 
 Babel.fontmap = Babel.fontmap or {}
 Babel.fontmap[0] = {}      -- l
@@ -63,7 +60,7 @@ local GLYPH = node.id('glyph')
 local function insert_implicit(head, state, outer)
   local new_state = state
   if state.sim and state.eim and state.sim ~= state.eim then
-    dir = ((outer == 'r') and 'TLT' or 'TRT') -- ie, reverse
+    dir = ((outer == 'r') and 'TLT' or 'TRT') -- i.e., reverse
     local d = node.new(DIR)
     d.dir = '+' .. dir
     node.insert_before(head, state.sim, d)
@@ -102,7 +99,7 @@ end
 
 -- TODO - \hbox with an explicit dir can lead to wrong results
 -- <R \hbox dir TLT{<R>}> and <L \hbox dir TRT{<L>}>. A small attempt
--- was s made to improve the situation, but the problem is the 3-dir
+-- was made to improve the situation, but the problem is the 3-dir
 -- model in babel/Unicode and the 2-dir model in LuaTeX don't fit
 -- well.
 
@@ -124,24 +121,23 @@ function Babel.bidi(head, ispar, hdir)
   local has_hyperlink = false
 
   local ATDIR = Babel.attr_dir
+  local attr_d, temp
+  local locale_d
 
   local save_outer
-  local temp = node.get_attribute(head, ATDIR)
-  if temp then
-    temp = temp & 0x3
-    save_outer = (temp == 0 and 'l') or
-                 (temp == 1 and 'r') or
-                 (temp == 2 and 'al')
-  elseif ispar then            -- Or error? Shouldn't happen
-    save_outer = ('TRT' == tex.pardir) and 'r' or 'l'
-  else                         -- Or error? Shouldn't happen
-    save_outer = ('TRT' == hdir) and 'r' or 'l'
-  end
+  local locale_d = node.get_attribute(head, ATDIR)
+  if locale_d then
+    locale_d = locale_d & 0x3
+    save_outer = (locale_d == 0 and 'l') or
+                 (locale_d == 1 and 'r') or
+                 (locale_d == 2 and 'al')
+  elseif ispar then       -- Or error? Shouldn't happen
     -- when the callback is called, we are just _after_ the box,
     -- and the textdir is that of the surrounding text
-  -- if not ispar and hdir ~= tex.textdir then
-  --   save_outer = ('TRT' == hdir) and 'r' or 'l'
-  -- end
+    save_outer = ('TRT' == tex.pardir) and 'r' or 'l'
+  else                    -- Empty box
+    save_outer = ('TRT' == hdir) and 'r' or 'l'
+  end
   local outer = save_outer
   local last = outer
   -- 'al' is only taken into account in the first, current loop
@@ -151,12 +147,17 @@ function Babel.bidi(head, ispar, hdir)
 
   for item in node.traverse(head) do
 
+    -- Mask: DxxxPPTT (Done, Pardir [0-2], Textdir [0-2])
+    locale_d = node.get_attribute(item, ATDIR)
+    node.set_attribute(item, ATDIR, 0x80)
+
     -- In what follows, #node is the last (previous) node, because the
     -- current one is not added until we start processing the neutrals.
-
     -- three cases: glyph, dir, otherwise
     if glyph_not_symbol_font(item)
        or (item.id == 7 and item.subtype == 2) then
+
+      if locale_d == 0x80 then goto nextnode end
 
       local d_font = nil
       local item_r
@@ -165,6 +166,7 @@ function Babel.bidi(head, ispar, hdir)
       else
         item_r = item
       end
+
       local chardata = characters[item_r.char]
       d = chardata and chardata.d or nil
       if not d or d == 'nsm' then
@@ -182,6 +184,7 @@ function Babel.bidi(head, ispar, hdir)
       d = d or 'l'
 
       -- A short 'pause' in bidi for mapfont
+      -- %%%% TODO. move if fontmap here
       d_font = d_font or d
       d_font = (d_font == 'l' and 0) or
                (d_font == 'nsm' and 0) or
@@ -197,8 +200,7 @@ function Babel.bidi(head, ispar, hdir)
         if inmath then
           attr_d = 0
         else
-          attr_d = node.get_attribute(item, ATDIR)
-          attr_d = attr_d & 0x3
+          attr_d = locale_d & 0x3
         end
         if attr_d == 1 then
           outer_first = 'r'
@@ -226,8 +228,7 @@ function Babel.bidi(head, ispar, hdir)
 
     elseif item.id == DIR then
       d = nil
-
-      if head ~= item then new_d = true end
+      new_d = true
 
     elseif item.id == node.id'glue' and item.subtype == 13 then
       glue_d = d
@@ -292,6 +293,7 @@ function Babel.bidi(head, ispar, hdir)
 
     -- Force mathdir in math if ON (currently works as expected only
     -- with 'l')
+
     if inmath and d == 'on' then
       d = ('TRT' == tex.mathdir) and 'r' or 'l'
     end
@@ -309,7 +311,9 @@ function Babel.bidi(head, ispar, hdir)
 
     outer_first = nil
 
-  end
+    ::nextnode::
+
+  end -- for each node
 
   -- TODO -- repeated here in case EN/ET is the last node. Find a
   -- better way of doing things:
@@ -439,9 +443,7 @@ function Babel.bidi(head, ispar, hdir)
   end
 
   head = node.prev(head) or head
-
-  -------------- FIX HYPERLINKS ----------------
-
+  --- FIXES ---
   if has_hyperlink then
     local flag, linking = 0, 0
     for item in node.traverse(head) do
@@ -468,5 +470,25 @@ function Babel.bidi(head, ispar, hdir)
     end
   end
 
+  for item in node.traverse_id(10, head) do
+    local p = item
+    local flag = false
+    while p.prev and p.prev.id == 14 do
+      flag = true
+      p = p.prev
+    end
+    if flag then
+      node.insert_before(head, p, node.copy(item))
+      node.remove(head,item)
+    end
+  end
+
+  return head
+end
+function Babel.unset_atdir(head)
+  local ATDIR = Babel.attr_dir
+  for item in node.traverse(head) do
+    node.set_attribute(item, ATDIR, 0x80)
+  end
   return head
 end

@@ -4,9 +4,9 @@
 %%
 %% The original source files were:
 %%
-%% l3debug.dtx  (with options: `package')
+%% l3debug.dtx  (with options: `def')
 %% 
-%% Copyright (C) 1990-2024 The LaTeX Project
+%% Copyright (C) 1990-2025 The LaTeX Project
 %% 
 %% It may be distributed and/or modified under the conditions of
 %% the LaTeX Project Public License (LPPL), either version 1.3c of
@@ -19,7 +19,7 @@
 %% and all files in that bundle must be distributed together.
 %% 
 %% File: l3debug.dtx
-\ProvidesExplFile{l3debug.def}{2024-05-27}{}{L3 Debugging support}
+\ProvidesExplFile{l3debug.def}{2025-08-13}{}{L3 Debugging support}
 \scan_new:N \s__debug_stop
 \cs_new:Npn \__debug_use_i_delimit_by_s_stop:nw #1 #2 \s__debug_stop {#1}
 \quark_new:N \q__debug_recursion_tail
@@ -209,17 +209,17 @@
   { \g__debug_deprecation_on_tl }
 \cs_new_protected:Npn \__debug_deprecation_off:
   { \g__debug_deprecation_off_tl }
-\tl_new:N \l__debug_internal_tl
+\tl_new:N \l__debug_tmp_tl
 \tl_new:N \l__debug_tmpa_tl
 \tl_new:N \l__debug_tmpb_tl
 \cs_new_protected:Npn \__debug_generate_parameter_list:NNN #1#2#3
   {
-    \__kernel_tl_set:Nx \l__debug_internal_tl
+    \__kernel_tl_set:Nx \l__debug_tmp_tl
       { \exp_last_unbraced:Nf \use_ii:nnn \cs_split_function:N #1 }
     \__kernel_tl_set:Nx #2
-      { \exp_args:NV \__debug_build_parm_text:n \l__debug_internal_tl }
+      { \exp_args:NV \__debug_build_parm_text:n \l__debug_tmp_tl }
     \__kernel_tl_set:Nx #3
-      { \exp_args:NV \__debug_build_arg_list:n \l__debug_internal_tl }
+      { \exp_args:NV \__debug_build_arg_list:n \l__debug_tmp_tl }
   }
 \cs_new:Npn \__debug_build_parm_text:n #1
   {
@@ -702,7 +702,7 @@
     {
       \__regex_trace_push:nnN { regex } { 1 } \__regex_escape_use:nnnn
       \group_begin:
-        \__kernel_tl_set:Nx \l__regex_internal_a_tl
+        \__kernel_tl_set:Nx \l__regex_tmpa_tl
           { \__regex_trace_pop:nnN { regex } { 1 } \__regex_escape_use:nnnn }
         \use_none:nnn
     }
@@ -1007,8 +1007,8 @@
         \skip_use:N \tex_glueexpr:D
           \__kernel_chk_expr:nNnN
             {##1} \tex_glueexpr:D { } \skip_if_finite:n
-        ; \prg_return_false:
-        #1 ; \prg_return_true: \s__skip_stop
+        \__skip_sep: \prg_return_false:
+        #1 \__skip_sep: \prg_return_true: \s__skip_stop
       }
   }
 \exp_args:No \__skip_tmp:w { \tl_to_str:n { fil } }

@@ -7,7 +7,7 @@
 %% babel.dtx  (with options: `errors')
 %% 
 %%
-%% Copyright (C) 2012-2024 Javier Bezos and Johannes L. Braams.
+%% Copyright (C) 2012-2025 Javier Bezos and Johannes L. Braams.
 %% Copyright (C) 1989-2012 Johannes L. Braams and
 %%           any individual authors listed elsewhere in this file.
 %% All rights reserved.
@@ -32,7 +32,6 @@
 %% and covered by LPPL is defined by the unpacking scripts (with
 %% extension |.ins|) which are part of the distribution.
 %%
-
 \catcode`\{=1  \catcode`\}=2  \catcode`\#=6
 \catcode`\:=12 \catcode`\,=12 \catcode`\.=12 \catcode`\-=12
 \catcode`\'=12 \catcode`\(=12 \catcode`\)=12
@@ -100,19 +99,19 @@
    {This macro is available only in LuaLaTeX and XeLaTeX.}%
    {Consider switching to these engines.}
 \bbl@errmessage{only-lua}
-   {This macro is available only in LuaLaTeX.}%
+   {This macro is available only in LuaLaTeX}%
    {Consider switching to that engine.}
 \bbl@errmessage{unknown-provide-key}
    {Unknown key '#1' in \string\babelprovide}%
    {See the manual for valid keys}%
 \bbl@errmessage{unknown-mapfont}
    {Option '\bbl@KVP@mapfont' unknown for\\%
-    mapfont. Use 'direction'.}%
+    mapfont. Use 'direction'}%
    {See the manual for details.}
 \bbl@errmessage{no-ini-file}
    {There is no ini file for the requested language\\%
     (#1: \languagename). Perhaps you misspelled it or your\\%
-    installation is not complete.}%
+    installation is not complete}%
    {Fix the name or reinstall babel.}
 \bbl@errmessage{digits-is-reserved}
    {The counter name 'digits' is reserved for mapping\\%
@@ -120,7 +119,7 @@
    {Use another name.}
 \bbl@errmessage{limit-two-digits}
    {Currently two-digit years are restricted to the\\
-    range 0-9999.}%
+    range 0-9999}%
    {There is little you can do. Sorry.}
 \bbl@errmessage{alphabetic-too-large}
  {Alphabetic numeral too large (#1)}%
@@ -132,20 +131,20 @@
    {See the manual for details.}
 \bbl@errmessage{unknown-ini-field}
    {Unknown field '#1' in \string\BCPdata.\\%
-    Perhaps you misspelled it.}%
+    Perhaps you misspelled it}%
    {See the manual for details.}
 \bbl@errmessage{unknown-locale-key}
    {Unknown key for locale '#2':\\%
     #3\\%
-    \string#1 will be set to \relax}%
+    \string#1 will be set to \string\relax}%
    {Perhaps you misspelled it.}%
 \bbl@errmessage{adjust-only-vertical}
    {Currently, #1 related features can be adjusted only\\%
-    in the main vertical list.}%
+    in the main vertical list}%
    {Maybe things change in the future, but this is what it is.}
 \bbl@errmessage{layout-only-vertical}
    {Currently, layout related features can be adjusted only\\%
-    in vertical mode.}%
+    in vertical mode}%
    {Maybe things change in the future, but this is what it is.}
 \bbl@errmessage{bidi-only-lua}
    {The bidi method 'basic' is available only in\\%
@@ -175,11 +174,11 @@
    {See the manual for further info}
 \bbl@errmessage{unknown-interchar}
    {'#1' for '\languagename' cannot be enabled.\\%
-    Maybe there is a typo.}%
+    Maybe there is a typo}%
    {See the manual for further details.}
 \bbl@errmessage{unknown-interchar-b}
    {'#1' for '\languagename' cannot be disabled.\\%
-    Maybe there is a typo.}%
+    Maybe there is a typo}%
    {See the manual for further details.}
 \bbl@errmessage{charproperty-only-vertical}
    {\string\babelcharproperty\space can be used only in\\%
@@ -214,7 +213,21 @@
    {The '#1' ldf style doesn't work with #2,\\%
     but you can use the ini locale instead.\\%
     Try adding 'provide=*' to the option list. You may\\%
-    also want to set 'bidi=' to some value.}%
+    also want to set 'bidi=' to some value}%
+   {See the manual for further details.}
+\bbl@errmessage{hyphenmins-args}
+   {\string\babelhyphenmins\ accepts either the optional\\%
+    argument or the star, but not both at the same time}%
+   {See the manual for further details.}
+\bbl@errmessage{no-locale-for-meta}
+   {There isn't currently a locale for the 'lang' requested\\%
+    in the PDF metadata ('#1'). To fix it, you can\\%
+    set explicitly a similar language (using the same\\%
+    script) with the key main= when loading babel. If you\\%
+    continue, I'll fallback to the 'nil' language, with\\%
+    tag 'und' and script 'Latn', but expect a bad font\\%
+    rendering with other scripts. You may also need set\\%
+    explicitly captions and date, too}%
    {See the manual for further details.}
 \endinput
 %%

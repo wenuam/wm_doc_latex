@@ -1,4 +1,4 @@
-%% Copyright (C) 2010-2022 by Martin Scharrer <martin.scharrer@web.de>
+%% Copyright (C) 2010-2025 by Martin Scharrer <martin.scharrer@web.de>
 %% ---------------------------------------------------------------------------
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
@@ -18,8 +18,8 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{standalone}[%
-    2022/10/10
-    v1.3b
+    2025/02/22
+    v1.5a
     Class to compile TeX sub-files standalone]
 \newif\ifstandalone
 \standalonetrue
@@ -131,6 +131,7 @@
 \newif\ifsa@convert
 \newif\ifsa@float
 \newif\ifsa@math
+\newif\ifsa@convert@perpage
 \let\sa@beamertrue\standalonebeamertrue
 \let\sa@beamerfalse\standalonebeamerfalse
 \def\sa@clsoption{%
@@ -329,16 +330,16 @@
 \sa@convertoption{false}[]{%
     \sa@convertfalse
 }
+\sa@convertoption{realmainfile}[]{%
+    \RequirePackage{currfile-abspath}%
+    \getmainfile
+    \let\sa@convert@mainfile\themainfile
+}
 \sa@convertoption{png}[]{%
     \setkeys{standalone.cls/convert}{true,outext={.png}}%
 }
 \sa@clsoption{png}[]{%
     \setkeys{standalone.cls/convert}{png,#1}%
-}
-\sa@convertoption{realmainfile}[]{%
-    \RequirePackage{currfile-abspath}%
-    \getmainfile
-    \let\sa@convert@mainfile\themainfile
 }
 \sa@convertoption{jpg}[]{%
     \setkeys{standalone.cls/convert}{true,outext={.jpg}}%
@@ -347,10 +348,22 @@
     \setkeys{standalone.cls/convert}{jpg,#1}%
 }
 \sa@convertoption{gif}[]{%
-    \setkeys{standalone.cls/convert}{true,outext={.gif}}%
+    \setkeys{standalone.cls/convert}{true,imagemagick,outext={.gif}}%
 }
 \sa@clsoption{gif}[]{%
     \setkeys{standalone.cls/convert}{gif,#1}%
+}
+\sa@convertoption{svg}[]{%
+    \setkeys{standalone.cls/convert}{true,inkscape,outext={.svg}}%
+}
+\sa@clsoption{svg}[]{%
+    \setkeys{standalone.cls/convert}{svg,#1}%
+}
+\sa@convertoption{emf}[]{%
+    \setkeys{standalone.cls/convert}{true,inkscape,outext={.emf}}%
+}
+\sa@clsoption{emf}[]{%
+    \setkeys{standalone.cls/convert}{emf,#1}%
 }
 \sa@convertoption{onfailure}{%
     \begingroup
@@ -384,6 +397,9 @@
 }
 \let\sa@convert@failuremsg\ClassWarning
 \let\sa@convert@notfoundmsg\ClassWarning
+\sa@convertoption{perpage}[true]{%
+    \sa@boolean{convert@perpage}{#1}%
+}
 \sa@convertoption{defgsdevice}{%
     \sa@defgsdevice#1\relax\relax
 }
@@ -400,26 +416,56 @@
     \sa@convertvar{outext}{.svg}
 }
 \sa@convertoption{imagemagick}[]{%
-    \def\sa@convert@command{\convertexe\space -density \density\space -units PixelsPerInch \infile\space \ifx\size\empty\else -resize \size\fi\space -quality 90 \outfile}%
-    \let\sa@convert@pageoffset\m@ne
+    \def\sa@convert@command{\convertexe\space
+        -density \density\space
+        -units PixelsPerInch
+        \infile\ifsa@convert@perpage[\prevpagenum]\fi\space
+        -scene 1
+        \ifx\size\empty\else -resize \size\fi\space
+        -quality 90 \outfile}%
 }
 \sa@convertoption{ghostscript}[]{%
-    \def\sa@convert@command{\gsexe\space -dSAFER -dBATCH -dNOPAUSE -sDEVICE=\gsdevice\space -r\density\space -sOutputFile=\outfile\space \infile}%
-    \let\sa@convert@pageoffset\z@
+    \def\sa@convert@command{\gsexe\space -dSAFER -dBATCH -dNOPAUSE
+        \ifsa@convert@perpage-sPageList=\pagenum\fi\space
+        -sDEVICE=\gsdevice\space
+        -r\density\space
+        -sOutputFile=\outfile\space \infile
+    }%
 }
-\sa@convertvar{latexoptions}{ -shell-escape }
+\sa@convertoption{ghostscript32}[]{%
+    \setkeys{standalone.cls/convert}{ghostscript,gsexe=\@nameuse{sa@convert@gsexe32}}%
+}
+\sa@convertoption{ghostscript64}[]{%
+    \setkeys{standalone.cls/convert}{ghostscript,gsexe=\@nameuse{sa@convert@gsexe64}}%
+}
+\sa@convertoption{inkscape}[]{%
+    \def\sa@convert@command{\inkscapeexe\space
+        --pdf-poppler \sa@inkscape@bgcolor\space
+        --export-type="\expandafter\@gobble\outext"
+        --pdf-page=\pagenum\space
+        -o \outfile\space \infile}
+    \sa@convert@perpagetrue
+    \def\sa@multi@pagemark{\pagenum}%
+}
+\def\sa@inkscape@bgcolor{\ifx\sa@convert@bgcolor\@empty\else--actions="export-background:\sa@convert@bgcolor"\fi}
+\sa@convertvar{latexoptions}{ -shell-escape \ifx\outputdir\empty\else-output-directory \sa@convert@quote\outputdir\sa@convert@quote\fi\space}
 \sa@convertvar{subjobname}{\jobname}
 \sa@convertvar{mainfile}{\jobname}
 \sa@convertvar{quote}{}
 \let\sa@convert@quote\relax
 \sa@convertvar{size}{}
 \sa@convertvar{inname}{\subjobname}
-\sa@convertvar{infile}{\inname\inext}
+\sa@convertvar{infile}{\indir\inname\inext}
+\sa@convertvar{outputdir}{}
+\sa@convertvar{indir}{\outputdir}
+\sa@convertvar{outdir}{\outputdir}
 \sa@convertvar{outext}{.png}
 \sa@convertvar{outname}{\inname}
-\sa@convertvar{outfile}{\outname\ifsa@multi\sa@multi@pagemark\fi\outext}
-\def\sa@multi@pagemark{-\percent0d}%
+\sa@convertvar{outfile}{\outdir\outname\ifsa@multi\sa@multi@pagemark\fi\outext}
+\def\sa@multi@pagemark{-\percent0d}
+\def\sa@convert@pagenum{1}
 \sa@convertvar{density}{300}
+\sa@convertvar{bgcolor}{}
 \sa@convertvar{gsdevice}{%
     \expandafter\ifx\csname sa@gsdevice@\outext\endcsname\relax
         \expandafter\@gobble\outext
@@ -431,19 +477,19 @@
     \sa@convertvar{latex}{lualatex}
     \sa@convertvar{inext}{.pdf}
     \sa@convertvar{precommand}{}
-    \setkeys{standalone.cls/convert}{imagemagick}
+    \setkeys{standalone.cls/convert}{ghostscript}
 \else
 \ifpdf
     \sa@convertvar{latex}{pdflatex}
     \sa@convertvar{inext}{.pdf}
     \sa@convertvar{precommand}{}
-    \setkeys{standalone.cls/convert}{imagemagick}
+    \setkeys{standalone.cls/convert}{ghostscript}
 \else
 \ifxetex
     \sa@convertvar{latex}{xelatex}
     \sa@convertvar{inext}{.pdf}
     \sa@convertvar{precommand}{}
-    \setkeys{standalone.cls/convert}{imagemagick}
+    \setkeys{standalone.cls/convert}{ghostscript}
 \else
     \sa@convertvar{latex}{latex}
     \sa@convertvar{inext}{.ps}
@@ -464,13 +510,16 @@
 \fi
 \if@tempswa
     \endgroup
-    \sa@convertvar{convertexe}{imgconvert}
-    \sa@convertvar{gsexe}{gswin32c}
+    \@namedef{sa@convert@gsexe32}{gswin32c}
+    \@namedef{sa@convert@gsexe64}{gswin64c}
 \else
     \endgroup
-    \sa@convertvar{convertexe}{convert}
-    \sa@convertvar{gsexe}{gs}
+    \@namedef{sa@convert@gsexe32}{gs}
+    \@namedef{sa@convert@gsexe64}{gs}
 \fi
+\sa@convertvar{gsexe}{\@nameuse{sa@convert@gsexe64}}
+\sa@convertvar{convertexe}{magick convert}
+\sa@convertvar{inkscapeexe}{inkscape}
 \newcommand*\standaloneenv[1]{%
     \begingroup
     \edef\@tempa{\endgroup\noexpand\@for\noexpand\@tempa:=\zap@space#1 \@empty}%
@@ -743,6 +792,7 @@
         \fi
         \global\paperwidth=\wd\sa@box
         \global\paperheight=\ht\sa@box
+        \special{papersize=\the\paperwidth,\the\paperheight}
         \global\hsize=\wd\sa@box
         \global\vsize=\ht\sa@box
         \global\@colht=\ht\sa@box
@@ -754,6 +804,7 @@
     \def\sa@placebox{%
         \global\paperwidth=\wd\sa@box
         \global\paperheight=\ht\sa@box
+        \special{papersize=\the\paperwidth,\the\paperheight}
         \global\@colht=\maxdimen
         \global\@colroom=\maxdimen
         \global\hsize=\maxdimen
@@ -847,6 +898,9 @@
     \sa@convertfalse
 \fi
 \ifsa@convert
+\ifsa@multi\else
+\sa@convert@perpagefalse
+\fi
 \def\sa@convert@stop{\csname fi\endcsname\stop}%
 \begingroup
 \let\on@line\@gobble
@@ -901,7 +955,9 @@
     \fi
     \endgroup
     \@tempcnta\sa@multi@numpages\relax
-    \advance\@tempcnta\sa@convert@pageoffset\relax
+    \ifsa@convert@perpage
+    \def\sa@multi@pagemark{-\pagenum}%
+    \else
     \ifnum\@tempcnta=\z@
         \def\sa@multi@pagemark{}%
         \edef\sa@lastoutfile{\outfile}%
@@ -917,6 +973,7 @@
         \repeat
         \edef\sa@multi@pagemark{-\percent0\the\@tempcntb d}%
     \fi
+    \fi
     \if@tempswa
         \edef\infile@filemodafter{\csname pdf\ifluatex @\fi filemoddate\endcsname{\infile}}%
         \ifx\infile@filemodbefore\infile@filemodafter
@@ -928,20 +985,40 @@
 \message{Executing precommand:^^J\sa@convert@precommand^^J^^J}%
         \ShellEscape{\sa@convert@precommand}%
     \fi
+    \ifsa@convert@perpage
+      \begingroup
+      \@tempcnta\sa@multi@numpages\relax
+      \@tempcntb\z@
+      \def\pagenum{\the\@tempcntb}%
+      \loop\ifnum\@tempcntb<\@tempcnta
+        \edef\prevpagenum{\pagenum}%
+        \advance\@tempcntb\@ne
+        \sa@execute@convert@command
+        \sa@checkoutfile{\outfile}{#1}%
+      \repeat
+      \endgroup
+    \else
+      \sa@execute@convert@command
+      \sa@checkoutfile{\sa@lastoutfile}{#1}%
+    \fi
+    \@tempswafalse
+}
+\def\sa@execute@convert@command{%
 \message{Executing command:^^J\sa@convert@command^^J^^J}%
     \ShellEscape{\sa@convert@command}%
-    \@tempswafalse
-    \IfFileExists{\sa@lastoutfile}{%
-        \edef\filemodafter{\csname pdf\ifluatex @\fi filemoddate\endcsname{\sa@lastoutfile}}%
+}
+\def\sa@checkoutfile#1#2{%
+    \IfFileExists{#1}{%
+        \edef\filemodafter{\csname pdf\ifluatex @\fi filemoddate\endcsname{#1}}%
         \ifx\filemodbefore\filemodafter
             \expandafter\ifx\csname pdf\ifluatex @\fi filemoddate\endcsname\relax\else
-                \sa@convert@failuremsg{standalone}{#1}{}%
+                \sa@convert@failuremsg{standalone}{#2}{}%
             \fi
         \else
-            \typeout{Class standalone:^^JOutput written on \sa@lastoutfile.}%
+            \typeout{Class standalone:^^JOutput written on #1.}%
         \fi
     }{%
-        \sa@convert@failuremsg{standalone}{#1}{}%
+        \sa@convert@failuremsg{standalone}{#2}{}%
     }%
 }
 \let\subjobname\sa@convert@subjobname
@@ -949,14 +1026,20 @@
 \let\infile\sa@convert@infile
 \let\inext\sa@convert@inext
 \let\inname\sa@convert@inname
+\let\indir\sa@convert@indir
+\let\outdir\sa@convert@outdir
+\let\outputdir\sa@convert@outputdir
 \let\gsdevice\sa@convert@gsdevice
 \let\convertexe\sa@convert@convertexe
+\let\gsexe\sa@convert@gsexe
+\let\inkscapeexe\sa@convert@inkscapeexe
 \let\gsexe\sa@convert@gsexe
 \let\density\sa@convert@density
 \let\size\sa@convert@size
 \let\outext\sa@convert@outext
 \let\outname\sa@convert@outname
 \let\outfile\sa@convert@outfile
+\let\pagenum\sa@convert@pagenum
 \let\percent\@percentchar
 \let\quote\sa@convert@quote
 \edef\sa@shellescape{%

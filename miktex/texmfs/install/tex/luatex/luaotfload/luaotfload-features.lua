@@ -5,8 +5,8 @@
 
 assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
     name          = "luaotfload-features",
-    version       = "3.28",       --TAGVERSION
-    date          = "2024-02-14", --TAGDATE
+    version       = "3.29",       --TAGVERSION
+    date          = "2024-12-03", --TAGDATE
     description   = "luaotfload submodule / features",
     license       = "GPL v2.0",
     author        = "Hans Hagen, Khaled Hosny, Elie Roux, Philipp Gesang, Marcel Krüger",
@@ -40,7 +40,7 @@ local otf               = handlers.otf
 
 local config            = config or { luaotfload = { run = { } } }
 
-local as_script         = config.luaotfload.run.live
+local as_script         = not config.luaotfload.run.live
 local normalize
 
 if as_script then
@@ -924,6 +924,20 @@ fonts.constructors.features.otf.register {
                 tfmdata.parameters.sizepercentage = mathdata.ScriptScriptPercentScaleDown
             end
         end,
+    },
+}
+
+local function unset_designsize(tfmdata)
+    tfmdata.designsize = 0
+end
+fonts.constructors.features.otf.register {
+    name = 'no_designsize',
+    description = 'Set designsize to zero to ensure round-tripping in \\fontsize',
+    default = true,
+    manipulators = {
+        base = unset_designsize,
+        node = unset_designsize,
+        plug = unset_designsize,
     },
 }
 

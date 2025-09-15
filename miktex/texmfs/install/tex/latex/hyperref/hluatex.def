@@ -11,7 +11,7 @@
 %% 1995-2001 Sebastian Rahtz, with portions written by David Carlisle and Heiko Oberdiek
 %% 2001-2015 Heiko Oberdiek
 %% 2016-2019 Oberdiek Package Support Group
-%% 2019-2024 LaTeX Project
+%% 2019-2025 LaTeX Project
 %%      https://github.com/latex3/hyperref/issues
 %% 
 %% This file is part of the `Hyperref Bundle'.
@@ -34,10 +34,10 @@
 %% 
 %% File: hyperref.dtx
 \ProvidesFile{hluatex.def}
-  [2024-07-10 v7.01j %
+  [2025-07-12 v7.01o %
   Hyperref driver for luaTeX]
 \Hy@VersionCheck{hluatex.def}
-%% 2024-07-10 v7.01j
+%% 2025-07-12 v7.01o
 %% force unicode encoding, see issue #101
 %% code mostly copied from hxetex.def
 \HyPsd@LoadUnicode
@@ -81,8 +81,7 @@
       \the\Hy@abspage<<#1>>%
     }%
   }%
-  \RequirePackage{atveryend}[2009/12/07]%
-  \AtVeryEndDocument{%
+  \AddToHook{enddocument/afteraux}{%
     \HyPL@SetPageLabels
   }%
 \fi
@@ -926,7 +925,7 @@
       \pdfrefobj\OBJ@pdfdocencoding
       \pdfrefobj\OBJ@ZaDb
       \pdfrefobj\OBJ@Helv
-    \AtVeryEndDocument{%
+    \AddToHook{enddocument/afteraux}{%
       \immediate\pdfobj{%
         <<%
           /Fields[\HyField@afields]%

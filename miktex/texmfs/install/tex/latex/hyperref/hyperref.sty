@@ -12,7 +12,7 @@
 %% 1995-2001 Sebastian Rahtz, with portions written by David Carlisle and Heiko Oberdiek
 %% 2001-2015 Heiko Oberdiek
 %% 2016-2019 Oberdiek Package Support Group
-%% 2019-2024 LaTeX Project
+%% 2019-2025 LaTeX Project
 %%      https://github.com/latex3/hyperref/issues
 %% 
 %% This file is part of the `Hyperref Bundle'.
@@ -36,7 +36,7 @@
 %% File: hyperref.dtx
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \ProvidesPackage{hyperref}
-  [2024-07-10 v7.01j %
+  [2025-07-12 v7.01o %
   Hypertext links for LaTeX]
 \begingroup
   \@makeother\`%
@@ -105,6 +105,20 @@
   }%
 \endgroup
 \Hy@SetCatcodes
+\IfFormatAtLeastT{2025-11-01}
+ {
+   \IfDocumentMetadataT
+    {
+      \def\hyper@nopatch@counter{} % disabled since 2024-11-01 anyway
+      \def\hyper@nopatch@bib{}
+      \def\hyper@nopatch@thm{}
+      \def\hyper@nopatch@caption{}
+      \def\hyper@nopatch@footnote{}
+      \def\hyper@nopatch@sectioning{}
+      \def\hyper@nopatch@toc{}
+      \def\hyper@nopatch@longtable{}
+    }
+ }
 \RequirePackage{iftex}[2019/10/24]
 \RequirePackage{keyval}[1997/11/10]
 \RequirePackage{kvsetkeys}[2007/09/29]
@@ -2358,7 +2372,7 @@
     \ifHy@breaklinks
       \Hy@WarningNoLine{%
         You have enabled option `breaklinks'.\MessageBreak
-        But driver `\Hy@driver.def' does not suppport this.\MessageBreak
+        But driver `\Hy@driver.def' does not support this.\MessageBreak
         Expect trouble with the link areas of broken links%
       }%
     \fi
@@ -2479,7 +2493,7 @@
 \@namedef{Hy@pdfversion@1.6}{\def\Hy@pdf@majorversion{1}\def\Hy@pdf@minorversion{6}}%
 \@namedef{Hy@pdfversion@1.7}{\def\Hy@pdf@majorversion{1}\def\Hy@pdf@minorversion{7}}%
 \@namedef{Hy@pdfversion@2.0}{\def\Hy@pdf@majorversion{2}\def\Hy@pdf@minorversion{0}}%
-\def\Hy@pdf@majorversion{1}\def\Hy@pdf@minorversion{5}
+\def\Hy@pdf@majorversion{1}\def\Hy@pdf@minorversion{7}
 \let\Hy@pdfversion\Hy@pdf@minorversion
 \def\Hy@pdf@majorminor@version{\numexpr100*\Hy@pdf@majorversion+\Hy@pdf@minorversion\relax}
 \def\Hy@pdfmajorminor@version{\numexpr100*\Hy@pdfmajorversion+\Hy@pdfminorversion\relax}
@@ -2721,7 +2735,10 @@
     }%
   \fi
 }
-\let\HyOpt@CustomDriver\@empty
+\IfPDFManagementActiveTF
+ {\def\HyOpt@CustomDriver{hgeneric-testphase}}
+ {\let\HyOpt@CustomDriver\@empty}
+
 \define@key{Hyp}{customdriver}{%
   \IfFileExists{#1.def}{%
     \def\HyOpt@CustomDriver{#1}%
@@ -3799,8 +3816,17 @@
   \Hy@boolkey{pdfdisplaydoctitle}{#1}%
 }
 \define@key{Hyp}{pdfa}[true]{%
-  \Hy@boolkey{pdfa}{#1}%
+ \IfDocumentMetadataTF
+  {
+    \PackageWarning{hyperref}{%
+     \string\DocumentMetadata\space detected.\MessageBreak
+     The 'pdfa' key will be ignored.\MessageBreak
+     Please set the PDF/A standard in \string\DocumentMetadata\MessageBreak
+     with the 'pdfstandard' key.}
+  }
+  {\Hy@boolkey{pdfa}{#1}}%
 }
+
 \define@key{Hyp}{pdfnewwindow}[true]{%
   \def\Hy@temp{#1}%
   \ifx\Hy@temp\@empty
@@ -4079,6 +4105,18 @@
   \Hy@DisableOption{nolinks}%
   \Hy@DisableOption{final}%
 }
+\ExplSyntaxOn
+\IfDocumentMetadataT
+ {
+   \tl_if_empty:eTF{\GetDocumentProperties{document/pdfstandard}}
+    {
+      \Hy@pdfafalse
+    }
+    {
+      \Hy@pdfatrue
+    }
+ }
+\ExplSyntaxOff
 \Hy@DisableOption{pdfa}
 \ifHy@pdfa
   \ifnum \Hy@pdf@majorminor@version< 104
@@ -5536,13 +5574,11 @@
     \else
       \ifx\Fld@default\relax
       \else
-        \pdfstringdef\Hy@gtemp\Fld@default
-        \xdef\Fld@choices{\Fld@choices/DV(\Hy@gtemp)}%
+        \xdef\Fld@choices{\Fld@choices/DV(\Fld@default)}%
       \fi
       \ifx\Fld@value\relax
       \else
-        \pdfstringdef\Hy@gtemp\Fld@value
-        \xdef\Fld@choices{\Fld@choices/V(\Hy@gtemp)}%
+        \xdef\Fld@choices{\Fld@choices/V(\Fld@value)}%
       \fi
     \fi
   \endgroup
@@ -6234,28 +6270,27 @@
   \Hy@UseMaketitleString{title}%
   \Hy@UseMaketitleString{author}%
 }
-\RequirePackage{atbegshi}[2007/09/09]
 \let\Hy@EveryPageHook\@empty
 \let\Hy@EveryPageBoxHook\@empty
 \let\Hy@FirstPageHook\@empty
-\AtBeginShipout{%
+\AddToHook{shipout/before}{%
   \Hy@EveryPageHook
   \ifx\Hy@EveryPageBoxHook\@empty
   \else
-    \setbox\AtBeginShipoutBox=\vbox{%
+    \setbox\ShipoutBox=\vbox{%
       \offinterlineskip
       \Hy@EveryPageBoxHook
-      \box\AtBeginShipoutBox
+      \box\ShipoutBox
     }%
   \fi
 }
 \Hy@iffileloaded{hpdftex.def}{%
-  \AtBeginShipout{%
+  \AddToHook{shipout/before}{%
     \Hy@FirstPageHook
     \global\let\Hy@FirstPageHook\@empty
   }%
 }{%
-  \AtBeginShipoutFirst{%
+  \AddToHook{shipout/firstpage}{%
     \Hy@FirstPageHook
   }%
 }
@@ -6459,6 +6494,7 @@
           }
         }
       }
+     \kern0pt
      \Hy@RestoreSpaceFactor
     }
  }
@@ -6489,6 +6525,7 @@
             \__hyp_target_counter:nn {#2}{#3}
           }
         \group_end:
+        \UseTaggingSocket{recordtarget}
       }
   }
 \cs_new_protected:Npn  \__hyp_target_manual:nn #1 #2 %#1 prefix, #2 name
@@ -6521,7 +6558,7 @@
 
 \cs_new_protected:Npn \__hyp_target_counter_doc:nn #1 #2
   {
-    \bool_lazy_and:nnTF { \cs_if_free_p:c {c@#2} } { \cs_if_free_p:c {theH#2} }
+    \bool_lazy_or:nnTF { \cs_if_free_p:c {c@#2} } { \cs_if_free_p:c {theH#2} }
       {
         \PackageWarning {hyperref}{Counter~'#2'~or~the~representation~'\string\theH#2`\MessageBreak
         don't~exist.~No~target~created.}{}
@@ -6567,58 +6604,76 @@
     \fi
   \fi
 }
-\Hy@CounterExists{section}{%
-  \providecommand\theHequation{\theHsection.\arabic{equation}}%
-}
-\providecommand\theHequation{\arabic{equation}}%
-\Hy@CounterExists{part}{%
-  \providecommand\theHpart{\arabic{part}}%
-}
-\@ifundefined{thechapter}{%
-  \providecommand\theHsection    {\arabic{section}}%
-  \providecommand\theHfigure     {\arabic{figure}}%
-  \providecommand\theHtable      {\arabic{table}}%
-}{%
-  \providecommand\theHchapter    {\arabic{chapter}}%
-  \providecommand\theHfigure     {\theHchapter.\arabic{figure}}%
-  \providecommand\theHtable      {\theHchapter.\arabic{table}}%
-  \providecommand\theHsection    {\theHchapter.\arabic{section}}%
-}
-\providecommand\theHsubsection   {\theHsection.\arabic{subsection}}
-\providecommand\theHsubsubsection{\theHsubsection.\arabic{subsubsection}}
-\providecommand\theHparagraph    {\theHsubsubsection.\arabic{paragraph}}
-\providecommand\theHsubparagraph {\theHparagraph.\arabic{subparagraph}}
-\providecommand\theHtheorem      {\theHsection.\arabic{theorem}}
-\providecommand\theHthm          {\theHsection.\arabic{thm}}
+\IfFormatAtLeastTF{2024-11-01}{}
+ {
+    \Hy@CounterExists{section}{%
+      \providecommand\theHequation{\theHsection.\arabic{equation}}%
+    }
+    \providecommand\theHequation{\arabic{equation}}%
+    \Hy@CounterExists{part}{%
+      \providecommand\theHpart{\arabic{part}}%
+    }
+    \@ifundefined{thechapter}{%
+      \providecommand\theHsection    {\arabic{section}}%
+      \providecommand\theHfigure     {\arabic{figure}}%
+      \providecommand\theHtable      {\arabic{table}}%
+    }{%
+      \providecommand\theHchapter    {\arabic{chapter}}%
+      \providecommand\theHfigure     {\theHchapter.\arabic{figure}}%
+      \providecommand\theHtable      {\theHchapter.\arabic{table}}%
+      \providecommand\theHsection    {\theHchapter.\arabic{section}}%
+    }
+    \providecommand\theHsubsection   {\theHsection.\arabic{subsection}}
+    \providecommand\theHsubsubsection{\theHsubsection.\arabic{subsubsection}}
+    \providecommand\theHparagraph    {\theHsubsubsection.\arabic{paragraph}}
+    \providecommand\theHsubparagraph {\theHparagraph.\arabic{subparagraph}}
+    \providecommand\theHtheorem      {\theHsection.\arabic{theorem}}
+    \providecommand\theHthm          {\theHsection.\arabic{thm}}
+  }
 \let\H@item\item
 \newcounter{Item}
-\def\theHItem{\arabic{Item}}
+\IfFormatAtLeastTF{2024-11-01}{}
+ {\def\theHItem{\arabic{Item}}}
 \def\item{%
   \@hyper@itemfalse
   \if@nmbrlist\@hyper@itemtrue\fi
   \H@item
 }
-\providecommand\theHenumi     {\theHItem}
-\providecommand\theHenumii    {\theHItem}
-\providecommand\theHenumiii   {\theHItem}
-\providecommand\theHenumiv    {\theHItem}
-\providecommand\theHHfootnote {\arabic{Hfootnote}}
-\providecommand\theHmpfootnote{\arabic{mpfootnote}}
-\@ifundefined{theHHmpfootnote}{%
-  \let\theHHmpfootnote\theHHfootnote
-}{}
-\let\H@refstepcounter\refstepcounter
+\IfFormatAtLeastTF{2024-11-01}{}
+ {
+   \providecommand\theHenumi     {\theHItem}
+   \providecommand\theHenumii    {\theHItem}
+   \providecommand\theHenumiii   {\theHItem}
+   \providecommand\theHenumiv    {\theHItem}
+   \providecommand\theHHfootnote {\arabic{Hfootnote}}
+   \providecommand\theHmpfootnote{\arabic{mpfootnote}}
+ }
+\let\H@refstepcounter\@kernel@refstepcounter
 \edef\name@of@eq{equation}%
 \newif\if@hyper@item
 \newif\if@skiphyperref
 \@hyper@itemfalse
 \@skiphyperreffalse
 \ExplSyntaxOn
-\def\refstepcounter#1{%
-  \legacy_if:nF {Hy@pdfstring}
+\IfFormatAtLeastTF{2024-11-01}
+ {
+  \NewSocketPlug{refstepcounter}{hyperref}{\ifHy@pdfstring\else#1\fi}
+  \AssignSocketPlug{refstepcounter}{hyperref}
+  \AddToHook{package/cleveref/after}
    {
-    \H@refstepcounter{#1}%
-    \bool_lazy_and:nnT
+     \@ifpackagelater{cleveref}{2018/03/28}{}
+      {
+      \NewSocketPlug{refstepcounter}{hyperref/fixcleveref}
+       {\ifHy@pdfstring\else
+         #1%
+         {\firstaid@cref@updatelabeldata{\@currentcounter}}%
+        \fi}
+       \AssignSocketPlug{refstepcounter}{hyperref/fixcleveref}
+      }
+   }
+  \NewSocketPlug{refstepcounter/target}{hyperref}
+    {
+      \bool_lazy_and:nnT
       { \l__hyp_target_create_bool }
       { ! \legacy_if_p:n{@skiphyperref} }
       {
@@ -6629,14 +6684,40 @@
             \@hyper@itemfalse
           }
           {
-            \hyper@refstepcounter{#1}%
+            \hyper@refstepcounter{\@currentcounter}%
           }
-      }
-   }
-}
+       }
+     }
+    \AssignSocketPlug{refstepcounter/target}{hyperref}
+  }
+  {
+    \def\refstepcounter#1{%
+      \legacy_if:nF {Hy@pdfstring}
+       {
+        \H@refstepcounter{#1}%
+        \bool_lazy_and:nnT
+          { \l__hyp_target_create_bool }
+          { ! \legacy_if_p:n{@skiphyperref} }
+          {
+            \legacy_if:nTF {@hyper@item}
+              {
+                \stepcounter{Item}%
+                \hyper@refstepcounter{Item}%
+                \@hyper@itemfalse
+              }
+              {
+                \hyper@refstepcounter{#1}%
+              }
+          }
+       }
+     }
+  }
 \ExplSyntaxOff
 \let\Hy@saved@refstepcounter\refstepcounter
-\newif\ifmeasuring@\measuring@false
+\ifcsname ifmeasuring@\endcsname
+\else
+ \expandafter\newif\csname ifmeasuring@\endcsname\measuring@false
+\fi
 \newcommand\Hy@ifnotmeasuring[1]{#1}
 \AddToHook{package/amsmath/after}
  {
@@ -7033,7 +7114,16 @@
   }}}{}
 \@ifundefined{hyper@nopatch@footnote}{%
 \ifHy@hyperfootnotes
-  \newcounter{Hfootnote}%
+  \@ifundefined{theHfootnote}
+   {\newcounter{Hfootnote}}
+   {\let\H@@theHfootnote\theHfootnote
+    \let\theHfootnote\undefined
+    \newcounter{Hfootnote}
+    \let\theHfootnote\H@@theHfootnote
+   }%
+  \@ifundefined{theHHmpfootnote}{%
+   \let\theHHmpfootnote\theHHfootnote
+   }{}
   \let\H@@footnotetext\@footnotetext
   \let\H@@footnotemark\@footnotemark
   \def\@xfootnotenext[#1]{%
@@ -7299,6 +7389,7 @@
           }%
           #3%
         \fi
+        \IfFormatAtLeastTF{2024-11-01}{\UseTaggingSocket{recordtarget}}{}%
       }%
     \fi
     \par
@@ -7712,6 +7803,7 @@
     \fi
   }
 }{}
+\IfFormatAtLeastTF{2024-11-01}{\def\hyper@nopatch@counter{}}{}
 \@ifundefined{hyper@nopatch@counter}
   {
    \let\H@definecounter\@definecounter
@@ -7800,12 +7892,13 @@
 \ifHy@hyperindex
   \def\HyInd@ParenLeft{(}%
   \def\HyInd@ParenRight{)}%
-  \def\hyperindexformat#1#2{%
+  \def\hyperxindexformat#1#2{%
     \let\HyOrg@hyperpage\hyperpage
     \let\hyperpage\@firstofone
     #1{\HyOrg@hyperpage{#2}}%
     \let\hyperpage\HyOrg@hyperpage
   }%
+  \let\hyperindexformat\hyperxindexformat
   \Hy@nextfalse
   \@ifpackageloaded{multind}{\Hy@nexttrue}{}%
   \@ifpackageloaded{index}{\Hy@nexttrue}{}%
@@ -7830,7 +7923,7 @@
                 \ifx\Hy@temp@A\HyInd@ParenRight 1\fi
                 \relax
           \HyInd@org@wrindex{#1}{%
-            #2|hyperindexformat{/#3#4}%
+            #2|hyperxindexformat{/#3#4}%
           }%
         \else
           \ifx\\#4\\%
@@ -7841,7 +7934,7 @@
             \fi
           \else
             \HyInd@org@wrindex{#1}{%
-              #2|#3hyperindexformat{/#4}%
+              #2|#3hyperxindexformat{/#4}%
             }%
           \fi
         \fi
@@ -7868,7 +7961,7 @@
                 \relax
           \protected@write\@indexfile{}{%
             \string\indexentry{%
-              #1|hyperindexformat{/#2#3}%
+              #1|hyperxindexformat{/#2#3}%
             }{\thepage}%
           }%
         \else
@@ -7897,14 +7990,14 @@
           \else
             \protected@write\@indexfile{}{%
                \string\indexentry{%
-                 #1|#2hyperindexformat{/#3}%
+                 #1|#2hyperxindexformat{/#3}%
                }{\thepage}%
             }%
             \ifx\Hy@temp@A\HyInd@ParenLeft
               \HyInd@DefKey{#1}%
               \expandafter
               \gdef\csname HyInd@(\HyInd@key)\endcsname{%
-                hyperindexformat{/#3}%
+                hyperxindexformat{/#3}%
               }%
             \fi
           \fi

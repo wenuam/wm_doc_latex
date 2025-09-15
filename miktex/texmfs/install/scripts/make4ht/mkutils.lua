@@ -107,8 +107,11 @@ function parse_lg(filename, builddir)
         table.insert(outputimages,rec)
       end
       )
-      line:gsub("File: (.*)",  function(k)
-        k = dir .. k
+      line:gsub("File: (.*)",  function(x)
+        local k = dir .. x
+        if not file_exists(k) then
+          k = x
+        end
         if not usedfiles[k] then
           table.insert(outputfiles,k)
           usedfiles[k] = true
@@ -204,18 +207,18 @@ function find_directories(dirs, pos)
     path = table.concat(dirs,"/", 1,pos) .. "/"
   end
   if not lfs.chdir(path)  then -- recursion until we succesfully changed dir
-  -- or there are no elements in the dir table
-  return find_directories(dirs,pos - 1)
-elseif pos ~= #dirs then -- if we succesfully changed dir
-  -- and we have dirs to create
-  local p = {}
-  for i = pos+1, #dirs do
-    table.insert(p, dirs[i])
+    -- or there are no elements in the dir table
+    return find_directories(dirs,pos - 1)
+  elseif pos ~= #dirs then -- if we succesfully changed dir
+    -- and we have dirs to create
+    local p = {}
+    for i = pos+1, #dirs do
+      table.insert(p, dirs[i])
+    end
+    return p
+  else  -- whole path exists
+    return {}
   end
-  return p
-else  -- whole path exists
-  return {}
-end
 end
 
 function mkdirectories(dirs)
@@ -244,7 +247,8 @@ end
 
 function file_in_builddir(filename, par)
   if par.builddir and par.builddir ~= "" then
-    return par.builddir .. "/" .. filename
+    local newname = par.builddir .. "/" .. filename
+    return newname
   end
   return filename
 end

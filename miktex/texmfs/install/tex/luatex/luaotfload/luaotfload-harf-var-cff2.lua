@@ -5,8 +5,8 @@
 do
  assert(luaotfload_module, "This is a part of luaotfload and should not be loaded independently") { 
      name          = "luaotfload-harf-var-cff2",
-     version       = "3.28",       --TAGVERSION
-     date          = "2024-02-14", --TAGDATE
+     version       = "3.29",       --TAGVERSION
+     date          = "2024-12-03", --TAGDATE
      description   = "luaotfload submodule / CFF2 table processing",
      license       = "GPL v2.0",
      author        = "Marcel Krüger",
@@ -85,7 +85,7 @@ end
 
 local function do_blend(result, vstore)
   if not vstore then
-    error'blend operator only allowed in Private disctionary of variable fonts'
+    error'blend operator only allowed in Private dictionary of variable fonts'
   end
   local vsindex = (result.vsindex or 0) + 1
   local factors = vstore[vsindex]

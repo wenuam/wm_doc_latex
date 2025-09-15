@@ -7,7 +7,7 @@
 -- babel.dtx  (with options: `transforms')
 -- 
 --
--- Copyright (C) 2012-2024 Javier Bezos and Johannes L. Braams.
+-- Copyright (C) 2012-2025 Javier Bezos and Johannes L. Braams.
 -- Copyright (C) 1989-2012 Johannes L. Braams and
 --           any individual authors listed elsewhere in this file.
 -- All rights reserved.
@@ -32,27 +32,23 @@
 -- and covered by LPPL is defined by the unpacking scripts (with
 -- extension |.ins|) which are part of the distribution.
 --
-
 Babel.linebreaking.replacements = {}
 Babel.linebreaking.replacements[0] = {}  -- pre
 Babel.linebreaking.replacements[1] = {}  -- post
 
--- Discretionaries contain strings as nodes
-function Babel.str_to_nodes(fn, matches, base)
-  local n, head, last
-  if fn == nil then return nil end
-  for s in string.utfvalues(fn(matches)) do
-    if base.id == 7 then
-      base = base.replace
-    end
-    n = node.copy(base)
-    n.char    = s
-    if not head then
-      head = n
-    else
-      last.next = n
-    end
-    last = n
+function Babel.tovalue(v)
+  if type(v) == 'table' then
+    return Babel.locale_props[v[1]].vars[v[2]] or v[3]
+  else
+    return v
+  end
+end
+
+Babel.attr_hboxed = luatexbase.registernumber'bbl@attr@hboxed'
+
+function Babel.set_hboxed(head, gc)
+  for item in node.traverse(head) do
+    node.set_attribute(item, Babel.attr_hboxed, 1)
   end
   return head
 end
@@ -62,6 +58,8 @@ Babel.fetch_subtext = {}
 Babel.ignore_pre_char = function(node)
   return (node.lang == Babel.nohyphenation)
 end
+
+Babel.show_transforms = false
 
 -- Merging both functions doesn't seen feasible, because there are too
 -- many differences.
@@ -89,7 +87,11 @@ Babel.fetch_subtext[0] = function(head)
         if Babel.ignore_pre_char(item) then
           word_string = word_string .. Babel.us_char
         else
-          word_string = word_string .. unicode.utf8.char(item.char)
+          if node.has_attribute(item, Babel.attr_hboxed) then
+            word_string = word_string .. Babel.us_char
+          else
+            word_string = word_string .. unicode.utf8.char(item.char)
+          end
         end
         word_nodes[#word_nodes+1] = item
       else
@@ -97,7 +99,11 @@ Babel.fetch_subtext[0] = function(head)
       end
 
     elseif item.id == 12 and item.subtype == 13 then
-      word_string = word_string .. ' '
+      if node.has_attribute(item, Babel.attr_hboxed) then
+        word_string = word_string .. Babel.us_char
+      else
+        word_string = word_string .. ' '
+      end
       word_nodes[#word_nodes+1] = item
 
     -- Ignore leading unrecognized nodes, too.
@@ -114,6 +120,7 @@ Babel.fetch_subtext[0] = function(head)
   if word_string:sub(-1) == ' ' then
     word_string = word_string:sub(1,-2)
   end
+  if Babel.show_transforms then texio.write_nl(word_string) end
   word_string = unicode.utf8.gsub(word_string, Babel.us_char .. '+$', '')
   return word_string, word_nodes, item, lang
 end
@@ -136,21 +143,33 @@ Babel.fetch_subtext[1] = function(head)
 
     elseif item.id == 29 then
       if item.lang == lang or lang == nil then
-        if (item.char ~= 124) and (item.char ~= 61) then -- not =, not |
-          lang = lang or item.lang
+        lang = lang or item.lang
+        if node.has_attribute(item, Babel.attr_hboxed) then
+          word_string = word_string .. Babel.us_char
+        elseif (item.char == 124) or (item.char == 61) then -- not =, not |
+          word_string = word_string .. Babel.us_char
+        else
           word_string = word_string .. unicode.utf8.char(item.char)
-          word_nodes[#word_nodes+1] = item
         end
+        word_nodes[#word_nodes+1] = item
       else
         break
       end
 
     elseif item.id == 7 and item.subtype == 2 then
-      word_string = word_string .. '='
+      if node.has_attribute(item, Babel.attr_hboxed) then
+        word_string = word_string .. Babel.us_char
+      else
+        word_string = word_string .. '='
+      end
       word_nodes[#word_nodes+1] = item
 
     elseif item.id == 7 and item.subtype == 3 then
-      word_string = word_string .. '|'
+      if node.has_attribute(item, Babel.attr_hboxed) then
+        word_string = word_string .. Babel.us_char
+      else
+        word_string = word_string .. '|'
+      end
       word_nodes[#word_nodes+1] = item
 
     -- (1) Go to next word if nothing was found, and (2) implicitly
@@ -169,7 +188,7 @@ Babel.fetch_subtext[1] = function(head)
 
     item = item.next
   end
-
+  if Babel.show_transforms then texio.write_nl(word_string) end
   word_string = unicode.utf8.gsub(word_string, Babel.us_char .. '+$', '')
   return word_string, word_nodes, item, lang
 end
@@ -187,8 +206,13 @@ Babel.us_char = string.char(31)
 function Babel.hyphenate_replace(head, mode)
   local u = unicode.utf8
   local lbkr = Babel.linebreaking.replacements[mode]
+  local tovalue = Babel.tovalue
 
   local word_head = head
+
+  if Babel.show_transforms then
+    texio.write_nl('\n==== Showing ' .. (mode == 0 and 'pre' or 'post') .. 'hyphenation ====')
+  end
 
   while true do  -- for each subtext block
 
@@ -324,7 +348,11 @@ function Babel.hyphenate_replace(head, mode)
             dummy_node = nil
           end
 
-          if (not enabled) or (crep and next(crep) == nil) then -- = {}
+          if not enabled then
+            last_match = save_last
+            goto next
+
+          elseif crep and next(crep) == nil then -- = {}
             if step == 0 then
               last_match = save_last    -- Optimization
             else
@@ -390,9 +418,9 @@ function Babel.hyphenate_replace(head, mode)
             d.replace = Babel.str_to_nodes(crep.no, matches, item_base)
             d.attr = item_base.attr
             if crep.pre == nil then  -- TeXbook p96
-              d.penalty = crep.penalty or tex.hyphenpenalty
+              d.penalty = tovalue(crep.penalty) or tex.hyphenpenalty
             else
-              d.penalty = crep.penalty or tex.exhyphenpenalty
+              d.penalty = tovalue(crep.penalty) or tex.exhyphenpenalty
             end
             placeholder = '|'
             head, new = node.insert_before(head, item, d)
@@ -403,16 +431,16 @@ function Babel.hyphenate_replace(head, mode)
           elseif crep and crep.penalty then
             d = node.new(14, 0)   -- (penalty, userpenalty)
             d.attr = item_base.attr
-            d.penalty = crep.penalty
+            d.penalty = tovalue(crep.penalty)
             head, new = node.insert_before(head, item, d)
 
           elseif crep and crep.space then
             -- 655360 = 10 pt = 10 * 65536 sp
             d = node.new(12, 13)      -- (glue, spaceskip)
             local quad = font.getfont(item_base.font).size or 655360
-            node.setglue(d, crep.space[1] * quad,
-                            crep.space[2] * quad,
-                            crep.space[3] * quad)
+            node.setglue(d, tovalue(crep.space[1]) * quad,
+                            tovalue(crep.space[2]) * quad,
+                            tovalue(crep.space[3]) * quad)
             if mode == 0 then
               placeholder = ' '
             end
@@ -422,18 +450,18 @@ function Babel.hyphenate_replace(head, mode)
             -- 655360 = 10 pt = 10 * 65536 sp
             d = node.new(2, 3)      -- (rule, empty) = \no*rule
             local quad = font.getfont(item_base.font).size or 655360
-            d.width   = crep.norule[1] * quad
-            d.height  = crep.norule[2] * quad
-            d.depth   = crep.norule[3] * quad
+            d.width   = tovalue(crep.norule[1]) * quad
+            d.height  = tovalue(crep.norule[2]) * quad
+            d.depth   = tovalue(crep.norule[3]) * quad
             head, new = node.insert_before(head, item, d)
 
           elseif crep and crep.spacefactor then
             d = node.new(12, 13)      -- (glue, spaceskip)
             local base_font = font.getfont(item_base.font)
             node.setglue(d,
-              crep.spacefactor[1] * base_font.parameters['space'],
-              crep.spacefactor[2] * base_font.parameters['space_stretch'],
-              crep.spacefactor[3] * base_font.parameters['space_shrink'])
+              tovalue(crep.spacefactor[1]) * base_font.parameters['space'],
+              tovalue(crep.spacefactor[2]) * base_font.parameters['space_stretch'],
+              tovalue(crep.spacefactor[3]) * base_font.parameters['space_shrink'])
             if mode == 0 then
               placeholder = ' '
             end
@@ -446,7 +474,7 @@ function Babel.hyphenate_replace(head, mode)
             d = node.new(13, 1)      -- (kern, user)
             local quad = font.getfont(item_base.font).size or 655360
             d.attr = item_base.attr
-            d.kern = crep.kern * quad
+            d.kern = tovalue(crep.kern) * quad
             head, new = node.insert_before(head, item, d)
 
           elseif crep and crep.node then
@@ -454,7 +482,7 @@ function Babel.hyphenate_replace(head, mode)
             d.attr = item_base.attr
             head, new = node.insert_before(head, item, d)
 
-          end  -- ie replacement cases
+          end  -- i.e., replacement cases
 
           -- Shared by disc, space(factor), kern, node and penalty.
           if sc == 1 then
@@ -476,6 +504,7 @@ function Babel.hyphenate_replace(head, mode)
 
         end  -- for each replacement
 
+        if Babel.show_transforms then texio.write_nl('>  ' .. w) end
         if Babel.debug then
             print('.....', '/')
             Babel.debug_hyph(w, w_nodes, sc, first, last, last_match)
@@ -493,6 +522,8 @@ function Babel.hyphenate_replace(head, mode)
     ::next::
     word_head = nw
   end  -- for substring
+
+  if Babel.show_transforms then texio.write_nl(string.rep('-', 32) .. '\n') end
   return head
 end
 

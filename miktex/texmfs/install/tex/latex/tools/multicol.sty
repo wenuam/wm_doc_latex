@@ -12,7 +12,7 @@
 %% reports for it can be opened at https://latex-project.org/bugs/
 %% (but please observe conditions on bug reports sent to that address!)
 %% 
-%% Copyright (C) 1993-2024
+%% Copyright (C) 1993-2025
 %% The LaTeX Project and any individual authors listed elsewhere
 %% in this file.
 %% 
@@ -35,7 +35,7 @@
 %% given in the file `manifest.txt'.
 %% 
 %% Package `multicol' to use with LaTeX2e
-%% Copyright 1989-2023 Frank Mittelbach
+%% Copyright 1989-2025 Frank Mittelbach
 %%
 %%  In addition to the terms of LPPL any distributed version
 %%  (unchanged or modified) of multicol has to keep the statement
@@ -92,7 +92,7 @@
 %% not for the payment of a license fee per se (which might or might
 %% not follow from this evaluation).
 %%
-%% The license fee, if any, can be payed either to the LaTeX fund
+%% The license fee, if any, can be paid either to the LaTeX fund
 %% (see ltx3info.txt in the base LaTeX distribution) or to the author of
 %% the program who can be contacted at
 %%
@@ -102,10 +102,12 @@
 \DeclareRelease{}{1994-06-01}{multicol-2017-04-11.sty}
 \DeclareRelease{}{2017-04-11}{multicol-2017-04-11.sty}
 \DeclareRelease{v1.8}{2019-10-01}{multicol-2019-10-01.sty}
+\DeclareRelease{v1.9}{2021-11-15}{multicol-2024-05-23.sty}
 \DeclareCurrentRelease{}{2021-11-15}
 
 \ProvidesPackage{multicol}
-          [2024/05/23 v1.9h  multicolumn formatting (FMi)]
+          [2025/05/25 v2.0a  multicolumn formatting (FMi)]
+
 \DeclareOption{twocolumn}
    {\PackageWarning{multicol}{May not work
              with the twocolumn option}}
@@ -117,9 +119,13 @@
 \DeclareOption{balancingshow}
     {\c@tracingmulticols\tw@}
 \DeclareOption{markshow}
-    {\c@tracingmulticols\thr@@}
+              {\c@tracingmulticols\thr@@
+               \DebugMarksOn
+              }
 \DeclareOption{debugshow}
-    {\c@tracingmulticols5\relax}
+              {\c@tracingmulticols5\relax
+               \DebugMarksOn
+              }
 \let\mc@gridwarn\maxdimen
 \DeclareOption{grid}
     {\def\mc@gridwarn{\@maxdepth}}
@@ -224,11 +230,8 @@
   \doublecol@number\col@number
   \multiply\doublecol@number\tw@
   \advance\doublecol@number\mult@rightbox
+  \mc@prepare@mark@regions
   \if@boxedmulticols
-    \let\l@kept@firstmark\kept@firstmark
-    \let\l@kept@botmark\kept@botmark
-    \global\let\kept@firstmark\@empty
-    \global\let\kept@botmark\@empty
   \else
     \nointerlineskip {\topskip\z@\null}%
     \output{%
@@ -255,9 +258,7 @@
          \unvbox\@cclv
          \global\setbox\last@line\lastbox
         }%
-           \prep@keptmarks
-           \global\let\kept@topmark\firstmark
-          }\eject
+    }\eject
     \advance\@colroom-\ht\partial@page
     \set@mult@vsize\relax
     \output{\multi@column@out}%
@@ -311,22 +312,12 @@
     \remove@discardable@items
     \color@endgroup\egroup
     \balance@columns
-    \return@nonemptymark{first}%
-                 \kept@firstmark
-    \return@nonemptymark{bot}%
-                  \kept@botmark
     \global\setbox\mc@boxedresult\vbox{%
+      \mc@handle@marks@and@reinserts
+          {in multicol (boxed mode)}%
       \page@sofar
-      \global\let\kept@firstmark
-                 \l@kept@firstmark
-      \global\let\kept@botmark
-                 \l@kept@botmark
+      \mc@reinsert@marks
     }%
-    \mult@info\tw@
-      {Restore kept marks to\MessageBreak
-       first: \meaning\kept@firstmark
-       \MessageBreak bot\space\space:
-              \meaning\kept@botmark }%
   \else
     \ifdim\pagegoal=\maxdimen
       \ifvoid\colbreak@box\else
@@ -338,11 +329,7 @@
     \penalty-\@Mvi
     \ifvbox\partial@page
          \unvbox\partial@page\fi
-     \global\let\kept@firstmark\@empty
-     \global\let\kept@botmark\@empty
-     \mult@info\tw@
-       {Make kept marks empty}%
-  \fi
+    \fi
   \@checkend{multicols}%
   \endgroup
   \global\c@unbalance\z@
@@ -412,6 +399,7 @@
 \ifvmode\else\errmessage{Multicol Error}\fi
    \nointerlineskip
    \setbox\z@\hbox{\multicolmindepthstring}\global\dimen\tw@\dp\z@
+   \UseTaggingSocket{page@sofar}%
    \moveright\multicol@leftmargin
     \hbox to\full@width{%
        \mc@align@columns
@@ -459,16 +447,14 @@
    \process@cols\mult@firstbox{%
         \setbox\count@
             \vsplit\@cclv to\dimen@
-            \set@keptmarks
-            \setbox\count@
-                 \vbox to\dimen@
-                  {\unvbox\count@
-                   \ifshr@nking
-                    \vfilmaxdepth\fi}%
-           }%
+       \setbox\count@
+            \vbox to\dimen@
+             {\unvbox\count@
+              \ifshr@nking
+               \vfilmaxdepth\fi}%
+   }%
    \setbox\mult@rightbox
        \vsplit\@cclv to\dimen@
-   \set@keptmarks
    \setbox\mult@rightbox\vbox to\dimen@
           {\unvbox\mult@rightbox
            \ifshr@nking\vfilmaxdepth\fi}%
@@ -488,41 +474,15 @@
        \ifnum \c@tracingmulticols>\thr@@
                     \hrule\allowbreak \fi
    \fi
-   \ifx\@empty\kept@firstmark
-      \let\firstmark\kept@topmark
-      \let\botmark\kept@topmark
-   \else
-      \let\firstmark\kept@firstmark
-      \let\botmark\kept@botmark
-   \fi
-   \let\topmark\kept@topmark
-   \mult@info\tw@
-        {Use kept top mark:\MessageBreak
-          \meaning\kept@topmark
-         \MessageBreak
-         Use kept first mark:\MessageBreak
-          \meaning\kept@firstmark
-        \MessageBreak
-         Use kept bot mark:\MessageBreak
-          \meaning\kept@botmark
-        \MessageBreak
-         Produce first mark:\MessageBreak
-          \meaning\firstmark
-        \MessageBreak
-        Produce bot mark:\MessageBreak
-          \meaning\botmark
-         \@gobbletwo}%
    \boxmaxdepth\maxdimen
-   \setbox\@cclv\vbox{\unvbox\partial@page
-                      \page@sofar}%
+   \setbox\@cclv\vbox
+      {%
+        \mc@handle@col@andpage@marks
+           {in multicol OR (full page)}%
+       \unvbox\partial@page
+       \page@sofar
+       }%
    \@makecol\@outputpage
-     \global\let\kept@topmark\botmark
-     \global\let\kept@firstmark\@empty
-     \global\let\kept@botmark\@empty
-     \mult@info\tw@
-        {(Re)Init top mark:\MessageBreak
-         \meaning\kept@topmark
-         \@gobbletwo}%
    \global\@colroom\@colht
    \global \@mparbottom \z@
    \global \@textfloatsheight \z@
@@ -635,15 +595,15 @@
         \insert\@kludgeins
                {\unvbox\@kludgeins}\fi
      \unvbox\partial@page
-     \return@nonemptymark{first}%
-                         \kept@firstmark
-     \return@nonemptymark{bot}\kept@botmark
+     %    \begin{macrocode}
+     \mc@handle@marks@and@reinserts
+         {in multicol OR (balancing)}%
      \page@sofar
+     \mc@reinsert@marks
      \penalty\z@
   \fi
 }
 \def\balance@columns{%
-   \get@keptmarks\mult@box
    \setbox\mult@box\vbox{%
         \penalty-\@M
         \unvbox\mult@box
@@ -875,6 +835,7 @@
 \def\set@floatcmds{%
  \let\@dblfloat\@dbflt
  \def\end@dblfloat{\@endfloatbox
+   \UseTaggingSocket{float/end}%
    \@largefloatcheck
    \outer@nobreak
    \ifnum\@floatpenalty<\z@
@@ -882,60 +843,8 @@
    \fi
    \ifnum\@floatpenalty=-\@Mii
      \@Esphack
+     \UseTaggingSocket{float/hmode/end}%
    \fi}}
-\def\kept@topmark{{}{}}
-\let\kept@firstmark\@empty
-\let\kept@botmark\@empty
-\def\return@nonemptymark#1#2{%
-  \ifx#2\@empty
-  \else
-    \mult@info\tw@
-      {Returned #1 mark:\MessageBreak
-       \meaning#2}%
-    \toks@\expandafter{#2}%
-    \mark{\the\toks@}%
-    \nobreak
-  \fi}
-\def\get@keptmarks#1{%
-  \begingroup
-   \vbadness\@M
-   \setbox#1\copy#1%
-   \mc@get@all@box@marks #1%
-   \set@keptmarks
- \endgroup
-}
-\def\mc@get@all@box@marks #1{%
-  \setbox\@tempboxa\vsplit#1to\maxdimen
-  \ifvoid#1\else
-    \setbox#1\vbox{\unvbox\@tempboxa \unvbox#1}%
-    \mc@get@all@box@marks #1%
-  \fi
-}
-\def\set@keptmarks{%
-   \ifx\kept@firstmark\@empty
-     \expandafter\gdef\expandafter
-        \kept@firstmark
-        \expandafter{\splitfirstmark}%
-     \ifx\kept@firstmark\@empty\else
-       \mult@info\tw@
-         {Set kept first mark:\MessageBreak
-          \meaning\kept@firstmark%
-          \@gobbletwo}%
-     \fi
-   \fi
-   \expandafter\def\expandafter\@tempa
-      \expandafter{\splitbotmark}%
-   \ifx\@tempa\@empty\else
-      \global\let\kept@botmark\@tempa
-      \mult@info\tw@
-        {Set kept bot mark:\MessageBreak
-         \meaning\kept@botmark%
-         \@gobbletwo}%
-   \fi}%
-\def\prep@keptmarks{%
-   \if@boxedmulticols \else
-     \get@keptmarks\partial@page
-   \fi}
 \skip0=0pt
 \edef\the@zero@skip{\the\skip0}
 \def\remove@discardable@items{%
@@ -1139,6 +1048,102 @@
 }
 \newif\ifmc@firstcol
 \mc@firstcoltrue
+\ExplSyntaxOn
+\int_new:N \g__mc_curr_col_int
+\cs_new:Npn \__mc_debug_marks:n #1 { \__mark_debug:n {#1} }
+\cs_new_protected:Npn \__mc_update_mcol_structures: {
+  \__mc_debug_marks:n
+     { \typeout{Marks:~ update~ mcol~ structures~ (multicol)} }
+  \int_step_inline:nnn {\col@number + 1} { \g__mc_curr_col_int }
+             { \mark_set_structure_to_err:n { mcol - ##1 } }
+  \int_gset:Nn \g__mc_curr_col_int {1}
+  \process@cols\mult@firstbox
+      {
+        \mark_update_structure_from_material:nn
+             {column}
+             {\unvcopy\count@}
+        \mark_copy_structure:nn
+             {mcol - \int_use:N\g__mc_curr_col_int }
+             {column}
+        \int_gincr:N \g__mc_curr_col_int
+      }
+  \mark_update_structure_from_material:nn
+     {column}
+     {\unvcopy\mult@rightbox}
+  \mark_copy_structure:nn
+     { mcol - \int_use:N\g__mc_curr_col_int }
+     {column}
+  \mark_copy_structure:nn{first-column}{mcol-1}
+  \mark_copy_structure:nn{last-column} {column}
+}
+
+\cs_new_protected:Npn \__mc_update_page_structures: {
+  \__mc_debug_marks:n
+     {
+       \typeout{Marks:~ update~ page~ structure~ (multicol)}
+     }
+  \mark_update_structure_from_material:nn
+      {page}
+      {
+        \unvcopy\partial@page
+        \process@cols \mult@firstbox { \unvcopy\count@ }
+        \unvcopy\mult@rightbox
+      }
+}
+
+\cs_new_protected:Npn \__mc_prepare_mark_reinserts: {
+  \__mc_debug_marks:n
+     { \typeout{Marks:~ prepare~ for~ reinserting~ marks~ (multicol)} }
+  \mark_get_marks_for_reinsertion:nNN
+     {
+       \process@cols \mult@firstbox { \unvcopy\count@ }
+       \unvcopy\mult@rightbox
+     }
+     \l__mc_first_marks_tl
+     \l__mc_last_marks_tl
+}
+\tl_new:N \l__mc_first_marks_tl
+\tl_new:N \l__mc_last_marks_tl
+\cs_new_protected:Npn \mc@reinsert@marks{
+  \__mc_debug_marks:n
+     { \typeout{Marks:~ --~ reinsert~ marks~ (multicol)} }
+     \l__mc_first_marks_tl \l__mc_last_marks_tl
+  \__mc_debug_marks:n
+     { \typeout{Marks:~ --~ finished~ reinserting~ marks~ (multicol)} }
+}
+\cs_new_protected:Npn \mc@prepare@mark@regions {
+  \legacy_if:nT { @boxedmulticols }
+    { \mark_copy_structure:nn{saved-column}{column} }
+  \__mc_debug_marks:n
+     { \typeout{Marks:~ empty~ mcol~ regions~ (multicol)} }
+  \mark_clear_structure:n {column}
+}
+\cs_new_protected:Npn \mc@handle@marks@and@reinserts #1 {
+  \__mc_update_mcol_structures:
+  \__mc_debug_marks:n { \__mark_status:nn {#1} {\the\col@number} }
+  \__mc_prepare_mark_reinserts:
+  \legacy_if:nT { @boxedmulticols }
+    { \mark_copy_structure:nn {column}{saved-column} }
+}
+
+\cs_new_protected:Npn \mc@handle@col@andpage@marks #1 {
+  \__mc_update_mcol_structures:
+  \__mc_update_page_structures:
+  \__mc_debug_marks:n { \__mark_status:nn {#1} {\the\col@number} }
+}
+\cs_set:Npn \leftmark {\mark_use_last:nn{page}{2e-left}}
+\cs_set:Npn \rightmark {\mark_use_first:nn{page}{2e-right}}
+\NewSocket{tagsupport/page@sofar}{0}
+\NewSocketPlug {tagsupport/page@sofar}{default}
+  {
+    \process@cols\mult@firstbox
+        {  \tag_mc_add_missing_to_stream:Nn \count@ {multicol} }
+    \tag_mc_add_missing_to_stream:Nn \mult@rightbox {multicol}
+  }
+\sys_if_engine_luatex:TF
+  { \AssignSocketPlug{tagsupport/page@sofar}{noop} }
+  { \AssignSocketPlug{tagsupport/page@sofar}{default} }
+\ExplSyntaxOff
 \endinput
 %%
 %% End of file `multicol.sty'.

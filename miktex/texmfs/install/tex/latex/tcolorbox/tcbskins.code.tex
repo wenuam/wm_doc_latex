@@ -1,8 +1,8 @@
-%% The LaTeX package tcolorbox - version 6.3.0 (2024/07/10)
+%% The LaTeX package tcolorbox - version 6.8.0 (2025/09/09)
 %% tcbskins.code.tex: Code for colorboxes with different skins
 %%
 %% -------------------------------------------------------------------------------------------
-%% Copyright (c) 2006-2024 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
+%% Copyright (c) 2006-2025 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
 %% -------------------------------------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -17,7 +17,7 @@
 %%
 %% This work consists of all files listed in README
 %%
-\tcb@set@library@version{6.3.0}
+\tcb@set@library@version{6.8.0}
 
 \RequirePackage{tikzfill.image}
 
@@ -1151,9 +1151,9 @@
       \ifcase#6
         \tcbdimto\tcb@xshift@boxedtitle{\kvtcb@xshift@boxedtitle}%
       \or%
-        \tcbdimto\tcb@xshift@boxedtitle{\kvtcb@left@rule+\kvtcb@boxsep+\kvtcb@leftupper-\tcb@xshift@boxedtitle@delta}%
+        \tcbdimto\tcb@xshift@boxedtitle{\kvtcb@xshift@boxedtitle+\kvtcb@left@rule+\kvtcb@boxsep+\kvtcb@leftupper-\tcb@xshift@boxedtitle@delta}%
       \else%
-        \tcbdimto\tcb@xshift@boxedtitle{\tcb@xshift@boxedtitle@delta-(\kvtcb@right@rule+\kvtcb@boxsep+\kvtcb@rightupper)}%
+        \tcbdimto\tcb@xshift@boxedtitle{\kvtcb@xshift@boxedtitle+\tcb@xshift@boxedtitle@delta-(\kvtcb@right@rule+\kvtcb@boxsep+\kvtcb@rightupper)}%
       \fi%
       \def\tcb@specialgeonodes@unbroken{%
         \node[#4,name=title,at={([xshift=\tcb@xshift@boxedtitle,yshift=\kvtcb@yshift@boxedtitle]frame.#5)},
@@ -1910,10 +1910,72 @@
   hyperurl* title/.style 2 args={hyperurl* node={#1}{#2}{title}},
   beamer hidden/.style={nirvana},
   beamer alerted/.style={fuzzy halo},
-  only/.code args={<#1>#2}{\only<#1>{\tcbset{#2}}},%
-  hide/.code args={<#1>}{\only<#1>{\tcbset{beamer hidden}}},%
-  alert/.code args={<#1>}{\only<#1>{\tcbset{beamer alerted}}},%
 }
+
+\ExplSyntaxOn
+
+\tl_new:N \l__tcobox_beamer_temporal_args
+\tl_new:N \l__tcobox_beamer_alt_args
+
+\tcbset{
+  only    /.code = { \__tcobox_beamer_only:w #1 },
+  hide    /.code = { \__tcobox_beamer_hide:w #1 },
+  alert   /.code = { \__tcobox_beamer_alert:w #1 },
+  alt     /.code = { \__tcobox_beamer_alt:w #1 },
+  temporal/.code = { \__tcobox_beamer_temporal:w #1 },
+  set~alt /.code =
+    {
+      \tl_set:Nn \l__tcobox_beamer_alt_args { #1 }
+    },
+  set~alt = {}{},
+  use~alt /.code =
+    {
+      \use:e
+        {
+          \__tcobox_beamer_alt:w \exp_not:n { #1 } \exp_not:o \l__tcobox_beamer_alt_args
+        }
+    },
+  set~temporal /.code =
+    {
+      \tl_set:Nn \l__tcobox_beamer_temporal_args { #1 }
+    },
+  set~temporal = {}{}{},
+  use~temporal /.code =
+    {
+      \use:e
+        {
+          \__tcobox_beamer_temporal:w \exp_not:n { #1 } \exp_not:o \l__tcobox_beamer_temporal_args
+        }
+    },
+}
+
+\cs_new_protected:Npn \__tcobox_beamer_only:w <#1>#2
+  {
+    \only <#1> { \tcbset{#2} }
+  }
+
+\cs_new_protected:Npn \__tcobox_beamer_hide:w <#1>
+  {
+    \only <#1> { \tcbset{beamer~hidden} }
+  }
+
+\cs_new_protected:Npn \__tcobox_beamer_alert:w <#1>
+  {
+    \only <#1> { \tcbset{beamer~alerted} }
+  }
+
+\cs_new_protected:Npn \__tcobox_beamer_alt:w <#1>#2#3
+  {
+    \alt <#1> { \tcbset{#2} }{ \tcbset{#3} }
+  }
+
+\cs_new_protected:Npn \__tcobox_beamer_temporal:w <#1>#2#3#4
+  {
+    \temporal <#1> { \tcbset{#2} }{ \tcbset{#3} }{ \tcbset{#4} }
+  }
+
+\ExplSyntaxOff
+
 
 \tcbset{%
   reset@skins/.style={%

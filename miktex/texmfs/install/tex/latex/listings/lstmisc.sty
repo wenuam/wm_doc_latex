@@ -16,8 +16,8 @@
 %% Send comments and ideas on the package, error reports and additional
 %% programming languages to Jobst Hoffmann at <j.hoffmann@fh-aachen.de>.
 %%
-\def\filedate{2024/05/25}
-\def\fileversion{1.10b}
+\def\filedate{2024/09/23}
+\def\fileversion{1.10c}
 \ProvidesFile{lstmisc.sty}
              [\filedate\space\fileversion\space(Carsten Heinz)]
 \lst@CheckVersion\fileversion%
@@ -1186,14 +1186,14 @@
      right:\def\lst@PlaceNumber{\rlap{\normalfont
                 \kern\linewidth \kern\lst@numbersep
                 \lst@numberstyle{\thelstnumber}}}%
-    }{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
+    }{\PackageError{Listings}{value `#1' for keyword `numbers' not supported}\@ehc}}
+\lst@Key{stepnumber}{1}{\def\lst@stepnumber{#1\relax}}
+\lst@Key{numberfirstline}{f}[t]{\lstKV@SetIf{#1}\lst@ifnumberfirstline}
 \lst@Key{numberstyle}{}{\def\lst@numberstyle{#1}}
 \lst@Key{numbersep}{10pt}{\def\lst@numbersep{#1}}
-\lst@Key{stepnumber}{1}{\def\lst@stepnumber{#1\relax}}
-\lst@AddToHook{EmptyStyle}{\let\lst@stepnumber\@ne}
 \lst@Key{numberblanklines}{true}[t]
     {\lstKV@SetIf{#1}\lst@ifnumberblanklines}
-\lst@Key{numberfirstline}{f}[t]{\lstKV@SetIf{#1}\lst@ifnumberfirstline}
+\lst@AddToHook{EmptyStyle}{\let\lst@stepnumber\@ne}
 \gdef\lst@numberfirstlinefalse{\let\lst@ifnumberfirstline\iffalse}
 \lst@Key{firstnumber}{auto}{%
     \lstKV@SwitchCases{#1}%

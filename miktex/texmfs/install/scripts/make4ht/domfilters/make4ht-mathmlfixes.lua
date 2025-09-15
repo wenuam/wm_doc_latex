@@ -1,4 +1,7 @@
 local log = logging.new("mathmlfixes")
+
+local mathml_chardata = require "make4ht-mathml-char-def"
+
 -- <mglyph> should be inside <mi>, so we don't process it 
 -- even though it is  a token element
 local token = {"mi", "mn", "mo", "mtext", "mspace", "ms"}
@@ -465,6 +468,58 @@ local function delete_last_empty_mtr(el)
 
 end
 
+
+local function fix_mtable_hlines(mtable)
+  -- TeX4ht adds <mtr class="hline"> for hlines. we need to remove these <mtr> elements and construct 
+  -- correct "rowlines" attribute for horizontal lines
+  local hlines = {}
+  local rowlines = {}
+  local styles = {}
+  local el_name, prefix = get_element_name(mtable)
+  -- process only <mtable> elements
+  if el_name ~= "mtable" or  mtable:get_attribute("rowlines") then
+    -- if rowlines attribute is already set, we don't need to do anything
+    return
+  end
+  local mtrs = mtable:query_selector("mtr")
+  for count, mtr in ipairs(mtrs) do
+    local hline = mtr:get_attribute("class")
+    if hline and hline == "array-hline" then
+      table.insert(hlines, "hline")
+      -- we need to remove <mtr> elements that represent hlines, hlines will be displayed using the rowlines attribute
+      mtr:remove_node()
+    elseif count == #mtrs and hline == "array-row" and is_empty_row(mtr) then
+      -- ignore empty row that is inserted if \hline is at the end of the array
+      mtr:remove_node()
+    else
+      -- just keep the track of normal lines
+      table.insert(hlines, "")
+    end
+  end
+  -- now we need to construct rowlines attribute
+  for i, el in ipairs(hlines) do
+    if el == "hline" then
+      -- rowlines are used only inside the array. at the start and at the end, we need to use CSS
+      if i == 1 then
+        table.insert(styles, "border-top: 1px solid black;")
+      elseif i == #hlines then
+        table.insert(styles, "border-bottom: 1px solid black;")
+      else
+        table.insert(rowlines, "solid")
+      end
+    else
+      -- we need to detect rows that weren't separated by hlines. in that case, we need to insert none to rowlines
+      if i > 1 and i ~= #hlines then
+        if hlines[i-1] ~= "hline" then table.insert(rowlines, "none") end
+      end
+    end
+  end
+  mtable:set_attribute("rowlines", table.concat(rowlines, " "))
+  local style = mtable:get_attribute("style") or ""
+  mtable:set_attribute("style", style .. table.concat(styles, " "))
+end
+
+
 local function fix_rel_mo(el)
   -- this is necessary for LibreOffice. It has a problem with relative <mo> that are
   -- first childs in an element list. This often happens in equations, where first
@@ -487,6 +542,41 @@ local function fix_rel_mo(el)
 
 end
 
+local uchar = utf8.char
+local ucodes = utf8.codes
+
+-- current version of MathML doesn't support the mathvariant attribute, so we need to replace unicode characters with the corresponding base code for the current font style
+local function replace_characters(math, current_style)
+  -- recursively loop over all the children of the math element and replace the unicode characters with the corresponding base code for the current font style
+  for _, child in ipairs(math:get_children()) do
+    if child:is_text() then
+      local text = child:get_text()
+      local new_text = {}
+      for _ ,char in ucodes(text) do
+        -- replace the unicode characters with the corresponding base code for the current font style
+        local code = mathml_chardata[char]
+        if code then
+          local new_char = code[current_style] or char
+          table.insert(new_text, uchar(new_char))
+        else
+          table.insert(new_text, uchar(char))
+        end
+      end
+      child._text = table.concat(new_text)
+    elseif child:is_element() then
+      local current_style = child:get_attribute("mathvariant") or current_style
+      replace_characters(child, current_style)
+    end
+  end
+end
+
+local function fix_mathml_chars(el)
+  local el_name, _ = get_element_name(el)
+  if el_name == "math" then
+    replace_characters(el, "normal")
+  end
+end
+
 
 return function(dom)
   dom:traverse_elements(function(el)
@@ -497,6 +587,7 @@ return function(dom)
       fix_mo_to_mfenced(el)
       fix_rel_mo(el)
     end
+    fix_mtable_hlines(el)
     fix_radicals(el)
     fix_token_elements(el)
     fix_nested_mstyle(el)
@@ -504,6 +595,10 @@ return function(dom)
     fix_numbers(el)
     fix_operators(el)
     fix_mathvariant(el)
+    if settings.output_format ~= "odt" then
+      -- ODT needs older MathML version
+      fix_mathml_chars(el)
+    end
     fix_dcases(el)
     top_mrow(el)
     delete_last_empty_mtr(el)
